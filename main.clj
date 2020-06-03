@@ -73,3 +73,13 @@
           (fib (- n 2)))
     )
 )
+
+;; El apunte define los siguientes elementos
+(def L (conj (conj (conj () 'c) 'b) 'a))
+(def V (conj (conj (conj [] 'a) 'b) 'c))
+(def Q (conj (conj (conj clojure.lang.PersistentQueue/EMPTY 'a) 'b) 'c))
+;(seq Q) ; para verla 
+(def HS (hash-set 'a 'b 'c))
+(def SS (sorted-set 'a 'c 'b))
+(def HM (hash-map :v1 'a, :v2 'b, :v3 'c))
+(def SM (sorted-map :v1 'a, :v3 'c, :v2 'b))
