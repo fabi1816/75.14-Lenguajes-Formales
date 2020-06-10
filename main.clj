@@ -30,6 +30,20 @@
 (defn pares [L M]
   (concat (separar L) (separar M)))
 
+;; Ejer. 4
+(defn traducir-nucleotido [n]
+  (case n
+    "G" "C"
+    "C" "G"
+    "T" "A"
+    "A" "U"
+    "?"))
+
+(defn adn2arn [adn]
+  (apply str
+    (map traducir-nucleotido 
+      (map str adn))))
+
 ;; Ejer. 5
 (defn sacar [n L]
   (remove (partial = n) L))
@@ -66,4 +80,21 @@
 ; Solución del prof.
 (defn trans-prof [LL]
   (apply map list LL))
-  
+
+;; Ejer. 14
+(defn cant-nucleotidos [adn]
+  (frequencies (map str adn)))
+
+;; Ejer. 16
+; TIP: Hecho por el prof
+(defn cant-div [primos n]
+  (if (= n 2) 0 
+  (reduce + 
+    (map #(- 1 (Integer/signum (rem n %))) 
+      (take-while #(<= % (Math/sqrt n)) primos)))))
+
+; TIP: Hecho por el prof
+; Devuelve los primos menores o iguales que n 
+(defn primes [n]
+  (reduce #(if (zero? (cant-div %1 %2)) (conj %1 %2) %1) 
+    (cons [] (range 2 (inc n)))))
