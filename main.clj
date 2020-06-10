@@ -1,85 +1,69 @@
-;; Inital problems
+;; Ejercicios
 
-;; Point 1
-( defn ang-ok [ a ]
-  (and (< a 180) (> a 0))
-)
-
-( defn tercer-angulo [ a b ]
-  ( if 
-    (and (ang-ok a) (ang-ok b))
-    (- 180 (+ a b ))
-    (print "wrong!")
-  )
-)
-
-;; Point 2
-( defn segs [ d h m s]
-  (+ s 
-    (* m 60)
-    (* h 60 60)
-    (* d 24 60 60))
-)
-
-;; Point 3
-(defn sig-mul-10 [ n ]
-  ( if (neg? n)
-    (* 10
-      (quot n 10))
-    (* 10
-      (+ 1
-        (quot n 10))))
-)
-
-;; Point 5
-(defn unidad [ n ]
-  (rem n 10))
-
-(defn decena [ n ] 
-  (unidad (quot n 10)))
-
-(defn centena [ n ] 
-  (decena (quot n 10)))
-
-(defn mil [ n ] 
-  (centena (quot n 10)))
-
-(defn d-mil [ n ] 
-  (mil (quot n 10)))
-
-
-(defn capicua? [ n ]
+;; Ejer. 1
+(defn abs [n] 
   (cond
-    (< n 0) (print "Too low!")
-    (< n 10) true
-    (< n 100) (= (decena n) (unidad n))
-    (< n 1000) (= (centena n) (unidad n))
-    (< n 10000) (and 
-                  (= (mil n) (unidad n))
-                  (= (centena n) (decena n)))
-    (< n 100000) (and 
-                  (= (d-mil n) (unidad n))
-                  (= (mil n) (decena n)))
-    true (print "Too long!"))
-)
+    (neg? n) (- n)
+    true n))
 
-;; Point 8
-(defn fib [ n ]
+(defn char-2-int [c]
+  (Character/digit c 10))
+
+(defn digs [n]
+  (map char-2-int
+    (flatten 
+      (partition 1 (str (abs n))))))
+
+;; Ejer. 2
+(defn texto [x]
+  (str "Uno para " x ", uno para mi"))
+
+(defn uno 
+  ([] (texto "ti"))
+  ([& args] (map texto args)))
+
+;; Ejer. 3
+(defn separar [L]
+  (map second 
+    (partition 2 L)))
+
+(defn pares [L M]
+  (concat (separar L) (separar M)))
+
+;; Ejer. 5
+(defn sacar [n L]
+  (remove (partial = n) L))
+
+; Solución del prof.
+(defn elim [n L]
   (cond
-    (= n 0) 0
-    (= n 1) 1
-    true (+ 
-          (fib (- n 1)) 
-          (fib (- n 2)))
-    )
+    (empty? L) L    ; Está vacia
+    (coll? (first L))    ; El primer elemento es una colección
+                      (cons
+                        (elim n (first L))  ; Elimino el n de la cabeza de la coleción
+                        (elim n (rest L)))  ; Elimino el n del resto de la colección
+    (= n (first L))   (elim n (rest L))   ; Ignoro el primer elemento y elimino el n del resto de la colección
+    true              (cons (first L) (elim n (rest L)))))  ; Agrego el primer elemento al resto de la lista con el n eliminado
+
+;; Ejer. 7
+(defn mitad-idx [L]
+  (quot (count L) 2))
+
+(defn half [L]
+  (cond
+    (odd? (count L)) (nth L (mitad-idx L))
+    true (list 
+            (nth L (- (mitad-idx L) 1)) 
+            (nth L (mitad-idx L)))))
+
+;; Ejer. 13
+(defn trans [LL]
+  (list
+    (map first LL)
+    (map second LL))
 )
 
-;; El apunte define los siguientes elementos
-(def L (conj (conj (conj () 'c) 'b) 'a))
-(def V (conj (conj (conj [] 'a) 'b) 'c))
-(def Q (conj (conj (conj clojure.lang.PersistentQueue/EMPTY 'a) 'b) 'c))
-;(seq Q) ; para verla 
-(def HS (hash-set 'a 'b 'c))
-(def SS (sorted-set 'a 'c 'b))
-(def HM (hash-map :v1 'a, :v2 'b, :v3 'c))
-(def SM (sorted-map :v1 'a, :v3 'c, :v2 'b))
+; Solución del prof.
+(defn trans-prof [LL]
+  (apply map list LL))
+  
