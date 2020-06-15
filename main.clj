@@ -101,8 +101,8 @@
 
 ;;; TP - entrega 16/06/2020
 
-;; Ejer. 11
-; (trian-sup '((1 2 3) (4 5 6) (7 8 9)) )
+;; Ejer. 11 (No-recursivo)
+; (triang-sup '((1 2 3) (4 5 6) (7 8 9)) )
 ; => ((1 2 3) (0 5 6) (0 0 9))
 (defn mask [zeros ones]
   (concat (repeat zeros 0) (repeat ones 1)))
@@ -122,11 +122,9 @@
   (map * L1 L2))
 
 (defn triang-sup [M]
-  (map list-prod 
-    M 
-    (mat-mask M)))
+  (map list-prod M (mat-mask M)))
 
-;; Ejer. 12
+;; Ejer. 12 (Recursivo)
 ; (diag '((1 2 3) (4 5 6) (7 8 9)) )
 ; => ((1 0 0) (0 5 0) (0 0 9))
 (defn partial-mask [c]
