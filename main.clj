@@ -127,3 +127,19 @@
     (mat-mask M)))
 
 ;; Ejer. 12
+; (diag '((1 2 3) (4 5 6) (7 8 9)) )
+; => ((1 0 0) (0 5 0) (0 0 9))
+(defn partial-mask [c]
+  (cons 1 (repeat c 0)))
+
+(defn diag-mask [c q]
+  (cond
+    (zero? q) '()
+    true (concat (partial-mask c) (diag-mask c (dec q))) ))
+
+(defn diag-mat-mask [M]
+  (partition (count M) 
+      (diag-mask (count M) (count M))))
+
+(defn diag [M]
+  (map list-prod M (diag-mat-mask M)))
