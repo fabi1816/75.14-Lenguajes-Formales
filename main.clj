@@ -98,3 +98,32 @@
 (defn primes [n]
   (reduce #(if (zero? (cant-div %1 %2)) (conj %1 %2) %1) 
     (cons [] (range 2 (inc n)))))
+
+;;; TP - entrega 16/06/2020
+
+;; Ejer. 11
+; (trian-sup '((1 2 3) (4 5 6) (7 8 9)) )
+; => ((1 2 3) (0 5 6) (0 0 9))
+(defn mask [zeros ones]
+  (concat (repeat zeros 0) (repeat ones 1)))
+
+(defn cant-zeros [c]
+  (range c))
+
+(defn cant-ones [c]
+  (map inc (reverse (range c))))
+
+(defn mat-mask [M]
+  (map mask 
+    (cant-zeros (count M)) 
+    (cant-ones (count M))))
+
+(defn list-prod [L1 L2]
+  (map * L1 L2))
+
+(defn triang-sup [M]
+  (map list-prod 
+    M 
+    (mat-mask M)))
+
+;; Ejer. 12
