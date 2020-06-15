@@ -124,6 +124,12 @@
 (defn triang-sup [M]
   (map list-prod M (mat-mask M)))
 
+;; Ejer. 11 (Recursivo)
+;???
+
+;; Ejer. 12 (No-recursivo)
+;???
+
 ;; Ejer. 12 (Recursivo)
 ; (diag '((1 2 3) (4 5 6) (7 8 9)) )
 ; => ((1 0 0) (0 5 0) (0 0 9))
