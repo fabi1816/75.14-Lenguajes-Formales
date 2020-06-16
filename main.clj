@@ -174,3 +174,18 @@
       (build-mask-VF M)
       (build-file-index M))))
 
+;; Ejer. 25b
+(defn cant-F [L]
+  (count
+    (filter (partial = 'F) L)))
+
+(defn bool-2-VF [b]
+  (case b
+    true 'V
+    false 'F))
+
+(defn mas-V-o-F [M]
+  (bool-2-VF
+    (>
+      (reduce + (map cant-V M))    ; Cant total de V
+      (reduce + (map cant-F M))))) ; Cant total de F
