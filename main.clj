@@ -124,11 +124,6 @@
 (defn triang-sup [M]
   (map list-prod M (mat-mask M)))
 
-;; Ejer. 11 (Recursivo)
-;???
-
-;; Ejer. 12 (No-recursivo)
-;???
 
 ;; Ejer. 12 (Recursivo)
 ; (diag '((1 2 3) (4 5 6) (7 8 9)) )
@@ -147,3 +142,35 @@
 
 (defn diag [M]
   (map list-prod M (diag-mat-mask M)))
+
+;; Ejer. 20
+(defn slice [string, len]
+  (partition len 1 (map str string)))
+
+;; Ejer. 25a
+(defn cant-V [L]
+  (count
+    (filter (partial = 'V) L)))
+
+(defn max-num-V [M]
+  (reduce max (map cant-V M)))
+
+(defn mask-VF [c max-V]
+  (cond
+    (= c max-V) 1
+    true 0))
+
+(defn build-mask-VF [M]
+  (map
+    (partial mask-VF (max-num-V M))
+    (map cant-V M)))
+
+(defn build-file-index [M]
+  (map inc (range (count M))))
+
+(defn filas-max-v [M]
+  (remove zero?
+    (list-prod
+      (build-mask-VF M)
+      (build-file-index M))))
+
