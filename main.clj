@@ -189,3 +189,7 @@
     (>
       (reduce + (map cant-V M))    ; Cant total de V
       (reduce + (map cant-F M))))) ; Cant total de F
+
+;; Ejer. 28
+(defn distl [c L]
+  (map list (repeat (count L) c) L))
