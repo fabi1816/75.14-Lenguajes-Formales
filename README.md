@@ -1,3 +1,3 @@
 # 75.14-Lenguajes-Formales
 
-Este repositorio contiene el código desarrollado para la materia
+Este branch contiene el código entregado como parte de los TP practicos
