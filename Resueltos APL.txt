@@ -1,0 +1,42 @@
+# APL
+
+> Cesar Leguizamon
+> 81052
+
+5.a)	Comando: B ← 'SIC TRANSIT' , 'GLORIA MUNDI'
+	Comando: B
+	Resultado: SIC TRANSITGLORIA MUNDI
+
+5.b)	Comando: ⍴B
+	Resultado: 23
+
+5.c)	Comando: B[ 2 × ⍳3  ]
+	Resultado: I R
+
+5.d)	Comando: B[ 1 + (⍴B) - ⍳⍴B ]
+	Resultado: IDNUM AIROLGTISNART CIS
+
+7.a) 	Comando: 4 5 ⍴ V ← 2 1 3 2 4 5 6 6 2 1
+	Resultado: 2 1 3 2 4
+                   5 6 6 2 1
+                   2 1 3 2 4
+                   5 6 6 2 1
+
+7.b) 	Comando: T ← 3 3 4 ⍴ V
+	Comando: T
+	Resultado: 2 1 3 2 	3 2 4 5 	4 5 6 6
+                   4 5 6 6 	6 6 2 1 	2 1 2 1
+                   2 1 2 1 	2 1 3 2 	3 2 4 5
+
+7.c) 	Comando: ,T
+	Resultado: 2 1 3 2 4 5 6 6 2 1 2 1 3 2 4 5 6 6 2 1 2 1 3 2 4 5 6 6 2 1 2 1 3 2 4 5
+
+7.d)	Comando: ⍴T
+	Resultado: 3 3 4
+
+7.e)	Comando: ⍴,T
+	Resultado: 36
+
+12)	Comando: 2 ⊥ B
+
+16)	Comando: ( (⍴M) ⍴ 1 0 ) × M

@@ -1,0 +1,61 @@
+# Calculo lambda
+
+> Cesar Leguizamon
+> 81052
+
+3.5) ( λx.( ( λy.x y ) z ) ) ( λx.x y )
+
+Ligadas: "x" (todas), "y" (primera)
+Libres:  "z"        , "y" (ultima)
+
+Orden normal => ( λx.( ( λy.x y ) z ) ) ( λx.x y )
+			α=> ( λx.( ( λw.x w ) z ) ) ( λx.x y )
+			β=> ( λw.( λx.x y ) w ) z
+			β=> ( λx.x y ) z
+			β=> ( z y ) 
+
+O Aplicativo => ( λx.( ( λy.x y ) z ) ) ( λx.x y )
+			β=> ( λx.x z ) ( λx.x y )
+			β=> ( λx.x y ) z
+			β=> ( z y )
+
+
+3.8) ( ( λx.( λy.λz.z ) x ) ( ( λx.x x x ) ( λx.x x x ) ) ) x
+
+Ligadas: "z", "x" (todas salvo la ultima)
+Libres:       "x" (ultima)
+
+Orden normal => ( ( λx.( λy.λz.z ) x ) ( ( λx.x x x ) ( λx.x x x ) ) ) x
+			β=> ( ( λy.λz.z ) ( ( λx.x x x ) ( λx.x x x ) ) ) x
+			β=> ( λy.λz.z ) x
+			β=> ( λz.z )
+
+O Aplicativo => ( ( λx.( λy.λz.z ) x ) ( ( λx.x x x ) ( λx.x x x ) ) ) x
+			β=> ( ( λx.λz.z ) ( ( λx.x x x ) ( λx.x x x ) ) ) x
+			β=> ( ( λx.λz.z ) ( ( λx.x x x ) ( λx.x x x ) ( λx.x x x ) ) ) x
+			β=> ( ( λx.λz.z ) ( ( ( λx.x x x ) ( λx.x x x ) ( λx.x x x ) ) ( λx.x x x ) ) ) x
+			β=> ...
+
+
+4.c) S (K S) K = B
+
+S = λx.λy.λz.x z (y z)
+K = λx.λy.x
+B = λx.λy.λz.x (y z)
+
+=> S (K S) K == (λx.λy.λz.x z (y z)) ((λx.λy.x) (λx.λy.λz.x z (y z))) (λx.λy.x)
+			α=> (λx.λy.λz.x z (y z)) ((λx.λw.x) (λx.λw.λz.x z (w z))) (λx.λy.x)
+			α=> (λx.λy.λz.x z (y z)) ((λx.λw.x) (λx.λw.λv.x v (w v))) (λx.λy.x)
+			β=> (λy.λz.((λx.λw.x) (λx.λw.λv.x v (w v))) z (y z)) (λx.λy.x)
+			α=> (λy.λz.((λx.λw.x) (λx.λw.λv.x v (w v))) z (y z)) (λt.λy.t)
+			β=>  λz.((λx.λw.x) (λx.λw.λv.x v (w v))) z ((λt.λy.t) z)
+			α=>  λz.((λx.λw.x) (λx.λu.λv.x v (u v))) z ((λt.λy.t) z)
+			β=>  λz.(λw.(λx.λu.λv.x v (u v))) z ((λt.λy.t) z)
+			β=>  λz.(λx.λu.λv.x v (u v)) ((λt.λy.t) z)
+			β=>  λz.λu.λv.((λt.λy.t) z) v (u v)
+			β=>  λz.λu.λv.(λy.z) v (u v)
+			β=>  λz.λu.λv. z (u v)
+			α=>  λx.λu.λv. x (u v)
+			α=>  λx.λy.λv. x (y v)
+			α=>  λx.λy.λz. x (y z) == B
+
