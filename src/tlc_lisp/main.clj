@@ -1,10 +1,10 @@
 (ns tlc-lisp.main)    ; Namespace del interprete TLC-Lisp
 
-(declare evaluar)
-(declare aplicar)
+(declare evaluar)    ; TODO: Terminar
+(declare aplicar)    ; TODO: Terminar
 (declare controlar-aridad)
 (declare igual?)
-(declare cargar-arch)
+(declare cargar-arch)    ; Done!
 (declare imprimir)
 (declare actualizar-amb)
 (declare revisar-f)
@@ -35,7 +35,10 @@
 	            (if (nil? (fnext res))
 				    true
 					(do (imprimir (first res)) (repl (fnext res)))))
-           (catch Exception e (println) (print "*error* ") (println (get (Throwable->map e) :cause)) (repl amb))))
+           (catch Exception e
+             (println) (print "*error* ") 
+             (println (get (Throwable->map e) :cause)) 
+             (repl amb))))
 )
 
 ; Carga el contenido de un archivo.
@@ -47,15 +50,15 @@
   ([amb-global amb-local arch]
     (let [nomb (first (evaluar arch amb-global amb-local))]
       (if (and (seq? nomb) (igual? (first nomb) '*error*))
-	    (do (imprimir nomb) amb-global) 
-        (let [nm (clojure.string/lower-case (str nomb)),
-              nom (if (and (> (count nm) 4)(clojure.string/ends-with? nm ".lsp")) nm (str nm ".lsp")),
+        (do (imprimir nomb) amb-global)
+        (let [nm (clojure.string/lower-case (str nomb))
+              nom (if (and (> (count nm) 4) (clojure.string/ends-with? nm ".lsp")) nm (str nm ".lsp"))
               ret (try (with-open [in (java.io.PushbackReader. (clojure.java.io/reader nom))]
-                             (binding [*read-eval* false] (try (let [res (evaluar (read in) amb-global nil)]
-							                                        (cargar-arch (fnext res) nil in res))
-	                                                           (catch Exception e (imprimir nil) amb-global))))
-			  	       (catch java.io.FileNotFoundException e (imprimir (list '*error* 'file-open-error 'file-not-found nom '1 'READ)) amb-global))]
-  		     ret))))
+                         (binding [*read-eval* false] (try (let [res (evaluar (read in) amb-global nil)]
+                                                             (cargar-arch (fnext res) nil in res))
+                                                           (catch Exception e (imprimir nil) amb-global))))
+                       (catch java.io.FileNotFoundException e (imprimir (list '*error* 'file-open-error 'file-not-found nom '1 'READ)) amb-global))]
+          ret))))
   ([amb-global amb-local in res]
     (try (let [res (evaluar (read in) amb-global nil)] (cargar-arch (fnext res) nil in res))
          (catch Exception e (imprimir (first res)) amb-global)))
@@ -141,5 +144,55 @@
 ; Falta terminar de implementar las 2 funciones anteriores (aplicar y evaluar)
 
 ; Falta implementar las 9 funciones auxiliares (actualizar-amb, controlar-aridad, imprimir, buscar, etc.)
+; Controla la aridad (cantidad de argumentos de una funcion).
+; Recibe una lista y un numero. Si la longitud de la lista coincide con el numero, retorna el numero.
+; Si es menor, retorna (list '*error* 'too-few-args).
+; Si es mayor, retorna (list '*error* 'too-many-args).
+(defn controlar-aridad [lis val-esperado] ...)
+
+; Compara la igualdad de dos simbolos.
+; Recibe dos simbolos a y b. Retorna true si se deben considerar iguales; si no, false.
+; Se utiliza porque TLC-LISP no es case-sensitive y ademas no distingue entre nil y la lista vacia.
+(defn igual? [a b] ...)
+
+; Imprime, con salto de linea, atomos o listas en formato estandar (las cadenas con comillas) y devuelve su valor. Muestra errores sin parentesis
+; Aridad 1: Si recibe un escalar, lo imprime con salto de linea en formato estandar (pero si es \space no lo imprime), purga la salida y devuelve el escalar.
+; Si recibe una secuencia cuyo primer elemento es '*error*, se llama recursivamente con dos argumentos iguales: la secuencia recibida
+; Si no, imprime lo recibido con salto de linea en formato estandar, purga la salida y devuelve la cadena.
+; Aridad 2: Si el primer parametro es nil, imprime un salto de linea, purga la salida y devuelve el segundo parametro.
+; Si no, imprime su primer elemento en formato estandar, imprime un espacio y se llama recursivamente con la cola del primer parametro y el segundo intacto.
+(defn imprimir
+  ([elem] ...)
+  ([lis orig] ...))
+
+; Actualiza un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...]
+; Recibe el ambiente, la clave y el valor.
+; Si el valor no es escalar y en su primera posicion contiene '*error*, retorna el ambiente intacto.
+; Si no, coloca la clave y el valor en el ambiente (puede ser un alta o una actualizacion) y lo retorna.
+(defn actualizar-amb [amb-global clave valor] ...)
+
+; Revisa una lista que representa una funcion.
+; Recibe la lista y, si esta comienza con '*error*, la retorna. Si no, retorna nil.
+(defn revisar-f [lis] ...)
+
+; Revisa una lista de argumentos evaluados.
+; Recibe la lista y, si esta contiene alguna sublista que comienza con '*error*, retorna esa sublista. Si no, retorna nil.
+(defn revisar-lae [lis] ...)
+
+; Busca una clave en un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...] y retorna el valor asociado
+; Si no la encuentra, retorna una lista con '*error* en la 1ra. pos., 'unbound-symbol en la 2da. y el elemento en la 3ra
+(defn buscar [elem lis] ...)
+
+; Evalua el cuerpo de una macro COND. Siempre retorna una lista con un resultado y un ambiente.
+; Recibe una lista de sublistas (cada una de las cuales tiene una condicion en su 1ra. posicion) y los ambientes global y local
+; Si la lista es nil, el resultado es nil y el ambiente retornado es el global.
+; Si no, evalua (con evaluar) la cabeza de la 1ra. sublista y, si el resultado no es nil, retorna el res. de invocar a evaluar-secuencia-en-cond con la cola de esa sublista
+; En caso contrario, sigue con las demas sublistas.
+(defn evaluar-cond [lis amb-global amb-local] ...)
+
+; Evalua (con evaluar) secuencialmente las sublistas de una lista y retorna el valor de la ultima evaluacion.
+(defn evaluar-secuencia-en-cond [lis amb-global amd-local] ...)
+
+; Al terminar de cargar el archivo, se retorna true.
 
 ; Falta hacer que la carga del interprete en Clojure (tlc-lisp.clj) retorne true 
