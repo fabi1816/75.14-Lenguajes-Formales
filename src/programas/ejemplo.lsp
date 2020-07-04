@@ -1,5 +1,5 @@
 ;;; TLC-LISP
-;;; Archivo con ejemplos
+;;; Archivo con ejemplos ejecutables
 
 (de sumar (a b) (+ a b))
 

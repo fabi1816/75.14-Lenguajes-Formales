@@ -5,18 +5,27 @@
     (prin3 "Ingrese el estado inicial: ") (setq inicial (read))
     (prin3 "Ingrese el estado final: ") (setq final (read))
     (cond 
-        ((equal inicial final) (prin3 "El problema ya esta resuelto !!!") (terpri) (breadth (t (buscar bc final (list (list inicial)) nil))))
+        ((equal inicial final) 
+            (prin3 "El problema ya esta resuelto !!!") (terpri) (breadth-first bc)) 
+        (t 
+            (buscar bc final (list (list inicial)) nil))))
 
 (de buscar (bc fin grafobusq estexp)
     (cond 
         ((null grafobusq) (fracaso))
         ((pertenece fin (first grafobusq)) (exito grafobusq))
-        (t (buscar bc fin (append (rest grafobusq) (expandir (first grafobusq) bc estexp)) (if (pertenece (first (first grafobusq)) estexp) estexp (cons (first (first grafobusq)) estexp))))))
+        (t (buscar bc fin 
+                (append (rest grafobusq) (expandir (first grafobusq) bc estexp)) 
+                (if (pertenece (first (first grafobusq)) estexp) 
+                    estexp 
+                    (cons (first (first grafobusq)) estexp))))))
 
 (de expandir (linea basecon estexp)
     (if (or (null basecon) (pertenece (first linea) estexp)) 
         nil
-        (if (not (equal ((eval (first basecon)) (first linea)) (first linea))) (cons (cons ((eval (first basecon)) (first linea)) linea) (expandir linea (rest basecon) estexp)) (expandir linea (rest basecon) estexp))))
+        (if (not (equal ((eval (first basecon)) (first linea)) (first linea))) 
+            (cons (cons ((eval (first basecon)) (first linea)) linea) (expandir linea (rest basecon) estexp)) 
+            (expandir linea (rest basecon) estexp))))
 
 (de pertenece (x lista)
     (cond 
