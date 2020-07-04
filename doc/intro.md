@@ -1,4 +1,4 @@
-# Introducción to TLP-Lisp
+# Introducción a TLP-Lisp
 
 TLC-LISP es un dialecto extinto de LISP. Fue lanzado en la década de 1980
 Fue utilizado en el campo de la inteligencia artificial
