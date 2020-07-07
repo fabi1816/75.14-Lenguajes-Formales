@@ -1,10 +1,10 @@
 (ns tlc-lisp.main    ; Namespace del interprete TLC-Lisp
-  (:require [clojure.string :refer :all]
-            [clojure.java.io :refer :all]))
+  (:require [clojure.string :refer [ends-with? lower-case]]
+            [clojure.java.io :refer [reader]]))
 
 (declare evaluar)    ; TODO: Terminar
 (declare aplicar)    ; TODO: Terminar
-(declare controlar-aridad)
+(declare controlar-aridad)    ; Done!
 (declare igual?)
 (declare cargar-arch)    ; Done!
 (declare imprimir)
@@ -174,12 +174,19 @@
 
 ; Falta terminar de implementar las 2 funciones anteriores (aplicar y evaluar)
 
-; Falta implementar las 9 funciones auxiliares (actualizar-amb, controlar-aridad, imprimir, buscar, etc.)
+
 ; Controla la aridad (cantidad de argumentos de una funcion).
 ; Recibe una lista y un numero. Si la longitud de la lista coincide con el numero, retorna el numero.
 ; Si es menor, retorna (list '*error* 'too-few-args).
 ; Si es mayor, retorna (list '*error* 'too-many-args).
-(defn controlar-aridad [lis val-esperado] "TODO: ...")
+(defn controlar-aridad 
+  "Devuelve la aridad de la lista si es la esperada
+   Si no devuelve una lista con un mensaje de error"
+  [lis val-esperado] (cond
+                       (= val-esperado (count lis)) val-esperado
+                       (> val-esperado (count lis)) (list '*error* 'too-few-args)
+                       (< val-esperado (count lis)) (list '*error* 'too-many-args)))
+
 
 ; Compara la igualdad de dos simbolos.
 ; Recibe dos simbolos a y b. Retorna true si se deben considerar iguales; si no, false.
