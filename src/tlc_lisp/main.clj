@@ -2,24 +2,24 @@
   (:require [clojure.string :refer [ends-with? lower-case]]
             [clojure.java.io :refer [reader]]))
 
-(declare evaluar)    ; TODO: Terminar
+(declare buscar)
+(declare igual?)    ; Done!
 (declare aplicar)    ; TODO: Terminar
-(declare controlar-aridad)    ; Done!
-(declare igual?)
-(declare cargar-arch)    ; Done!
+(declare evaluar)    ; TODO: Terminar
 (declare imprimir)
-(declare actualizar-amb)
 (declare revisar-f)
 (declare revisar-lae)
-(declare buscar)
+(declare cargar-arch)    ; Done!
 (declare evaluar-cond)
+(declare actualizar-amb)
+(declare controlar-aridad)    ; Done!
 (declare evaluar-secuencia-en-cond)
 
-;; Funciones auxiliares
+;; Funciones auxiliares al final del archivo
 (declare es-error?)
-(declare es-nombre-archivo-valido?)
 (declare cargar-input)
 (declare is-non-nil-empty-list?)
+(declare es-nombre-archivo-valido?)
 
 
 ; REPL (read–eval–print loop).
@@ -87,22 +87,6 @@
          (catch Exception e
            (imprimir (first res)) amb-global))))
 
-;; Funciones auxiliares
-(defn es-error?
-  "Es una secuencia cuyo primer elemento es '*error*'?"
-  [elem] (and (seq? elem) (igual? (first elem) '*error*)))
-
-(defn es-nombre-archivo-valido?
-  "Checkquea que el string sea un nombre de archivo .lsp valido"
-  [nombre] (and (> (count nombre) 4) (ends-with? nombre ".lsp")))
-
-(defn cargar-input
-  "Carga y evalua uno a uno todo el contenido del input"
-  [input amb-global] (try
-                       (let [res (evaluar (read input) amb-global nil)]
-                         (cargar-arch (second res) nil input res))
-                       (catch Exception e
-                         (imprimir nil) amb-global)))
 
 ; Evalua una expresion usando los ambientes global y local.
 ;  Siempre retorna una lista con un resultado y un ambiente.
@@ -308,6 +292,26 @@
 ; Falta hacer que la carga del interprete en Clojure (tlc-lisp.clj) retorne true
 
 ;; Funciones auxiliares
+
+(defn es-error?
+  "Es una secuencia cuyo primer elemento es '*error*'?"
+  [elem] (and (seq? elem) (igual? (first elem) '*error*)))
+
+
+(defn es-nombre-archivo-valido?
+  "Checkquea que el string sea un nombre de archivo .lsp valido"
+  [nombre] (and (> (count nombre) 4) (ends-with? nombre ".lsp")))
+
+
+(defn cargar-input
+  "Carga y evalua uno a uno todo el contenido del input"
+  [input amb-global] (try
+                       (let [res (evaluar (read input) amb-global nil)]
+                         (cargar-arch (second res) nil input res))
+                       (catch Exception e
+                         (imprimir nil) amb-global)))
+
+
 (defn is-non-nil-empty-list?
   "Checks that the parameter is an empty list and that it is not nil"
   [l] (and (list? l) (empty? l)))
