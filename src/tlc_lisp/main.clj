@@ -1,4 +1,6 @@
-(ns tlc-lisp.main)    ; Namespace del interprete TLC-Lisp
+(ns tlc-lisp.main    ; Namespace del interprete TLC-Lisp
+  (:require [clojure.string :refer :all]
+            [clojure.java.io :refer :all]))
 
 (declare evaluar)    ; TODO: Terminar
 (declare aplicar)    ; TODO: Terminar
@@ -12,6 +14,11 @@
 (declare buscar)
 (declare evaluar-cond)
 (declare evaluar-secuencia-en-cond)
+
+;; Utils
+(declare es-error?)
+(declare es-nombre-archivo-valido?)
+(declare cargar-input)
 
 
 ; REPL (read–eval–print loop).
@@ -37,12 +44,12 @@
         (let [res (evaluar (read) amb nil)]    ; Bindea `res` al resultado de `evaluar`
           (if (nil? (second res))              ; Chequea si la segunda posicion de `res` es `nil`
             true
-            (do (imprimir (first res)) (repl (second res)))))
+            (do (imprimir (first res))         ; Imprime el primer elemento del resultado 
+                (repl (second res)))))         ; Se llama a si mismo con el resto del resultado
         (catch Exception e
           (println) (print "*error* ")
           (println (get (Throwable->map e) :cause))
-          (repl amb))))
-)
+          (repl amb)))))
 
 ; Carga el contenido de un archivo.
 ; Aridad 3: Recibe los ambientes global y local y el nombre de un archivo
@@ -50,22 +57,43 @@
 ; y lee un elemento de la entrada (si falla, imprime nil), lo evalua y llama recursivamente con el (nuevo?) amb., nil, la entrada y un arg. mas: el resultado de la evaluacion.
 ; Aridad 4: lee un elem. del archivo (si falla, imprime el ultimo resultado), lo evalua y llama recursivamente con el (nuevo?) amb., nil, la entrada y el resultado de la eval.
 (defn cargar-arch
+  "Carga el contenido de un archivo"
   ([amb-global amb-local arch]
     (let [nomb (first (evaluar arch amb-global amb-local))]
-      (if (and (seq? nomb) (igual? (first nomb) '*error*))
-        (do (imprimir nomb) amb-global)
-        (let [nm (clojure.string/lower-case (str nomb))
-              nom (if (and (> (count nm) 4) (clojure.string/ends-with? nm ".lsp")) nm (str nm ".lsp"))
-              ret (try (with-open [in (java.io.PushbackReader. (clojure.java.io/reader nom))]
-                         (binding [*read-eval* false] (try (let [res (evaluar (read in) amb-global nil)]
-                                                             (cargar-arch (fnext res) nil in res))
-                                                           (catch Exception e (imprimir nil) amb-global))))
-                       (catch java.io.FileNotFoundException e (imprimir (list '*error* 'file-open-error 'file-not-found nom '1 'READ)) amb-global))]
+      (if (es-error? nomb)
+        (do (imprimir nomb) amb-global)    ; Mostrar el error
+        (let [nm (lower-case (str nomb))
+              nom (if (es-nombre-archivo-valido? nm) 
+                    nm 
+                    (str nm ".lsp"))       ; Si no es un nombre de archivo valido le agrega '.lsp' al final
+              ret (try (with-open [in (java.io.PushbackReader. (reader nom))]
+                         (binding [*read-eval* false]
+                           (cargar-input in amb-global)))
+                       (catch java.io.FileNotFoundException e
+                         (imprimir (list '*error* 'file-open-error 'file-not-found nom '1 'READ)) amb-global))]
           ret))))
   ([amb-global amb-local in res]
-    (try (let [res (evaluar (read in) amb-global nil)] (cargar-arch (fnext res) nil in res))
-         (catch Exception e (imprimir (first res)) amb-global)))
-)
+    (try (let [res (evaluar (read in) amb-global nil)]    ; Identico a cargar-input pero maneja la excapción diferente
+           (cargar-arch (second res) nil in res))
+         (catch Exception e
+           (imprimir (first res)) amb-global))))
+
+;; Utils
+(defn es-error?
+  "Es una secuencia cuyo primer elemento es '*error*'?"
+  [elem] (and (seq? elem) (igual? (first elem) '*error*)))
+
+(defn es-nombre-archivo-valido?
+  "Checkquea que el string sea un nombre de archivo .lsp valido"
+  [nombre] (and (> (count nombre) 4) (ends-with? nombre ".lsp")))
+
+(defn cargar-input
+  "Carga y evalua uno a uno todo el contenido del input"
+  [input amb-global] (try
+                       (let [res (evaluar (read input) amb-global nil)]
+                         (cargar-arch (second res) nil input res))
+                       (catch Exception e
+                         (imprimir nil) amb-global)))
 
 ; Evalua una expresion usando los ambientes global y local. Siempre retorna una lista con un resultado y un ambiente.
 ; Si la evaluacion falla, el resultado es una lista con '*error* como primer elemento, por ejemplo: (list '*error* 'too-many-args) y el ambiente es el ambiente global.
@@ -165,6 +193,8 @@
 ; Aridad 2: Si el primer parametro es nil, imprime un salto de linea, purga la salida y devuelve el segundo parametro.
 ; Si no, imprime su primer elemento en formato estandar, imprime un espacio y se llama recursivamente con la cola del primer parametro y el segundo intacto.
 (defn imprimir
+  "Imprime con un salto de linea lo recibido devolviendo el mismo valor,
+   Muestra los errores."
   ([elem] "TODO...")
   ([lis orig] "TODO..."))
 
