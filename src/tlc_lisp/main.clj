@@ -15,7 +15,7 @@
 (declare evaluar-cond)
 (declare evaluar-secuencia-en-cond)
 
-;; Utils
+;; Funciones auxiliares
 (declare es-error?)
 (declare es-nombre-archivo-valido?)
 (declare cargar-input)
@@ -78,7 +78,7 @@
          (catch Exception e
            (imprimir (first res)) amb-global))))
 
-;; Utils
+;; Funciones auxiliares
 (defn es-error?
   "Es una secuencia cuyo primer elemento es '*error*'?"
   [elem] (and (seq? elem) (igual? (first elem) '*error*)))
