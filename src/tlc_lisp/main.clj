@@ -22,10 +22,13 @@
 
 
 ; REPL (read–eval–print loop).
-; Aridad 0: Muestra mensaje de bienvenida y se llama recursivamente con el ambiente inicial.
+; Aridad 0: Muestra mensaje de bienvenida y se llama recursivamente con
+;  el ambiente inicial.
 ; Aridad 1: Muestra >>> y lee una expresion y la evalua.
-; Si la 2da. posicion del resultado es nil, retorna true (caso base de la recursividad).
-; Si no, imprime la 1ra. pos. del resultado y se llama recursivamente con la 2da. pos. del resultado. 
+; Si la 2da. posicion del resultado es nil, retorna true (caso base de la
+;  recursividad).
+; Si no, imprime la 1ra. pos. del resultado y se llama recursivamente con
+;  la 2da. pos. del resultado. 
 (defn repl
   "Inicia el REPL de TLC-Lisp"
    ([]
@@ -53,9 +56,14 @@
 
 ; Carga el contenido de un archivo.
 ; Aridad 3: Recibe los ambientes global y local y el nombre de un archivo
-; (literal como string o atomo, con o sin extension .lsp, o el simbolo ligado al nombre de un archivo en el ambiente), abre el archivo 
-; y lee un elemento de la entrada (si falla, imprime nil), lo evalua y llama recursivamente con el (nuevo?) amb., nil, la entrada y un arg. mas: el resultado de la evaluacion.
-; Aridad 4: lee un elem. del archivo (si falla, imprime el ultimo resultado), lo evalua y llama recursivamente con el (nuevo?) amb., nil, la entrada y el resultado de la eval.
+; (literal como string o atomo, con o sin extension .lsp, o el simbolo ligado
+;  al nombre de un archivo en el ambiente), abre el archivo 
+; y lee un elemento de la entrada (si falla, imprime nil), lo evalua y llama
+;  recursivamente con el (nuevo?) amb., nil, la entrada y un arg. mas: el
+;  resultado de la evaluacion.
+; Aridad 4: lee un elem. del archivo (si falla, imprime el ultimo resultado),
+;  lo evalua y llama recursivamente con el (nuevo?) amb., nil, la entrada y
+;  el resultado de la eval.
 (defn cargar-arch
   "Carga el contenido de un archivo"
   ([amb-global amb-local arch]
@@ -95,15 +103,24 @@
                        (catch Exception e
                          (imprimir nil) amb-global)))
 
-; Evalua una expresion usando los ambientes global y local. Siempre retorna una lista con un resultado y un ambiente.
-; Si la evaluacion falla, el resultado es una lista con '*error* como primer elemento, por ejemplo: (list '*error* 'too-many-args) y el ambiente es el ambiente global.
-; Si la expresion es un escalar numero o cadena, retorna la expresion y el ambiente global.
-; Si la expresion es otro tipo de escalar, la busca (en los ambientes local y global) y retorna el valor y el ambiente global.
+; Evalua una expresion usando los ambientes global y local.
+;  Siempre retorna una lista con un resultado y un ambiente.
+; Si la evaluacion falla, el resultado es una lista con '*error* como primer
+;  elemento, por ejemplo: (list '*error* 'too-many-args) y el ambiente es el 
+;  ambiente global.
+; Si la expresion es un escalar numero o cadena, retorna la expresion y el
+;  ambiente global.
+; Si la expresion es otro tipo de escalar, la busca (en los ambientes local y
+;  global) y retorna el valor y el ambiente global.
 ; Si la expresion es una secuencia nula, retorna nil y el ambiente global.
-; Si el primer elemento de la expresion es '*error*, retorna la expresion y el ambiente global.
-; Si el primer elemento de la expresion es una forma especial o una macro, valida los demas elementos y retorna el resultado y el (nuevo?) ambiente.
-; Si no lo es, se trata de una funcion en posicion de operador (es una aplicacion de calculo lambda), por lo que se llama a la funcion aplicar,
-; pasandole 4 argumentos: la evaluacion del primer elemento, una lista con las evaluaciones de los demas, el ambiente global y el ambiente local. 
+; Si el primer elemento de la expresion es '*error*, retorna la expresion y el
+;  ambiente global.
+; Si el primer elemento de la expresion es una forma especial o una macro,
+;  valida los demas elementos y retorna el resultado y el (nuevo?) ambiente.
+; Si no lo es, se trata de una funcion en posicion de operador (es una
+;  aplicacion de calculo lambda), por lo que se llama a la funcion aplicar,
+; pasandole 4 argumentos: la evaluacion del primer elemento, una lista con las
+;  evaluaciones de los demas, el ambiente global y el ambiente local. 
 (defn evaluar [expre amb-global amb-local]
 	(if (not (seq? expre))
 		(if (or (number? expre) (string? expre)) (list expre amb-global) (list (buscar expre (concat amb-local amb-global)) amb-global))
@@ -130,16 +147,30 @@
 			  true (aplicar (first (evaluar (first expre) amb-global amb-local)) (map (fn [x] (first (evaluar x amb-global amb-local))) (next expre)) amb-global amb-local)))
 )
 
-; Aplica una funcion a una lista de argumentos evaluados, usando los ambientes global y local. Siempre retorna una lista con un resultado y un ambiente.
-; Si la aplicacion falla, el resultado es una lista con '*error* como primer elemento, por ejemplo: (list '*error* 'arg-wrong-type) y el ambiente es el ambiente global.
-; Aridad 4: Recibe la func., la lista de args. evaluados y los ambs. global y local. Se llama recursivamente agregando 2 args.: la func. revisada y la lista de args. revisada.
+; Aplica una funcion a una lista de argumentos evaluados, usando los ambientes
+;  global y local. Siempre retorna una lista con un resultado y un ambiente.
+; Si la aplicacion falla, el resultado es una lista con '*error* como primer
+;  elemento, por ejemplo: (list '*error* 'arg-wrong-type) y el ambiente es el 
+;  ambiente global.
+; Aridad 4: Recibe la func., la lista de args. evaluados y los ambs. global y
+;  local. Se llama recursivamente agregando 2 args.: la func. revisada y la 
+;  lista de args. revisada.
 ; Aridad 6: Si la funcion revisada no es nil, se la retorna con el amb. global.
-; Si la lista de args. evaluados revisada no es nil, se la retorna con el amb. global.
-; Si no, en caso de que la func. sea escalar (predefinida o definida por el usuario), se devuelven el resultado de su aplicacion (controlando la aridad) y el ambiente global.
-; Si la func. no es escalar, se valida que la cantidad de parametros y argumentos coincidan, y:
-; en caso de que se trate de una func. lambda con un solo cuerpo, se la evalua usando el amb. global intacto y el local actualizado con los params. ligados a los args.,  
-; en caso de haber multiples cuerpos, se llama a aplicar recursivamente, pasando la funcion lambda sin el primer cuerpo, la lista de argumentos evaluados,
-; el amb. global actualizado con la eval. del 1er. cuerpo (usando el amb. global intacto y el local actualizado con los params. ligados a los args.) y el amb. local intacto. 
+; Si la lista de args. evaluados revisada no es nil, se la retorna con el
+;  amb. global.
+; Si no, en caso de que la func. sea escalar (predefinida o definida por el
+;  usuario), se devuelven el resultado de su aplicacion (controlando la aridad)
+;   y el ambiente global.
+; Si la func. no es escalar, se valida que la cantidad de parametros y
+;  argumentos coincidan, y:
+; en caso de que se trate de una func. lambda con un solo cuerpo, se la evalua
+;  usando el amb. global intacto y el local actualizado con los params.
+;  ligados a los args.,  
+; en caso de haber multiples cuerpos, se llama a aplicar recursivamente,
+;  pasando la funcion lambda sin el primer cuerpo, la lista de argumentos evaluados,
+; el amb. global actualizado con la eval. del 1er. cuerpo (usando el amb.
+;  global intacto y el local actualizado con los params. ligados a los args.)
+;   y el amb. local intacto. 
 (defn aplicar
    ([f lae amb-global amb-local]
       (aplicar (revisar-f f) (revisar-lae lae) f lae amb-global amb-local))
@@ -168,19 +199,27 @@
 					(cond (< (count lae) (count (fnext f))) (list (list '*error* 'too-few-args) amb-global)
 					      (> (count lae) (count (fnext f))) (list (list '*error* 'too-many-args) amb-global)
 					      true (if (nil? (next (nnext f)))
-					               (evaluar (first (nnext f)) amb-global (concat (reduce concat (map list (fnext f) lae)) amb-local))
-						           (aplicar (cons 'lambda (cons (fnext f) (next (nnext f)))) lae (fnext (evaluar (first (nnext f)) amb-global (concat (reduce concat (map list (fnext f) lae)) amb-local))) amb-local))))))
+                  (evaluar (first (nnext f))
+                           amb-global
+                           (concat (reduce concat (map list (fnext f) lae)) amb-local))
+                  (aplicar (cons 'lambda (cons (fnext f) (next (nnext f)))) 
+                           lae 
+                           (fnext (evaluar (first (nnext f)) 
+                                           amb-global 
+                                           (concat (reduce concat (map list (fnext f) lae)) amb-local)))
+                           amb-local))))))
 )
 
 ; Falta terminar de implementar las 2 funciones anteriores (aplicar y evaluar)
 
 
 ; Controla la aridad (cantidad de argumentos de una funcion).
-; Recibe una lista y un numero. Si la longitud de la lista coincide con el numero, retorna el numero.
+; Recibe una lista y un numero. Si la longitud de la lista coincide con el
+;  numero, retorna el numero.
 ; Si es menor, retorna (list '*error* 'too-few-args).
 ; Si es mayor, retorna (list '*error* 'too-many-args).
 (defn controlar-aridad 
-  "Devuelve la aridad de la lista si es la esperada
+  "Devuelve la aridad de la lista si es la esperada,
    Si no devuelve una lista con un mensaje de error"
   [lis val-esperado] (cond
                        (= val-esperado (count lis)) val-esperado
@@ -189,50 +228,72 @@
 
 
 ; Compara la igualdad de dos simbolos.
-; Recibe dos simbolos a y b. Retorna true si se deben considerar iguales; si no, false.
-; Se utiliza porque TLC-LISP no es case-sensitive y ademas no distingue entre nil y la lista vacia.
+; Recibe dos simbolos a y b. Retorna true si se deben considerar iguales;
+;  si no, false.
+; Se utiliza porque TLC-LISP no es case-sensitive y ademas no distingue entre
+;  nil y la lista vacia.
 (defn igual? [a b] "TODO...")
 
-; Imprime, con salto de linea, atomos o listas en formato estandar (las cadenas con comillas) y devuelve su valor. Muestra errores sin parentesis
-; Aridad 1: Si recibe un escalar, lo imprime con salto de linea en formato estandar (pero si es \space no lo imprime), purga la salida y devuelve el escalar.
-; Si recibe una secuencia cuyo primer elemento es '*error*, se llama recursivamente con dos argumentos iguales: la secuencia recibida
-; Si no, imprime lo recibido con salto de linea en formato estandar, purga la salida y devuelve la cadena.
-; Aridad 2: Si el primer parametro es nil, imprime un salto de linea, purga la salida y devuelve el segundo parametro.
-; Si no, imprime su primer elemento en formato estandar, imprime un espacio y se llama recursivamente con la cola del primer parametro y el segundo intacto.
+; Imprime, con salto de linea, atomos o listas en formato estandar (las cadenas
+;  con comillas) y devuelve su valor. Muestra errores sin parentesis
+; Aridad 1: Si recibe un escalar, lo imprime con salto de linea en formato
+;  estandar (pero si es \space no lo imprime), purga la salida y devuelve
+;  el escalar.
+; Si recibe una secuencia cuyo primer elemento es '*error*, se llama
+;  recursivamente con dos argumentos iguales: la secuencia recibida
+; Si no, imprime lo recibido con salto de linea en formato estandar, purga
+;  la salida y devuelve la cadena.
+; Aridad 2: Si el primer parametro es nil, imprime un salto de linea, purga
+;  la salida y devuelve el segundo parametro.
+; Si no, imprime su primer elemento en formato estandar, imprime un espacio y
+;  se llama recursivamente con la cola del primer parametro y el segundo intacto.
 (defn imprimir
   "Imprime con un salto de linea lo recibido devolviendo el mismo valor,
    Muestra los errores."
   ([elem] "TODO...")
   ([lis orig] "TODO..."))
 
-; Actualiza un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...]
+; Actualiza un ambiente (una lista con claves en las posiciones impares
+;  [1, 3, 5...] y valores en las pares [2, 4, 6...]
 ; Recibe el ambiente, la clave y el valor.
-; Si el valor no es escalar y en su primera posicion contiene '*error*, retorna el ambiente intacto.
-; Si no, coloca la clave y el valor en el ambiente (puede ser un alta o una actualizacion) y lo retorna.
+; Si el valor no es escalar y en su primera posicion contiene '*error*, retorna
+;  el ambiente intacto.
+; Si no, coloca la clave y el valor en el ambiente (puede ser un alta o una
+;  actualizacion) y lo retorna.
 (defn actualizar-amb [amb-global clave valor] "TODO...")
 
 ; Revisa una lista que representa una funcion.
-; Recibe la lista y, si esta comienza con '*error*, la retorna. Si no, retorna nil.
+; Recibe la lista y, si esta comienza con '*error*, la retorna.
+;  Si no, retorna nil.
 (defn revisar-f [lis] "TODO...")
 
 ; Revisa una lista de argumentos evaluados.
-; Recibe la lista y, si esta contiene alguna sublista que comienza con '*error*, retorna esa sublista. Si no, retorna nil.
+; Recibe la lista y, si esta contiene alguna sublista que comienza con
+;  '*error*, retorna esa sublista. Si no, retorna nil.
 (defn revisar-lae [lis] "TODO...")
 
-; Busca una clave en un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...] y retorna el valor asociado
-; Si no la encuentra, retorna una lista con '*error* en la 1ra. pos., 'unbound-symbol en la 2da. y el elemento en la 3ra
+; Busca una clave en un ambiente (una lista con claves en las posiciones
+;  impares [1, 3, 5...] y valores en las pares [2, 4, 6...] y retorna
+;  el valor asociado
+; Si no la encuentra, retorna una lista con '*error* en la 1ra. pos.,
+;  'unbound-symbol en la 2da. y el elemento en la 3ra
 (defn buscar [elem lis] "TODO...")
 
-; Evalua el cuerpo de una macro COND. Siempre retorna una lista con un resultado y un ambiente.
-; Recibe una lista de sublistas (cada una de las cuales tiene una condicion en su 1ra. posicion) y los ambientes global y local
+; Evalua el cuerpo de una macro COND. Siempre retorna una lista con un
+;  resultado y un ambiente.
+; Recibe una lista de sublistas (cada una de las cuales tiene una condicion
+;  en su 1ra. posicion) y los ambientes global y local
 ; Si la lista es nil, el resultado es nil y el ambiente retornado es el global.
-; Si no, evalua (con evaluar) la cabeza de la 1ra. sublista y, si el resultado no es nil, retorna el res. de invocar a evaluar-secuencia-en-cond con la cola de esa sublista
+; Si no, evalua (con evaluar) la cabeza de la 1ra. sublista y, si el resultado
+;  no es nil, retorna el res. de invocar a evaluar-secuencia-en-cond con la
+;  cola de esa sublista
 ; En caso contrario, sigue con las demas sublistas.
 (defn evaluar-cond [lis amb-global amb-local] "TODO...")
 
-; Evalua (con evaluar) secuencialmente las sublistas de una lista y retorna el valor de la ultima evaluacion.
+; Evalua (con evaluar) secuencialmente las sublistas de una lista y retorna
+;  el valor de la ultima evaluacion.
 (defn evaluar-secuencia-en-cond [lis amb-global amd-local] "TODO...")
 
 ; Al terminar de cargar el archivo, se retorna true.
 
-; Falta hacer que la carga del interprete en Clojure (tlc-lisp.clj) retorne true 
+; Falta hacer que la carga del interprete en Clojure (tlc-lisp.clj) retorne true
