@@ -13,12 +13,14 @@
 (declare evaluar-cond)
 (declare evaluar-secuencia-en-cond)
 
+
 ; REPL (read–eval–print loop).
 ; Aridad 0: Muestra mensaje de bienvenida y se llama recursivamente con el ambiente inicial.
 ; Aridad 1: Muestra >>> y lee una expresion y la evalua.
 ; Si la 2da. posicion del resultado es nil, retorna true (caso base de la recursividad).
 ; Si no, imprime la 1ra. pos. del resultado y se llama recursivamente con la 2da. pos. del resultado. 
 (defn repl
+  "Inicia el REPL de TLC-Lisp"
    ([]
       (println "Interprete de TLC-LISP en Clojure")
 	  (println "Trabajo Practico de 75.14/95.48 - Lenguajes Formales 2020")
@@ -31,14 +33,15 @@
  			  t t terpri terpri + add - sub)))
    ([amb]  
       (print ">>> ") (flush)
-      (try (let [res (evaluar (read) amb nil)]
-	            (if (nil? (fnext res))
-				    true
-					(do (imprimir (first res)) (repl (fnext res)))))
-           (catch Exception e
-             (println) (print "*error* ") 
-             (println (get (Throwable->map e) :cause)) 
-             (repl amb))))
+      (try
+        (let [res (evaluar (read) amb nil)]    ; Bindea `res` al resultado de `evaluar`
+          (if (nil? (second res))              ; Chequea si la segunda posicion de `res` es `nil`
+            true
+            (do (imprimir (first res)) (repl (second res)))))
+        (catch Exception e
+          (println) (print "*error* ")
+          (println (get (Throwable->map e) :cause))
+          (repl amb))))
 )
 
 ; Carga el contenido de un archivo.
@@ -148,12 +151,12 @@
 ; Recibe una lista y un numero. Si la longitud de la lista coincide con el numero, retorna el numero.
 ; Si es menor, retorna (list '*error* 'too-few-args).
 ; Si es mayor, retorna (list '*error* 'too-many-args).
-(defn controlar-aridad [lis val-esperado] ...)
+(defn controlar-aridad [lis val-esperado] "TODO: ...")
 
 ; Compara la igualdad de dos simbolos.
 ; Recibe dos simbolos a y b. Retorna true si se deben considerar iguales; si no, false.
 ; Se utiliza porque TLC-LISP no es case-sensitive y ademas no distingue entre nil y la lista vacia.
-(defn igual? [a b] ...)
+(defn igual? [a b] "TODO...")
 
 ; Imprime, con salto de linea, atomos o listas en formato estandar (las cadenas con comillas) y devuelve su valor. Muestra errores sin parentesis
 ; Aridad 1: Si recibe un escalar, lo imprime con salto de linea en formato estandar (pero si es \space no lo imprime), purga la salida y devuelve el escalar.
@@ -162,36 +165,36 @@
 ; Aridad 2: Si el primer parametro es nil, imprime un salto de linea, purga la salida y devuelve el segundo parametro.
 ; Si no, imprime su primer elemento en formato estandar, imprime un espacio y se llama recursivamente con la cola del primer parametro y el segundo intacto.
 (defn imprimir
-  ([elem] ...)
-  ([lis orig] ...))
+  ([elem] "TODO...")
+  ([lis orig] "TODO..."))
 
 ; Actualiza un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...]
 ; Recibe el ambiente, la clave y el valor.
 ; Si el valor no es escalar y en su primera posicion contiene '*error*, retorna el ambiente intacto.
 ; Si no, coloca la clave y el valor en el ambiente (puede ser un alta o una actualizacion) y lo retorna.
-(defn actualizar-amb [amb-global clave valor] ...)
+(defn actualizar-amb [amb-global clave valor] "TODO...")
 
 ; Revisa una lista que representa una funcion.
 ; Recibe la lista y, si esta comienza con '*error*, la retorna. Si no, retorna nil.
-(defn revisar-f [lis] ...)
+(defn revisar-f [lis] "TODO...")
 
 ; Revisa una lista de argumentos evaluados.
 ; Recibe la lista y, si esta contiene alguna sublista que comienza con '*error*, retorna esa sublista. Si no, retorna nil.
-(defn revisar-lae [lis] ...)
+(defn revisar-lae [lis] "TODO...")
 
 ; Busca una clave en un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...] y retorna el valor asociado
 ; Si no la encuentra, retorna una lista con '*error* en la 1ra. pos., 'unbound-symbol en la 2da. y el elemento en la 3ra
-(defn buscar [elem lis] ...)
+(defn buscar [elem lis] "TODO...")
 
 ; Evalua el cuerpo de una macro COND. Siempre retorna una lista con un resultado y un ambiente.
 ; Recibe una lista de sublistas (cada una de las cuales tiene una condicion en su 1ra. posicion) y los ambientes global y local
 ; Si la lista es nil, el resultado es nil y el ambiente retornado es el global.
 ; Si no, evalua (con evaluar) la cabeza de la 1ra. sublista y, si el resultado no es nil, retorna el res. de invocar a evaluar-secuencia-en-cond con la cola de esa sublista
 ; En caso contrario, sigue con las demas sublistas.
-(defn evaluar-cond [lis amb-global amb-local] ...)
+(defn evaluar-cond [lis amb-global amb-local] "TODO...")
 
 ; Evalua (con evaluar) secuencialmente las sublistas de una lista y retorna el valor de la ultima evaluacion.
-(defn evaluar-secuencia-en-cond [lis amb-global amd-local] ...)
+(defn evaluar-secuencia-en-cond [lis amb-global amd-local] "TODO...")
 
 ; Al terminar de cargar el archivo, se retorna true.
 
