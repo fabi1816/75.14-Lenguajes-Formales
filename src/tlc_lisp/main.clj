@@ -19,6 +19,7 @@
 (declare es-error?)
 (declare es-nombre-archivo-valido?)
 (declare cargar-input)
+(declare is-non-nil-empty-list?)
 
 
 ; REPL (read–eval–print loop).
@@ -232,7 +233,15 @@
 ;  si no, false.
 ; Se utiliza porque TLC-LISP no es case-sensitive y ademas no distingue entre
 ;  nil y la lista vacia.
-(defn igual? [a b] "TODO...")
+(defn igual?
+  "Compara igualdad al estilo de TLC-Lisp
+   Case-insensitive y nil es igual a la lista vacia"
+  [a b] (cond
+          (and (string? a) (string? b)) (= (lower-case a) (lower-case b))
+          (and (nil? a) (is-non-nil-empty-list? b)) true
+          (and (nil? b) (is-non-nil-empty-list? a)) true
+          :else (= a b)))
+
 
 ; Imprime, con salto de linea, atomos o listas en formato estandar (las cadenas
 ;  con comillas) y devuelve su valor. Muestra errores sin parentesis
@@ -297,3 +306,8 @@
 ; Al terminar de cargar el archivo, se retorna true.
 
 ; Falta hacer que la carga del interprete en Clojure (tlc-lisp.clj) retorne true
+
+;; Funciones auxiliares
+(defn is-non-nil-empty-list?
+  "Checks that the parameter is an empty list and that it is not nil"
+  [l] (and (list? l) (empty? l)))
