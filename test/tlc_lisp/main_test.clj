@@ -1,6 +1,8 @@
 (ns tlc-lisp.main-test
   (:require [clojure.test :refer [deftest is testing]]
-            [tlc-lisp.main :refer [controlar-aridad igual?]]))
+            [tlc-lisp.main :refer [controlar-aridad
+                                   igual?
+                                   actualizar-amb]]))
 
 
 (deftest test-controlar-aridad
@@ -35,3 +37,11 @@
   (testing "Las otras comparaciones son iguales"
     (is (igual? 1 1))
     (is (igual? 'A 'A))))
+
+(deftest test-actualizar-ambiente
+  (testing "Nueva clave y valor"
+    (is (= '(K V) (actualizar-amb '() 'K 'V)))
+    (is (= '(one two K V) (actualizar-amb '(one two) 'K 'V))))
+  (testing "Actualizar clave pre-existente"
+    (is (= '(K V) (actualizar-amb '(K XXX) 'K 'V)))
+    (is (= '(A B K V C D) (actualizar-amb '(A B K feo C D) 'K 'V)))))

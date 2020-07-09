@@ -11,7 +11,7 @@
 (declare revisar-lae)
 (declare cargar-arch)    ; Done!
 (declare evaluar-cond)
-(declare actualizar-amb)
+(declare actualizar-amb)    ; Done!
 (declare controlar-aridad)    ; Done!
 (declare evaluar-secuencia-en-cond)
 
@@ -246,6 +246,7 @@
   ([elem] "TODO...")
   ([lis orig] "TODO..."))
 
+
 ; Actualiza un ambiente (una lista con claves en las posiciones impares
 ;  [1, 3, 5...] y valores en las pares [2, 4, 6...]
 ; Recibe el ambiente, la clave y el valor.
@@ -253,11 +254,19 @@
 ;  el ambiente intacto.
 ; Si no, coloca la clave y el valor en el ambiente (puede ser un alta o una
 ;  actualizacion) y lo retorna.
-(defn actualizar-amb 
+(defn actualizar-amb
   "Actualiza el ambiente con la clave (nombre de la función) y su valor (el 
    responsable de ejecutar esa función)
    Retorna el ambiente actualizado"
-  [amb-global clave valor] "TODO...")
+  [amb-global clave valor] (cond
+                             ; El primer elemento es la clave buscada: Lo reemplazo junto con su valor
+                             (= clave (first amb-global)) (concat (list clave valor) (drop 2 amb-global))
+                             (empty? amb-global) (list clave valor)    ; El ambiente está vacio: los agrego
+                             
+                             ; Agrego los primeros 2 elementos a lo que me devuelva la actualización del resto del ambiente
+                             :else (concat (take 2 amb-global)
+                                           (actualizar-amb (drop 2 amb-global) clave valor))))
+
 
 ; Revisa una lista que representa una funcion.
 ; Recibe la lista y, si esta comienza con '*error*, la retorna.
