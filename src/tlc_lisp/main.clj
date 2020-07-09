@@ -206,10 +206,11 @@
 (defn controlar-aridad 
   "Devuelve la aridad de la lista si es la esperada,
    Si no devuelve una lista con un mensaje de error"
-  [lis val-esperado] (cond
-                       (= val-esperado (count lis)) val-esperado
-                       (> val-esperado (count lis)) (list '*error* 'too-few-args)
-                       (< val-esperado (count lis)) (list '*error* 'too-many-args)))
+  [lis val-esperado] 
+  (cond
+    (= val-esperado (count lis)) val-esperado
+    (> val-esperado (count lis)) (list '*error* 'too-few-args)
+    (< val-esperado (count lis)) (list '*error* 'too-many-args)))
 
 
 ; Compara la igualdad de dos simbolos.
@@ -220,11 +221,12 @@
 (defn igual?
   "Compara igualdad al estilo de TLC-Lisp
    Case-insensitive y nil es igual a la lista vacia"
-  [a b] (cond
-          (and (string? a) (string? b)) (= (lower-case a) (lower-case b))
-          (and (nil? a) (is-non-nil-empty-list? b)) true
-          (and (nil? b) (is-non-nil-empty-list? a)) true
-          :else (= a b)))
+  [a b]
+  (cond
+    (and (string? a) (string? b)) (= (lower-case a) (lower-case b))
+    (and (nil? a) (is-non-nil-empty-list? b)) true
+    (and (nil? b) (is-non-nil-empty-list? a)) true
+    :else (= a b)))
 
 
 ; Imprime, con salto de linea, atomos o listas en formato estandar (las cadenas
@@ -258,14 +260,18 @@
   "Actualiza el ambiente con la clave (nombre de la función) y su valor (el 
    responsable de ejecutar esa función)
    Retorna el ambiente actualizado"
-  [amb-global clave valor] (cond
-                             ; El primer elemento es la clave buscada: Lo reemplazo junto con su valor
-                             (= clave (first amb-global)) (concat (list clave valor) (drop 2 amb-global))
-                             (empty? amb-global) (list clave valor)    ; El ambiente está vacio: los agrego
-                             
-                             ; Agrego los primeros 2 elementos a lo que me devuelva la actualización del resto del ambiente
-                             :else (concat (take 2 amb-global)
-                                           (actualizar-amb (drop 2 amb-global) clave valor))))
+  [amb-global clave valor] 
+  (cond
+    ; El primer elemento es la clave buscada: Lo reemplazo junto con su valor
+    (= clave (first amb-global)) (concat (list clave valor) (drop 2 amb-global))
+
+    ; El ambiente está vacio: los agrego
+    (empty? amb-global) (list clave valor)
+
+    ; Agrego los primeros 2 elementos a lo que me devuelva la actualización
+    ;  del resto del ambiente
+    :else (concat (take 2 amb-global)
+                  (actualizar-amb (drop 2 amb-global) clave valor))))
 
 
 ; Revisa una lista que representa una funcion.
@@ -308,23 +314,26 @@
 
 (defn es-error?
   "Es una secuencia cuyo primer elemento es '*error*'?"
-  [elem] (and (seq? elem) (igual? (first elem) '*error*)))
-
+  [elem]
+  (and (seq? elem)
+       (igual? (first elem) '*error*)))
 
 (defn es-nombre-archivo-valido?
   "Checkquea que el string sea un nombre de archivo .lsp valido"
-  [nombre] (and (> (count nombre) 4) (ends-with? nombre ".lsp")))
-
+  [nombre] 
+  (and (> (count nombre) 4)
+       (ends-with? nombre ".lsp")))
 
 (defn cargar-input
   "Carga y evalua uno a uno todo el contenido del input"
-  [input amb-global] (try
-                       (let [res (evaluar (read input) amb-global nil)]
-                         (cargar-arch (second res) nil input res))
-                       (catch Exception e
-                         (imprimir nil) amb-global)))
-
+  [input amb-global]
+  (try
+    (let [res (evaluar (read input) amb-global nil)]
+      (cargar-arch (second res) nil input res))
+    (catch Exception e
+      (imprimir nil) amb-global)))
 
 (defn is-non-nil-empty-list?
   "Checks that the parameter is an empty list and that it is not nil"
-  [l] (and (list? l) (empty? l)))
+  [l]
+  (and (list? l) (empty? l)))
