@@ -33,15 +33,15 @@
 (defn repl
   "Inicia el REPL de TLC-Lisp"
    ([]
-      (println "Interprete de TLC-LISP en Clojure")
-	  (println "Trabajo Practico de 75.14/95.48 - Lenguajes Formales 2020")
-	  (println "Inspirado en:")
-      (println "TLC-LISP Version 1.51 for the IBM Personal Computer")
-      (println "Copyright (c) 1982, 1983, 1984, 1985 The Lisp Company") (flush)
-      (repl '(add add append append cond cond cons cons de de env env equal equal eval eval exit exit
- 			  first first ge ge gt gt if if lambda lambda length length list list load load lt lt nil nil not not
- 			  null null or or prin3 prin3 quote quote read read rest rest reverse reverse setq setq sub sub
- 			  t t terpri terpri + add - sub)))
+    (println "Interprete de TLC-LISP en Clojure")
+    (println "Trabajo Practico de 75.14/95.48 - Lenguajes Formales 2020")
+    (println "Inspirado en:")
+    (println "TLC-LISP Version 1.51 for the IBM Personal Computer")
+    (println "Copyright (c) 1982, 1983, 1984, 1985 The Lisp Company") (flush)
+    (repl '(add add append append cond cond cons cons de de env env equal equal eval eval exit exit
+            first first ge ge gt gt if if lambda lambda length length list list load load lt lt nil nil not not
+            null null or or prin3 prin3 quote quote read read rest rest reverse reverse setq setq sub sub
+            t t terpri terpri + add - sub)))
    ([amb]  
       (print ">>> ") (flush)
       (try
@@ -253,7 +253,11 @@
 ;  el ambiente intacto.
 ; Si no, coloca la clave y el valor en el ambiente (puede ser un alta o una
 ;  actualizacion) y lo retorna.
-(defn actualizar-amb [amb-global clave valor] "TODO...")
+(defn actualizar-amb 
+  "Actualiza el ambiente con la clave (nombre de la función) y su valor (el 
+   responsable de ejecutar esa función)
+   Retorna el ambiente actualizado"
+  [amb-global clave valor] "TODO...")
 
 ; Revisa una lista que representa una funcion.
 ; Recibe la lista y, si esta comienza con '*error*, la retorna.
