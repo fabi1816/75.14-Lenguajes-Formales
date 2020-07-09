@@ -44,4 +44,7 @@
     (is (= '(one two K V) (actualizar-amb '(one two) 'K 'V))))
   (testing "Actualizar clave pre-existente"
     (is (= '(K V) (actualizar-amb '(K XXX) 'K 'V)))
-    (is (= '(A B K V C D) (actualizar-amb '(A B K feo C D) 'K 'V)))))
+    (is (= '(A B K V C D) (actualizar-amb '(A B K feo C D) 'K 'V))))
+  (testing "Si hay un error no modifica el ambiente"
+    (is (= '() (actualizar-amb '() 'K '*error*)))
+    (is (= '(K V) (actualizar-amb '(K V) 'K '*error*)))))

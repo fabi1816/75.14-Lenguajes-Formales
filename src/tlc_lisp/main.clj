@@ -262,6 +262,9 @@
    Retorna el ambiente actualizado"
   [amb-global clave valor] 
   (cond
+    ; No modifica el ambiente si el valor es un *error*
+    (= '*error* valor) amb-global
+    
     ; El primer elemento es la clave buscada: Lo reemplazo junto con su valor
     (= clave (first amb-global)) (concat (list clave valor) (drop 2 amb-global))
 
