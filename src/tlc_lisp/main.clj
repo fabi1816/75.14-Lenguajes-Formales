@@ -6,7 +6,7 @@
 (declare igual?)    ; Done!
 (declare aplicar)    ; TODO: Terminar
 (declare evaluar)    ; TODO: Terminar
-(declare imprimir)
+(declare imprimir)    ; Done!
 (declare revisar-f)    ; Done!
 (declare revisar-lae)    ; Done!
 (declare cargar-arch)    ; Done!
@@ -54,6 +54,7 @@
           (println) (print "*error* ")
           (println (get (Throwable->map e) :cause))
           (repl amb)))))
+
 
 ; Carga el contenido de un archivo.
 ; Aridad 3: Recibe los ambientes global y local y el nombre de un archivo
@@ -242,10 +243,19 @@
 ; Si no, imprime su primer elemento en formato estandar, imprime un espacio y
 ;  se llama recursivamente con la cola del primer parametro y el segundo intacto.
 (defn imprimir
-  "Imprime con un salto de linea lo recibido devolviendo el mismo valor,
+  "Imprime, con un salto de linea al final, lo recibido devolviendo el mismo valor,
    Muestra los errores."
-  ([elem] "TODO...")
-  ([lis orig] "TODO..."))
+  ([elem]
+   (cond
+     (= \space elem) elem    ; Si es \space no lo imprime pero si lo devuelve
+     (and (list? elem) (= '*error* (first elem))) (imprimir elem elem)
+     :else (do (println elem) (flush) elem)))    ; Es un no *error*
+  ([lis orig]
+   (cond
+     (nil? lis) (do (println) (flush) orig)
+     :else (do (print (first lis))
+               (print \space)
+               (imprimir (next lis) orig)))))
 
 
 ; Actualiza un ambiente (una lista con claves en las posiciones impares

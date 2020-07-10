@@ -5,7 +5,10 @@
                                    actualizar-amb
                                    revisar-f
                                    revisar-lae
-                                   buscar]]))
+                                   buscar
+                                   imprimir
+                                   evaluar-cond
+                                   evaluar-secuencia-en-cond]]))
 
 
 (deftest test-controlar-aridad
@@ -83,3 +86,22 @@
     (is (= '(*error* unbound-symbol A) (buscar 'A '())))
     (is (= '(*error* unbound-symbol A) (buscar 'A '(C D))))
     (is (= '(*error* unbound-symbol A) (buscar 'A '(C D E F))))))
+
+(deftest test-imprimir
+  (testing "Imprimir un escalar"
+    (is (= 1 (imprimir 1)))
+    (is (= 'TEXTO (imprimir 'TEXTO)))
+    (is (= "String" (imprimir "String")))
+    (is (= \space (imprimir \space))))
+  (testing "Imprimir una lista"
+    (is (= '() (imprimir '())))
+    (is (= '(A B) (imprimir '(A B)))))
+  (testing "Es un mensaje de error"
+    (is (= '(*error* descrip) (imprimir '(*error* descrip)))))
+  (testing "Primer parametro es nil"
+    (is (= 'hola (imprimir nil 'hola))))
+  (testing "Primer parametro es una lista no-nil"
+    (is (= '(C D) (import '(A B) '(C D))))))
+
+(deftest test-evaluar-cond "TODO")
+(deftest test-evaluar-secuencia-en-cond "TODO")
