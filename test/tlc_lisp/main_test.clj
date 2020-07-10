@@ -4,7 +4,8 @@
                                    igual?
                                    actualizar-amb
                                    revisar-f
-                                   revisar-lae]]))
+                                   revisar-lae
+                                   buscar]]))
 
 
 (deftest test-controlar-aridad
@@ -61,9 +62,14 @@
     (is (nil? (revisar-f '(A B))))))
 
 (deftest test-revisar-lae
-  (testing "No hay error"
+  (testing "No hay error en la lista"
     (is (nil? (revisar-lae '())))
     (is (nil? (revisar-lae '(A))))
     (is (nil? (revisar-lae '(A B))))
     (is (nil? (revisar-lae '(A (B C))))))
-  )
+  (testing "Hay un error en la lista"
+    (is (= '(*error*) (revisar-lae '((*error*)))))
+    (is (= '(*error* msg) (revisar-lae '((*error* msg)))))
+    (is (= '(*error* msg) (revisar-lae '(A B (*error* msg)))))
+    (is (= '(*error* msg) (revisar-lae '(A B (*error* msg) C D))))
+    (is (= '(*error* msg) (revisar-lae '(A B (*error* msg) (C D) E))))))
