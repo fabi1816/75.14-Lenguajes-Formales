@@ -106,35 +106,58 @@
 ; Si no lo es, se trata de una funcion en posicion de operador (es una
 ;  aplicacion de calculo lambda), por lo que se llama a la funcion aplicar,
 ; pasandole 4 argumentos: la evaluacion del primer elemento, una lista con las
-;  evaluaciones de los demas, el ambiente global y el ambiente local. 
+;  evaluaciones de los demas, el ambiente global y el ambiente local.
+(defn es-escalar?
+  "Chequea si `elem` es un escalar no-nulo"
+  [elem] (and (not (seq? elem)) (not (nil? elem))))
+
+(defn es-numero-o-string?
+  "Chequea si `elem` es un numero o un string"
+  [elem] (or (number? elem) (string? elem)))
+
+(defn evaluar-escalares
+  "Evalua las expresiones que son escalares"
+  [expre amb-global amb-local]
+  (cond
+    (es-numero-o-string? expre) (list expre amb-global)
+    :else (list (buscar expre (concat amb-local amb-global)) amb-global)))
+
+(defn salir
+  "Sale del interprete de TLC-Lisp"
+  [expre amb-global]
+  (cond
+    (< (count (next expre)) 1) (list nil nil)
+    :else (list (list '*error* 'too-many-args) amb-global)))
+
 (defn evaluar
   "Evalua una expresion en los ambientes global y local
    Retorna un lista con el resultado y un ambiente"
   [expre amb-global amb-local]
-	(if (not (seq? expre))
-		(if (or (number? expre) (string? expre)) (list expre amb-global) (list (buscar expre (concat amb-local amb-global)) amb-global))
-		(cond (igual? expre nil) (list nil amb-global)
-        (igual? (first expre) '*error*) (list expre amb-global)
-        (igual? (first expre) 'exit) (if (< (count (next expre)) 1) (list nil nil) (list (list '*error* 'too-many-args) amb-global))
-        (igual? (first expre) 'setq) (cond (< (count (next expre)) 2) (list (list '*error* 'list 'expected nil) amb-global)
-                                           (igual? (fnext expre) nil) (list (list '*error* 'cannot-set nil) amb-global)
-                                           (not (symbol? (fnext expre))) (list (list '*error* 'symbol 'expected (fnext expre)) amb-global)
-                                           (= (count (next expre)) 2) (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
-                                                                        (list (first res) (actualizar-amb amb-global (fnext expre) (first res))))
-                                           true (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
-                                                  (evaluar (cons 'setq (next (nnext expre))) (actualizar-amb amb-global (fnext expre) (first res)) amb-local)))
-        (igual? (first expre) 'de) (cond (< (count (next expre)) 2) (list (list '*error* 'list 'expected nil) amb-global)
-                                         (and (not (igual? (first (nnext expre)) nil)) (not (seq? (first (nnext expre))))) (list (list '*error* 'list 'expected (first (nnext expre))) amb-global)
-                                         (igual? (fnext expre) nil) (list (list '*error* 'cannot-set nil) amb-global)
-                                         (not (symbol? (fnext expre))) (list (list '*error* 'symbol 'expected (fnext expre)) amb-global)
-                                         true (list (fnext expre) (actualizar-amb amb-global (fnext expre) (cons 'lambda (nnext expre)))))
-        (igual? (first expre) 'quote) (list (if (igual? (fnext expre) nil) nil (fnext expre)) amb-global)
-        (igual? (first expre) 'lambda) (cond (< (count (next expre)) 1) (list (list '*error* 'list 'expected nil) amb-global)
-                                             (and (not (igual? (fnext expre) nil)) (not (seq? (fnext expre)))) (list (list '*error* 'list 'expected (fnext expre)) amb-global)
-                                             true (list expre amb-global))
-        (igual? (first expre) 'cond) (evaluar-cond (next expre) amb-global amb-local)
-        true (aplicar (first (evaluar (first expre) amb-global amb-local)) (map (fn [x] (first (evaluar x amb-global amb-local))) (next expre)) amb-global amb-local)))
+	(cond
+   (es-escalar? expre) (evaluar-escalares expre amb-global amb-local)
+   :else (cond (igual? expre nil) (list nil amb-global)
+               (igual? (first expre) '*error*) (list expre amb-global)
+               (igual? (first expre) 'exit) (salir expre amb-global)
+               (igual? (first expre) 'setq) (cond (< (count (next expre)) 2) (list (list '*error* 'list 'expected nil) amb-global)
+                                                  (igual? (fnext expre) nil) (list (list '*error* 'cannot-set nil) amb-global)
+                                                  (not (symbol? (fnext expre))) (list (list '*error* 'symbol 'expected (fnext expre)) amb-global)
+                                                  (= (count (next expre)) 2) (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
+                                                                               (list (first res) (actualizar-amb amb-global (fnext expre) (first res))))
+                                                  true (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
+                                                         (evaluar (cons 'setq (next (nnext expre))) (actualizar-amb amb-global (fnext expre) (first res)) amb-local)))
+               (igual? (first expre) 'de) (cond (< (count (next expre)) 2) (list (list '*error* 'list 'expected nil) amb-global)
+                                                (and (not (igual? (first (nnext expre)) nil)) (not (seq? (first (nnext expre))))) (list (list '*error* 'list 'expected (first (nnext expre))) amb-global)
+                                                (igual? (fnext expre) nil) (list (list '*error* 'cannot-set nil) amb-global)
+                                                (not (symbol? (fnext expre))) (list (list '*error* 'symbol 'expected (fnext expre)) amb-global)
+                                                true (list (fnext expre) (actualizar-amb amb-global (fnext expre) (cons 'lambda (nnext expre)))))
+               (igual? (first expre) 'quote) (list (if (igual? (fnext expre) nil) nil (fnext expre)) amb-global)
+               (igual? (first expre) 'lambda) (cond (< (count (next expre)) 1) (list (list '*error* 'list 'expected nil) amb-global)
+                                                    (and (not (igual? (fnext expre) nil)) (not (seq? (fnext expre)))) (list (list '*error* 'list 'expected (fnext expre)) amb-global)
+                                                    true (list expre amb-global))
+               (igual? (first expre) 'cond) (evaluar-cond (next expre) amb-global amb-local)
+               true (aplicar (first (evaluar (first expre) amb-global amb-local)) (map (fn [x] (first (evaluar x amb-global amb-local))) (next expre)) amb-global amb-local)))
 )
+
 
 ; Aplica una funcion a una lista de argumentos evaluados, usando los ambientes
 ;  global y local. Siempre retorna una lista con un resultado y un ambiente.

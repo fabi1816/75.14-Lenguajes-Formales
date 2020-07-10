@@ -112,7 +112,7 @@
   (testing "TODO"
     (is (= "TODO..." (evaluar-secuencia-en-cond nil nil nil)))))
 
-(deftest test-evaluar
+(deftest test-evaluar-escalares
   (testing "La expresion es escalar numero o string"
     (is (= '(1 (A B)) (evaluar 1 '(A B) '(C D))))
     (is (= '("TEXTO" (A B)) (evaluar "TEXTO" '(A B) '(C D)))))
@@ -120,13 +120,13 @@
     (is (= '(B (A B)) (evaluar 'A '(A B) '(C D))))
     (is (= '(D (A B)) (evaluar 'C '(A B) '(C D))))
     (is (= '(Y (A X)) (evaluar 'A '(A X) '(A Y)))))
-  (testing "Expresion es secuencia 'nula', supongo que significa vacia"
-    (is (= '(nil (A B)) (evaluar '() '(A B) '(C D)))))
+  (testing "La expresion es nil o lista vacia, en TLC-Lisp son lo mismo"
+    (is (= '(nil (A B)) (evaluar nil '(A B) '(C D))))
+    (is (= '(nil (A B)) (evaluar '() '(A B) '(C D))))))
+
+(deftest test-evaluar-comandos-especiales
   (testing "La expresión es un mensaje de error"
     (is (= '((*error* descrip) (A B)) (evaluar '(*error* descrip) '(A B) '(C D)))))
-  (testing "Es una evaluación exitosa simple"
-    (is (= '(3 (A B)) (evaluar '(+ 1 2) '(A B) '(C D))))
-    (is (= '(2 (A B)) (evaluar '(* 1 2) '(A B) '(C D))))
-    (is (= '(1 (A B)) (evaluar '(- 3 2) '(A B) '(C D)))))
-  (testing "Es una evaluación que devuelve error"
-    (is (= '((*error* unbound-symbol no-existe) (A B)) (evaluar '(no-existe A) '(A B) '(C D))))))
+  (testing "Evaluar comando salir"
+    (is (= '(nil nil) (evaluar '(exit) '(A B) '(C D))))
+    (is (= '((*error* too-many-args) (A B)) (evaluar '(exit extra) '(A B) '(C D))))))
