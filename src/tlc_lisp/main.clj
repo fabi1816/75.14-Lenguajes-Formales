@@ -129,6 +129,22 @@
     (< (count (next expre)) 1) (list nil nil)
     :else (list (list '*error* 'too-many-args) amb-global)))
 
+(defn setq-insuficientes?
+  "Valida que el comando de setq tenga suficientes elementos"
+  [cmd]
+  (or (= (count cmd) 1) (< (count (next cmd)) 2)))
+
+(defn evaluar-setq
+  [expre amb-global amb-local]
+  (cond
+    (setq-insuficientes? expre) (list (list '*error* 'list 'expected nil) amb-global)
+    (igual? (second expre) nil) (list (list '*error* 'cannot-set nil) amb-global)    ; Trata de re-definir el nil
+    (not (symbol? (second expre))) (list (list '*error* 'symbol 'expected (fnext expre)) amb-global)
+    (= (count (next expre)) 2) (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
+                                 (list (first res) (actualizar-amb amb-global (fnext expre) (first res))))
+    true (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
+           (evaluar (cons 'setq (next (nnext expre))) (actualizar-amb amb-global (fnext expre) (first res)) amb-local))))
+
 (defn evaluar
   "Evalua una expresion en los ambientes global y local
    Retorna un lista con el resultado y un ambiente"
@@ -138,14 +154,7 @@
    (igual? expre nil) (list nil amb-global)
    (igual? (first expre) '*error*) (list expre amb-global)
    (igual? (first expre) 'exit) (salir expre amb-global)
-   (igual? (first expre) 'setq) (cond
-                                  (< (count (next expre)) 2) (list (list '*error* 'list 'expected nil) amb-global)
-                                  (igual? (fnext expre) nil) (list (list '*error* 'cannot-set nil) amb-global)
-                                  (not (symbol? (fnext expre))) (list (list '*error* 'symbol 'expected (fnext expre)) amb-global)
-                                  (= (count (next expre)) 2) (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
-                                                               (list (first res) (actualizar-amb amb-global (fnext expre) (first res))))
-                                  true (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
-                                         (evaluar (cons 'setq (next (nnext expre))) (actualizar-amb amb-global (fnext expre) (first res)) amb-local)))
+   (igual? (first expre) 'setq) (evaluar-setq expre amb-global amb-local)
    (igual? (first expre) 'de) (cond
                                 (< (count (next expre)) 2) (list (list '*error* 'list 'expected nil) amb-global)
                                 (and (not (igual? (first (nnext expre)) nil)) (not (seq? (first (nnext expre))))) (list (list '*error* 'list 'expected (first (nnext expre))) amb-global)

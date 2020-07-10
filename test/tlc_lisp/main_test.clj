@@ -129,4 +129,10 @@
     (is (= '((*error* descrip) (A B)) (evaluar '(*error* descrip) '(A B) '(C D)))))
   (testing "Evaluar comando salir"
     (is (= '(nil nil) (evaluar '(exit) '(A B) '(C D))))
-    (is (= '((*error* too-many-args) (A B)) (evaluar '(exit extra) '(A B) '(C D))))))
+    (is (= '((*error* too-many-args) (A B)) (evaluar '(exit extra) '(A B) '(C D)))))
+  (testing "Evaluar comando setq"
+    (is (= '((*error* list expected nil) (A B)) (evaluar '(setq) '(A B) '(C D))))
+    (is (= '((*error* list expected nil) (A B)) (evaluar '(setq nil) '(A B) '(C D))))
+    (is (= '((*error* list expected nil) (A B)) (evaluar '(setq ()) '(A B) '(C D))))
+    (is (= '((*error* cannot-set nil) (A B)) (evaluar '(setq nil XXX) '(A B) '(C D))))
+    (is (= '((*error* cannot-set nil) (A B)) (evaluar '(setq () XXX) '(A B) '(C D))))))
