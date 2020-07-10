@@ -2,7 +2,8 @@
   (:require [clojure.test :refer [deftest is testing]]
             [tlc-lisp.main :refer [controlar-aridad
                                    igual?
-                                   actualizar-amb]]))
+                                   actualizar-amb
+                                   revisar-f]]))
 
 
 (deftest test-controlar-aridad
@@ -48,3 +49,12 @@
   (testing "Si hay un error no modifica el ambiente"
     (is (= '() (actualizar-amb '() 'K '*error*)))
     (is (= '(K V) (actualizar-amb '(K V) 'K '*error*)))))
+
+(deftest test-revisar-f
+  (testing "Es un error"
+    (is (nil? (revisar-f '(*error*))))
+    (is (nil? (revisar-f '(*error* A B)))))
+  (testing "No es un error"
+    (is (= '() (revisar-f '())))
+    (is (= '(A) (revisar-f '(A))))
+    (is (= '(A B) (revisar-f '(A B))))))

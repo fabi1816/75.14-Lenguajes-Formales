@@ -7,7 +7,7 @@
 (declare aplicar)    ; TODO: Terminar
 (declare evaluar)    ; TODO: Terminar
 (declare imprimir)
-(declare revisar-f)
+(declare revisar-f)    ; Done!
 (declare revisar-lae)
 (declare cargar-arch)    ; Done!
 (declare evaluar-cond)
@@ -195,8 +195,7 @@
                            amb-local))))))
 )
 
-; Falta terminar de implementar las 2 funciones anteriores (aplicar y evaluar)
-
+; TODO: Falta terminar de implementar las 2 funciones anteriores (aplicar y evaluar)
 
 ; Controla la aridad (cantidad de argumentos de una funcion).
 ; Recibe una lista y un numero. Si la longitud de la lista coincide con el
@@ -280,7 +279,13 @@
 ; Revisa una lista que representa una funcion.
 ; Recibe la lista y, si esta comienza con '*error*, la retorna.
 ;  Si no, retorna nil.
-(defn revisar-f [lis] "TODO...")
+(defn revisar-f 
+  "Chequea que la lista no sea un error,
+   Si es un error retorna nil"
+  [lis] 
+  (cond
+    (= '*error* (first lis)) nil
+    :else lis))
 
 ; Revisa una lista de argumentos evaluados.
 ; Recibe la lista y, si esta contiene alguna sublista que comienza con
@@ -311,7 +316,7 @@
 
 ; Al terminar de cargar el archivo, se retorna true.
 
-; Falta hacer que la carga del interprete en Clojure (tlc-lisp.clj) retorne true
+; TODO: Falta hacer que la carga del interprete en Clojure (tlc-lisp.clj) retorne true
 
 ;; Funciones auxiliares
 
