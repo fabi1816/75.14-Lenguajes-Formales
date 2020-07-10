@@ -3,7 +3,8 @@
             [tlc-lisp.main :refer [controlar-aridad
                                    igual?
                                    actualizar-amb
-                                   revisar-f]]))
+                                   revisar-f
+                                   revisar-lae]]))
 
 
 (deftest test-controlar-aridad
@@ -52,9 +53,17 @@
 
 (deftest test-revisar-f
   (testing "Es un error"
-    (is (nil? (revisar-f '(*error*))))
-    (is (nil? (revisar-f '(*error* A B)))))
+    (is (= '(*error*) (revisar-f '(*error*))))
+    (is (= '(*error* A B) (revisar-f '(*error* A B)))))
   (testing "No es un error"
-    (is (= '() (revisar-f '())))
-    (is (= '(A) (revisar-f '(A))))
-    (is (= '(A B) (revisar-f '(A B))))))
+    (is (nil? (revisar-f '())))
+    (is (nil? (revisar-f '(A))))
+    (is (nil? (revisar-f '(A B))))))
+
+(deftest test-revisar-lae
+  (testing "No hay error"
+    (is (nil? (revisar-lae '())))
+    (is (nil? (revisar-lae '(A))))
+    (is (nil? (revisar-lae '(A B))))
+    (is (nil? (revisar-lae '(A (B C))))))
+  )

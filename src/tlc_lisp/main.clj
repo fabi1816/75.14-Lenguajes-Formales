@@ -8,7 +8,7 @@
 (declare evaluar)    ; TODO: Terminar
 (declare imprimir)
 (declare revisar-f)    ; Done!
-(declare revisar-lae)
+(declare revisar-lae)    ; Done!
 (declare cargar-arch)    ; Done!
 (declare evaluar-cond)
 (declare actualizar-amb)    ; Done!
@@ -284,13 +284,19 @@
    Si es un error retorna nil"
   [lis] 
   (cond
-    (= '*error* (first lis)) nil
-    :else lis))
+    (= '*error* (first lis)) lis
+    :else nil))
+
 
 ; Revisa una lista de argumentos evaluados.
 ; Recibe la lista y, si esta contiene alguna sublista que comienza con
 ;  '*error*, retorna esa sublista. Si no, retorna nil.
-(defn revisar-lae [lis] "TODO...")
+(defn revisar-lae
+  "Retorna la sub-lista que es un mensaje de error
+   Si no hay ninguna retorna nil"
+  [lis]
+  (first (remove nil? (map revisar-f (filter seq? lis)))))
+
 
 ; Busca una clave en un ambiente (una lista con claves en las posiciones
 ;  impares [1, 3, 5...] y valores en las pares [2, 4, 6...] y retorna
