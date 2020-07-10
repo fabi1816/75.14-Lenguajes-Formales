@@ -73,3 +73,13 @@
     (is (= '(*error* msg) (revisar-lae '(A B (*error* msg)))))
     (is (= '(*error* msg) (revisar-lae '(A B (*error* msg) C D))))
     (is (= '(*error* msg) (revisar-lae '(A B (*error* msg) (C D) E))))))
+
+(deftest test-buscar
+  (testing "Existe el elemento"
+    (is (= 'B (buscar 'A '(A B))))
+    (is (= 'B (buscar 'A '(X Y A B))))
+    (is (= 'B (buscar 'A '(X Y A B V W)))))
+  (testing "No existe el elemento"
+    (is (= '(*error* unbound-symbol A) (buscar 'A '())))
+    (is (= '(*error* unbound-symbol A) (buscar 'A '(C D))))
+    (is (= '(*error* unbound-symbol A) (buscar 'A '(C D E F))))))

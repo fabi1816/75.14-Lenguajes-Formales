@@ -2,7 +2,7 @@
   (:require [clojure.string :refer [ends-with? lower-case]]
             [clojure.java.io :refer [reader]]))
 
-(declare buscar)
+(declare buscar)    ; Done!
 (declare igual?)    ; Done!
 (declare aplicar)    ; TODO: Terminar
 (declare evaluar)    ; TODO: Terminar
@@ -303,7 +303,15 @@
 ;  el valor asociado
 ; Si no la encuentra, retorna una lista con '*error* en la 1ra. pos.,
 ;  'unbound-symbol en la 2da. y el elemento en la 3ra
-(defn buscar [elem lis] "TODO...")
+(defn buscar
+  "Busca el valor asociado al `elem` en la `lis`
+   Devuelve un mensaje de error si no la encuentra"
+  [elem lis]
+  (cond
+    (empty? lis) (list '*error* 'unbound-symbol elem)
+    (= elem (first lis)) (second lis)
+    :else (buscar elem (drop 2 lis))))
+
 
 ; Evalua el cuerpo de una macro COND. Siempre retorna una lista con un
 ;  resultado y un ambiente.
