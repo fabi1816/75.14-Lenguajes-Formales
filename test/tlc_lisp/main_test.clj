@@ -7,6 +7,7 @@
                                    revisar-lae
                                    buscar
                                    imprimir
+                                   evaluar
                                    evaluar-cond
                                    evaluar-secuencia-en-cond]]))
 
@@ -101,7 +102,31 @@
   (testing "Primer parametro es nil"
     (is (= 'hola (imprimir nil 'hola))))
   (testing "Primer parametro es una lista no-nil"
-    (is (= '(C D) (import '(A B) '(C D))))))
+    (is (= '(C D) (imprimir '(A B) '(C D))))))
 
-(deftest test-evaluar-cond "TODO")
-(deftest test-evaluar-secuencia-en-cond "TODO")
+(deftest test-evaluar-cond
+  (testing "TODO"
+    (is (= "TODO..." (evaluar-cond nil nil nil)))))
+
+(deftest test-evaluar-secuencia-en-cond
+  (testing "TODO"
+    (is (= "TODO..." (evaluar-secuencia-en-cond nil nil nil)))))
+
+(deftest test-evaluar
+  (testing "La expresion es escalar numero o string"
+    (is (= '(1 (A B)) (evaluar 1 '(A B) '(C D))))
+    (is (= '("TEXTO" (A B)) (evaluar "TEXTO" '(A B) '(C D)))))
+  (testing "Busca el escalar en los ambientes, primero el local"
+    (is (= '(B (A B)) (evaluar 'A '(A B) '(C D))))
+    (is (= '(D (A B)) (evaluar 'C '(A B) '(C D))))
+    (is (= '(Y (A X)) (evaluar 'A '(A X) '(A Y)))))
+  (testing "Expresion es secuencia 'nula', supongo que significa vacia"
+    (is (= '(nil (A B)) (evaluar '() '(A B) '(C D)))))
+  (testing "La expresión es un mensaje de error"
+    (is (= '((*error* descrip) (A B)) (evaluar '(*error* descrip) '(A B) '(C D)))))
+  (testing "Es una evaluación exitosa simple"
+    (is (= '(3 (A B)) (evaluar '(+ 1 2) '(A B) '(C D))))
+    (is (= '(2 (A B)) (evaluar '(* 1 2) '(A B) '(C D))))
+    (is (= '(1 (A B)) (evaluar '(- 3 2) '(A B) '(C D)))))
+  (testing "Es una evaluación que devuelve error"
+    (is (= '((*error* unbound-symbol no-existe) (A B)) (evaluar '(no-existe A) '(A B) '(C D))))))
