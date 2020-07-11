@@ -30,6 +30,7 @@
 (declare es-numero-o-string?)
 (declare setq-insuficientes?)
 (declare lambda-define-param?)
+(declare resultado-de-evaluar)
 (declare is-non-nil-empty-list?)
 (declare evaluar-setq-multiples)
 (declare es-nombre-archivo-valido?)
@@ -92,13 +93,13 @@
               ret (try (with-open [in (java.io.PushbackReader. (reader nom))]
                          (binding [*read-eval* false]
                            (cargar-input in amb-global)))
-                       (catch java.io.FileNotFoundException e
+                       (catch java.io.FileNotFoundException _
                          (imprimir (list '*error* 'file-open-error 'file-not-found nom '1 'READ)) amb-global))]
           ret))))
-  ([amb-global amb-local in res]
+  ([amb-global _amb-local in res]
     (try (let [res (evaluar (read in) amb-global nil)]    ; Identico a cargar-input pero maneja la excapción diferente
            (cargar-arch (second res) nil in res))
-         (catch Exception e
+         (catch Exception _
            (imprimir (first res)) amb-global))))
 
 
@@ -125,18 +126,31 @@
   "Evalua una expresion en los ambientes global y local
    Retorna un lista con el resultado y un ambiente"
   [expre amb-global amb-local]
-	(cond
-   (es-escalar? expre) (evaluar-escalares expre amb-global amb-local)
-   (igual? expre nil) (list nil amb-global)
-   (igual? (first expre) '*error*) (list expre amb-global)
-   (igual? (first expre) 'de) (evaluar-de expre amb-global amb-local)
-   (igual? (first expre) 'exit) (salir expre amb-global)
-   (igual? (first expre) 'setq) (evaluar-setq expre amb-global amb-local)   
-   (igual? (first expre) 'quote) (evaluar-quote expre amb-global amb-local)
-   (igual? (first expre) 'lambda) (evaluar-lambda expre amb-global amb-local)
-   (igual? (first expre) 'cond) (evaluar-cond (next expre) amb-global amb-local)
-   true (aplicar (first (evaluar (first expre) amb-global amb-local)) (map (fn [x] (first (evaluar x amb-global amb-local))) (next expre)) amb-global amb-local))
-)
+  (cond
+    (es-escalar? expre) (evaluar-escalares expre amb-global amb-local)
+    (igual? expre nil) (list nil amb-global)
+    (igual? (first expre) '*error*) (list expre amb-global)
+    (igual? (first expre) 'de) (evaluar-de expre amb-global amb-local)
+    (igual? (first expre) 'exit) (salir expre amb-global amb-local)
+    (igual? (first expre) 'setq) (evaluar-setq expre amb-global amb-local)
+    (igual? (first expre) 'cond) (evaluar-cond (next expre) amb-global amb-local)
+    (igual? (first expre) 'quote) (evaluar-quote expre amb-global amb-local)
+    (igual? (first expre) 'lambda) (evaluar-lambda expre amb-global amb-local)
+    :else (aplicar (resultado-de-evaluar (first expre) amb-global amb-local)         ; Función a evaluar
+                   (map #(resultado-de-evaluar % amb-global amb-local) (next expre)) ; Lista de argumentos
+                   amb-global amb-local)))
+
+
+; TODO: Estos macros deberia ser definidos en la función evaluar
+; de: Done!
+; exit: Done!
+; setq: Done!
+; quote: Done!
+; lambda: Done!
+; cond: WIP
+; if
+; load
+; or
 
 
 ; Aplica una funcion a una lista de argumentos evaluados, usando los ambientes
@@ -167,39 +181,40 @@
    ([f lae amb-global amb-local]
       (aplicar (revisar-f f) (revisar-lae lae) f lae amb-global amb-local))
    ([resu1 resu2 f lae amb-global amb-local]
-      (cond resu1 (list resu1 amb-global)
-		    resu2 (list resu2 amb-global)
-		    true  (if (not (seq? f))
-		              (list (cond
-  			                (igual? f 'env) (if (> (count lae) 0)
-							                    (list '*error* 'too-many-args)
-												(concat amb-global amb-local))
-							(igual? f 'first) (let [ari (controlar-aridad lae 1)]
-							                      (cond (seq? ari) ari
-												        (igual? (first lae) nil) nil
-												        (not (seq? (first lae))) (list '*error* 'list 'expected (first lae))
-										                true (ffirst lae)))
-							(igual? f 'add) (if (< (count lae) 2)
-							                    (list '*error* 'too-few-args)
-							                    (try (reduce + lae) 
-												     (catch Exception e (list '*error* 'number-expected))))
-							true (let [lamb (buscar f (concat amb-local amb-global))]
-								    (cond (or (number? lamb) (igual? lamb 't) (igual? lamb nil)) (list '*error* 'non-applicable-type lamb)
-		                                  (or (number? f) (igual? f 't) (igual? f nil)) (list '*error* 'non-applicable-type f)
-		                                  (igual? (first lamb) '*error*) lamb
-	 	                                  true (aplicar lamb lae amb-global amb-local)))) amb-global)
-					(cond (< (count lae) (count (fnext f))) (list (list '*error* 'too-few-args) amb-global)
-					      (> (count lae) (count (fnext f))) (list (list '*error* 'too-many-args) amb-global)
-					      true (if (nil? (next (nnext f)))
-                  (evaluar (first (nnext f))
-                           amb-global
-                           (concat (reduce concat (map list (fnext f) lae)) amb-local))
-                  (aplicar (cons 'lambda (cons (fnext f) (next (nnext f)))) 
-                           lae 
-                           (fnext (evaluar (first (nnext f)) 
-                                           amb-global 
-                                           (concat (reduce concat (map list (fnext f) lae)) amb-local)))
-                           amb-local))))))
+      (cond
+        resu1 (list resu1 amb-global)
+        resu2 (list resu2 amb-global)
+        true  (if (not (seq? f))
+                (list (cond
+                        (igual? f 'env) (if (> (count lae) 0)
+                                          (list '*error* 'too-many-args)
+                                          (concat amb-global amb-local))
+                        (igual? f 'first) (let [ari (controlar-aridad lae 1)]
+                                            (cond (seq? ari) ari
+                                                  (igual? (first lae) nil) nil
+                                                  (not (seq? (first lae))) (list '*error* 'list 'expected (first lae))
+                                                  true (ffirst lae)))
+                        (igual? f 'add) (if (< (count lae) 2)
+                                          (list '*error* 'too-few-args)
+                                          (try (reduce + lae)
+                                               (catch Exception e (list '*error* 'number-expected))))
+                        true (let [lamb (buscar f (concat amb-local amb-global))]
+                               (cond (or (number? lamb) (igual? lamb 't) (igual? lamb nil)) (list '*error* 'non-applicable-type lamb)
+                                     (or (number? f) (igual? f 't) (igual? f nil)) (list '*error* 'non-applicable-type f)
+                                     (igual? (first lamb) '*error*) lamb
+                                     true (aplicar lamb lae amb-global amb-local)))) amb-global)
+                (cond (< (count lae) (count (fnext f))) (list (list '*error* 'too-few-args) amb-global)
+                      (> (count lae) (count (fnext f))) (list (list '*error* 'too-many-args) amb-global)
+                      true (if (nil? (next (nnext f)))
+                             (evaluar (first (nnext f))
+                                      amb-global
+                                      (concat (reduce concat (map list (fnext f) lae)) amb-local))
+                             (aplicar (cons 'lambda (cons (fnext f) (next (nnext f))))
+                                      lae
+                                      (fnext (evaluar (first (nnext f))
+                                                      amb-global
+                                                      (concat (reduce concat (map list (fnext f) lae)) amb-local)))
+                                      amb-local))))))
 )
 
 
@@ -399,7 +414,7 @@
 
 (defn salir
   "Sale del interprete de TLC-Lisp"
-  [expre amb-global]
+  [expre amb-global _]
   (cond
     (< (count (next expre)) 1) (list nil nil)
     :else (list (list '*error* 'too-many-args) amb-global)))
@@ -482,3 +497,9 @@
     (< (count (next expre)) 1) (list (list '*error* 'list 'expected nil) amb-global)
     (lambda-define-param? expre) (list (list '*error* 'list 'expected (second expre)) amb-global)
     :else (list expre amb-global)))
+
+
+(defn resultado-de-evaluar
+  "Devuelve el resultado de evaluar `x` en los ambientes global y local"
+  [x amb-global amb-local]
+  (first (evaluar x amb-global amb-local)))
