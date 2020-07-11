@@ -139,9 +139,9 @@
   (cond
     (setq-insuficientes? expre) (list (list '*error* 'list 'expected nil) amb-global)
     (igual? (second expre) nil) (list (list '*error* 'cannot-set nil) amb-global)    ; Trata de re-definir el nil
-    (not (symbol? (second expre))) (list (list '*error* 'symbol 'expected (fnext expre)) amb-global)
+    (not (symbol? (second expre))) (list (list '*error* 'symbol 'expected (second expre)) amb-global)
     (= (count (next expre)) 2) (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
-                                 (list (first res) (actualizar-amb amb-global (fnext expre) (first res))))
+                                 (list (first res) (actualizar-amb amb-global (second expre) (first res))))
     true (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
            (evaluar (cons 'setq (next (nnext expre))) (actualizar-amb amb-global (fnext expre) (first res)) amb-local))))
 
@@ -154,7 +154,7 @@
    (igual? expre nil) (list nil amb-global)
    (igual? (first expre) '*error*) (list expre amb-global)
    (igual? (first expre) 'exit) (salir expre amb-global)
-   (igual? (first expre) 'setq) (evaluar-setq expre amb-global amb-local)
+   (igual? (first expre) 'setq) (evaluar-setq expre amb-global amb-local)   
    (igual? (first expre) 'de) (cond
                                 (< (count (next expre)) 2) (list (list '*error* 'list 'expected nil) amb-global)
                                 (and (not (igual? (first (nnext expre)) nil)) (not (seq? (first (nnext expre))))) (list (list '*error* 'list 'expected (first (nnext expre))) amb-global)

@@ -130,9 +130,15 @@
   (testing "Evaluar comando salir"
     (is (= '(nil nil) (evaluar '(exit) '(A B) '(C D))))
     (is (= '((*error* too-many-args) (A B)) (evaluar '(exit extra) '(A B) '(C D)))))
-  (testing "Evaluar comando setq"
+  (testing "Error al evaluar el comando setq"
     (is (= '((*error* list expected nil) (A B)) (evaluar '(setq) '(A B) '(C D))))
     (is (= '((*error* list expected nil) (A B)) (evaluar '(setq nil) '(A B) '(C D))))
     (is (= '((*error* list expected nil) (A B)) (evaluar '(setq ()) '(A B) '(C D))))
     (is (= '((*error* cannot-set nil) (A B)) (evaluar '(setq nil XXX) '(A B) '(C D))))
-    (is (= '((*error* cannot-set nil) (A B)) (evaluar '(setq () XXX) '(A B) '(C D))))))
+    (is (= '((*error* cannot-set nil) (A B)) (evaluar '(setq () XXX) '(A B) '(C D))))
+    (is (= '((*error* symbol expected 1) (A B)) (evaluar '(setq 1 XXX) '(A B) '(C D))))
+    (is (= '((*error* symbol expected "TEXTO") (A B)) (evaluar '(setq "TEXTO" XXX) '(A B) '(C D)))))
+  (testing "Evaluar el comando setq"
+    (is (= '(1 '(A 1)) (evaluar '(setq A 1) '(A B) '(C D))))
+    (is (= '(1 '(A B X 1)) (evaluar '(setq X 1) '(A B) '(C D))))
+    (is (= '(1 '(A B C 1)) (evaluar '(setq C 1) '(A B) '(C D))))))
