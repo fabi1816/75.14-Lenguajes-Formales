@@ -129,12 +129,11 @@
    (es-escalar? expre) (evaluar-escalares expre amb-global amb-local)
    (igual? expre nil) (list nil amb-global)
    (igual? (first expre) '*error*) (list expre amb-global)
+   (igual? (first expre) 'de) (evaluar-de expre amb-global amb-local)
    (igual? (first expre) 'exit) (salir expre amb-global)
    (igual? (first expre) 'setq) (evaluar-setq expre amb-global amb-local)   
-   (igual? (first expre) 'de) (evaluar-de expre amb-global amb-local)
    (igual? (first expre) 'quote) (evaluar-quote expre amb-global amb-local)
    (igual? (first expre) 'lambda) (evaluar-lambda expre amb-global amb-local)
-   
    (igual? (first expre) 'cond) (evaluar-cond (next expre) amb-global amb-local)
    true (aplicar (first (evaluar (first expre) amb-global amb-local)) (map (fn [x] (first (evaluar x amb-global amb-local))) (next expre)) amb-global amb-local))
 )
