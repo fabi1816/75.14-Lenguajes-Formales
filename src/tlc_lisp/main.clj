@@ -20,6 +20,14 @@
 (declare cargar-input)
 (declare is-non-nil-empty-list?)
 (declare es-nombre-archivo-valido?)
+(declare es-escalar?)
+(declare es-numero-o-string?)
+(declare evaluar-escalares)
+(declare salir)
+(declare setq-insuficientes?)
+(declare evaluar-setq-unico)
+(declare evaluar-setq-multiples)
+(declare evaluar-setq)
 
 
 ; REPL (read–eval–print loop).
@@ -107,44 +115,6 @@
 ;  aplicacion de calculo lambda), por lo que se llama a la funcion aplicar,
 ; pasandole 4 argumentos: la evaluacion del primer elemento, una lista con las
 ;  evaluaciones de los demas, el ambiente global y el ambiente local.
-(defn es-escalar?
-  "Chequea si `elem` es un escalar no-nulo"
-  [elem] (and (not (seq? elem)) (not (nil? elem))))
-
-(defn es-numero-o-string?
-  "Chequea si `elem` es un numero o un string"
-  [elem] (or (number? elem) (string? elem)))
-
-(defn evaluar-escalares
-  "Evalua las expresiones que son escalares"
-  [expre amb-global amb-local]
-  (cond
-    (es-numero-o-string? expre) (list expre amb-global)
-    :else (list (buscar expre (concat amb-local amb-global)) amb-global)))
-
-(defn salir
-  "Sale del interprete de TLC-Lisp"
-  [expre amb-global]
-  (cond
-    (< (count (next expre)) 1) (list nil nil)
-    :else (list (list '*error* 'too-many-args) amb-global)))
-
-(defn setq-insuficientes?
-  "Valida que el comando de setq tenga suficientes elementos"
-  [cmd]
-  (or (= (count cmd) 1) (< (count (next cmd)) 2)))
-
-(defn evaluar-setq
-  [expre amb-global amb-local]
-  (cond
-    (setq-insuficientes? expre) (list (list '*error* 'list 'expected nil) amb-global)
-    (igual? (second expre) nil) (list (list '*error* 'cannot-set nil) amb-global)    ; Trata de re-definir el nil
-    (not (symbol? (second expre))) (list (list '*error* 'symbol 'expected (second expre)) amb-global)
-    (= (count (next expre)) 2) (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
-                                 (list (first res) (actualizar-amb amb-global (second expre) (first res))))
-    true (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
-           (evaluar (cons 'setq (next (nnext expre))) (actualizar-amb amb-global (fnext expre) (first res)) amb-local))))
-
 (defn evaluar
   "Evalua una expresion en los ambientes global y local
    Retorna un lista con el resultado y un ambiente"
@@ -387,11 +357,13 @@
   (and (seq? elem)
        (igual? (first elem) '*error*)))
 
+
 (defn es-nombre-archivo-valido?
   "Checkquea que el string sea un nombre de archivo .lsp valido"
   [nombre] 
   (and (> (count nombre) 4)
        (ends-with? nombre ".lsp")))
+
 
 (defn cargar-input
   "Carga y evalua uno a uno todo el contenido del input"
@@ -402,7 +374,69 @@
     (catch Exception e
       (imprimir nil) amb-global)))
 
+
 (defn is-non-nil-empty-list?
   "Checks that the parameter is an empty list and that it is not nil"
   [l]
   (and (list? l) (empty? l)))
+
+
+(defn es-escalar?
+  "Chequea si `elem` es un escalar no-nulo"
+  [elem] (and (not (seq? elem)) (not (nil? elem))))
+
+
+(defn es-numero-o-string?
+  "Chequea si `elem` es un numero o un string"
+  [elem] (or (number? elem) (string? elem)))
+
+
+(defn evaluar-escalares
+  "Evalua las expresiones que son escalares"
+  [expre amb-global amb-local]
+  (cond
+    (es-numero-o-string? expre) (list expre amb-global)
+    :else (list (buscar expre (concat amb-local amb-global)) amb-global)))
+
+
+(defn salir
+  "Sale del interprete de TLC-Lisp"
+  [expre amb-global]
+  (cond
+    (< (count (next expre)) 1) (list nil nil)
+    :else (list (list '*error* 'too-many-args) amb-global)))
+
+
+(defn setq-insuficientes?
+  "Valida que el comando de setq tenga suficientes elementos"
+  [cmd]
+  (or (= (count cmd) 1) (< (count (next cmd)) 2)))
+
+
+(defn evaluar-setq-unico
+  "Evalua una unica expresion del comando setq de TLC-Lisp"
+  [expre amb-global amb-local]
+  (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
+    (list
+     (first res)
+     (actualizar-amb amb-global (second expre) (first res)))))
+
+
+(defn evaluar-setq-multiples
+  "Evaluan todos los comandos de setq en la `expre`"
+  [expre amb-global amb-local]
+  (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
+    (evaluar
+     (cons 'setq (drop 3 expre))
+     (actualizar-amb amb-global (second expre) (first res)) amb-local)))
+
+
+(defn evaluar-setq
+  "Valida y ejecuta todos los bindeos de setq; el comando de TLC-Lisp"
+  [expre amb-global amb-local]
+  (cond
+    (setq-insuficientes? expre) (list (list '*error* 'list 'expected nil) amb-global)
+    (igual? (second expre) nil) (list (list '*error* 'cannot-set nil) amb-global)    ; Trata de re-definir el nil
+    (not (symbol? (second expre))) (list (list '*error* 'symbol 'expected (second expre)) amb-global)
+    (= (count (next expre)) 2) (evaluar-setq-unico expre amb-global amb-local)    ; Solo hay un comando setq
+    :else (evaluar-setq-multiples expre amb-global amb-local)))    ; Multiples setq en la expresión
