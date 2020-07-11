@@ -18,9 +18,12 @@
 ;; Funciones auxiliares al final del archivo
 (declare salir)
 (declare es-error?)
+(declare evaluar-de)
 (declare es-escalar?)
 (declare cargar-input)
 (declare evaluar-setq)
+(declare evaluar-quote)
+(declare de-define-params?)
 (declare evaluar-escalares)
 (declare evaluar-setq-unico)
 (declare es-numero-o-string?)
@@ -116,22 +119,7 @@
 ; pasandole 4 argumentos: la evaluacion del primer elemento, una lista con las
 ;  evaluaciones de los demas, el ambiente global y el ambiente local.
 
-(defn de-define-params?
-  "Indica si la expresión 'de' de TLC-Lisp define una lista de parametros.
-   La lista de parametros puede estar vacia."
-  [expre]
-  (and (not (igual? (first (nnext expre)) nil))    ; No tiene una lista vacia
-       (not (seq? (first (nnext expre))))))        ; No tiene una lista
 
-(defn evaluar-de
-  "Evalua la expresión 'de' en TLC-Lisp"
-  [expre amb-global _l]
-  (cond
-    (< (count (next expre)) 2) (list (list '*error* 'list 'expected nil) amb-global)
-    (de-define-params? expre) (list (list '*error* 'list 'expected (first (nnext expre))) amb-global)
-    (igual? (second expre) nil) (list (list '*error* 'cannot-set nil) amb-global)
-    (not (symbol? (second expre))) (list (list '*error* 'symbol 'expected (second expre)) amb-global)
-    :else (list (second expre) (actualizar-amb amb-global (second expre) (cons 'lambda (nnext expre))))))
 
 (defn evaluar
   "Evalua una expresion en los ambientes global y local
@@ -144,7 +132,7 @@
    (igual? (first expre) 'exit) (salir expre amb-global)
    (igual? (first expre) 'setq) (evaluar-setq expre amb-global amb-local)   
    (igual? (first expre) 'de) (evaluar-de expre amb-global amb-local)
-   (igual? (first expre) 'quote) (list (if (igual? (fnext expre) nil) nil (fnext expre)) amb-global)
+   (igual? (first expre) 'quote) (evaluar-quote expre amb-global amb-local)
    (igual? (first expre) 'lambda) (cond
                                     (< (count (next expre)) 1) (list (list '*error* 'list 'expected nil) amb-global)
                                     (and (not (igual? (fnext expre) nil)) (not (seq? (fnext expre)))) (list (list '*error* 'list 'expected (fnext expre)) amb-global)
@@ -453,3 +441,31 @@
     (not (symbol? (second expre))) (list (list '*error* 'symbol 'expected (second expre)) amb-global)
     (= (count (next expre)) 2) (evaluar-setq-unico expre amb-global amb-local)    ; Solo hay un comando setq
     :else (evaluar-setq-multiples expre amb-global amb-local)))    ; Multiples setq en la expresión
+
+
+(defn de-define-params?
+  "Indica si la expresión 'de' de TLC-Lisp define una lista de parametros.
+   La lista de parametros puede estar vacia."
+  [expre]
+  (and (not (igual? (first (nnext expre)) nil))    ; No tiene una lista vacia
+       (not (seq? (first (nnext expre))))))        ; No tiene una lista
+
+
+(defn evaluar-de
+  "Evalua la expresión 'de' en TLC-Lisp.
+   Define la función en el ambiente global"
+  [expre amb-global _]
+  (cond
+    (< (count (next expre)) 2) (list (list '*error* 'list 'expected nil) amb-global)
+    (de-define-params? expre) (list (list '*error* 'list 'expected (first (nnext expre))) amb-global)
+    (igual? (second expre) nil) (list (list '*error* 'cannot-set nil) amb-global)
+    (not (symbol? (second expre))) (list (list '*error* 'symbol 'expected (second expre)) amb-global)
+    :else (list (second expre) (actualizar-amb amb-global (second expre) (cons 'lambda (nnext expre))))))
+
+
+(defn evaluar-quote
+  "Evalua el comando 'quote'"
+  [expre amb-global _]
+  (if (igual? (second expre) nil)
+    (list nil amb-global)
+    (list (second expre) amb-global)))

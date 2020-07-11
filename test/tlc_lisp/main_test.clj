@@ -159,5 +159,16 @@
     (is (= '(f (f (lambda () (1)))) (evaluar '(de f () (1)) '() nil)))
     (is (= '(f (A B f (lambda() (1)))) (evaluar '(de f() (1)) '(A B) nil)))
     (is (= '(f (A B f (lambda () (1)))) (evaluar '(de f () (1)) '(A B) nil)))
-    (is (= '(suma (suma (lambda (a b) (+ a b)))) (evaluar '(de suma (a b) (+ a b)) '() nil)))))
+    (is (= '(suma (suma (lambda (a b) (+ a b)))) (evaluar '(de suma (a b) (+ a b)) '() nil)))
+    (is (= '(suma (A B suma (lambda (a b) (+ a b)))) (evaluar '(de suma (a b) (+ a b)) '(A B) nil)))))
 
+(deftest test-evaluar-comando-quote
+  (testing "Quote vacio"
+    (is (= '(nil ()) (evaluar '(quote) '() nil)))
+    (is (= '(nil ()) (evaluar '(quote ()) '() nil)))
+    (is (= '(nil ()) (evaluar '(quote nil) '() nil)))
+    (is (= '(nil (A B)) (evaluar '(quote nil) '(A B) nil))))
+  (testing "Quote algo"
+    (is (= '(A ()) (evaluar '(quote A) '() nil)))
+    (is (= '(AB ()) (evaluar '(quote AB) '() nil)))
+    (is (= '(AB (C D)) (evaluar '(quote AB) '(C D) nil)))))
