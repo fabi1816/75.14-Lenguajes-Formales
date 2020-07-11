@@ -124,12 +124,14 @@
     (is (= '(nil (A B)) (evaluar nil '(A B) '(C D))))
     (is (= '(nil (A B)) (evaluar '() '(A B) '(C D))))))
 
-(deftest test-evaluar-comandos-especiales
+(deftest test-evaluar-comandos-simples
   (testing "La expresión es un mensaje de error"
     (is (= '((*error* descrip) (A B)) (evaluar '(*error* descrip) '(A B) '(C D)))))
   (testing "Evaluar comando salir"
     (is (= '(nil nil) (evaluar '(exit) '(A B) '(C D))))
-    (is (= '((*error* too-many-args) (A B)) (evaluar '(exit extra) '(A B) '(C D)))))
+    (is (= '((*error* too-many-args) (A B)) (evaluar '(exit extra) '(A B) '(C D))))))
+
+(deftest test-evaluar-comando-setq
   (testing "Error al evaluar el comando setq"
     (is (= '((*error* list expected nil) (A B)) (evaluar '(setq) '(A B) '(C D))))
     (is (= '((*error* list expected nil) (A B)) (evaluar '(setq nil) '(A B) '(C D))))
@@ -142,3 +144,20 @@
     (is (= '(1 (A 1)) (evaluar '(setq A 1) '(A B) '(C D))))
     (is (= '(1 (A B X 1)) (evaluar '(setq X 1) '(A B) '(C D))))
     (is (= '(1 (A B C 1)) (evaluar '(setq C 1) '(A B) '(C D))))))
+
+(deftest test-evaluar-comando-de
+  (testing "Error al evaluar el comando 'de'"
+    (is (= '((*error* list expected nil) (A B)) (evaluar '(de) '(A B) nil)))
+    (is (= '((*error* list expected nil) (A B)) (evaluar '(de fun-nombre) '(A B) nil)))
+    (is (= '((*error* list expected "XX") (A B)) (evaluar '(de fun-nombre "XX") '(A B) nil)))
+    (is (= '((*error* list expected XX) (A B)) (evaluar '(de fun-nombre XX) '(A B) nil)))
+    (is (= '((*error* cannot-set nil) (A B)) (evaluar '(de nil ()) '(A B) nil)))
+    (is (= '((*error* cannot-set nil) (A B)) (evaluar '(de () ()) '(A B) nil)))
+    (is (= '((*error* symbol expected 1) (A B)) (evaluar '(de 1 ()) '(A B) nil)))
+    (is (= '((*error* symbol expected "XX") (A B)) (evaluar '(de "XX" ()) '(A B) nil))))
+  (testing "Evalua el comando 'de' y define una función"
+    (is (= '(f (f (lambda () (1)))) (evaluar '(de f () (1)) '() nil)))
+    (is (= '(f (A B f (lambda() (1)))) (evaluar '(de f() (1)) '(A B) nil)))
+    (is (= '(f (A B f (lambda () (1)))) (evaluar '(de f () (1)) '(A B) nil)))
+    (is (= '(suma (suma (lambda (a b) (+ a b)))) (evaluar '(de suma (a b) (+ a b)) '() nil)))))
+
