@@ -139,6 +139,6 @@
     (is (= '((*error* symbol expected 1) (A B)) (evaluar '(setq 1 XXX) '(A B) '(C D))))
     (is (= '((*error* symbol expected "TEXTO") (A B)) (evaluar '(setq "TEXTO" XXX) '(A B) '(C D)))))
   (testing "Evaluar el comando setq"
-    (is (= '(1 '(A 1)) (evaluar '(setq A 1) '(A B) '(C D))))
-    (is (= '(1 '(A B X 1)) (evaluar '(setq X 1) '(A B) '(C D))))
-    (is (= '(1 '(A B C 1)) (evaluar '(setq C 1) '(A B) '(C D))))))
+    (is (= '(1 (A 1)) (evaluar '(setq A 1) '(A B) '(C D))))
+    (is (= '(1 (A B X 1)) (evaluar '(setq X 1) '(A B) '(C D))))
+    (is (= '(1 (A B C 1)) (evaluar '(setq C 1) '(A B) '(C D))))))
