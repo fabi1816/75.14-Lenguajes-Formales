@@ -16,18 +16,18 @@
 (declare evaluar-secuencia-en-cond)
 
 ;; Funciones auxiliares al final del archivo
-(declare es-error?)
-(declare cargar-input)
-(declare is-non-nil-empty-list?)
-(declare es-nombre-archivo-valido?)
-(declare es-escalar?)
-(declare es-numero-o-string?)
-(declare evaluar-escalares)
 (declare salir)
-(declare setq-insuficientes?)
-(declare evaluar-setq-unico)
-(declare evaluar-setq-multiples)
+(declare es-error?)
+(declare es-escalar?)
+(declare cargar-input)
 (declare evaluar-setq)
+(declare evaluar-escalares)
+(declare evaluar-setq-unico)
+(declare es-numero-o-string?)
+(declare setq-insuficientes?)
+(declare is-non-nil-empty-list?)
+(declare evaluar-setq-multiples)
+(declare es-nombre-archivo-valido?)
 
 
 ; REPL (read–eval–print loop).
