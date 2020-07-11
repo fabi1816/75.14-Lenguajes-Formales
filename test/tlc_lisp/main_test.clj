@@ -157,7 +157,6 @@
     (is (= '((*error* symbol expected "XX") (A B)) (evaluar '(de "XX" ()) '(A B) nil))))
   (testing "Evalua el comando 'de' y define una función"
     (is (= '(f (f (lambda () (1)))) (evaluar '(de f () (1)) '() nil)))
-    (is (= '(f (A B f (lambda() (1)))) (evaluar '(de f() (1)) '(A B) nil)))
     (is (= '(f (A B f (lambda () (1)))) (evaluar '(de f () (1)) '(A B) nil)))
     (is (= '(suma (suma (lambda (a b) (+ a b)))) (evaluar '(de suma (a b) (+ a b)) '() nil)))
     (is (= '(suma (A B suma (lambda (a b) (+ a b)))) (evaluar '(de suma (a b) (+ a b)) '(A B) nil)))))
@@ -172,3 +171,14 @@
     (is (= '(A ()) (evaluar '(quote A) '() nil)))
     (is (= '(AB ()) (evaluar '(quote AB) '() nil)))
     (is (= '(AB (C D)) (evaluar '(quote AB) '(C D) nil)))))
+
+(deftest test-evaluar-comando-lambda
+  (testing "Errores al definir lambdas"
+    (is (= '((*error* list expected nil) ()) (evaluar '(lambda) '() nil)))
+    (is (= '((*error* list expected nil) (A B)) (evaluar '(lambda) '(A B) nil)))
+    (is (= '((*error* list expected 1) ()) (evaluar '(lambda 1) '() nil)))
+    (is (= '((*error* list expected AAA) ()) (evaluar '(lambda AAA) '() nil))))
+  (testing "Lambda define función"
+    (is (= '((lambda () (1)) ()) (evaluar '(lambda () (1)) '() nil)))
+    (is (= '((lambda () (1)) (A B)) (evaluar '(lambda () (1)) '(A B) nil)))
+    (is (= '((lambda (x) (* 2 x)) (A B)) (evaluar '(lambda (x) (* 2 x)) '(A B) nil)))))

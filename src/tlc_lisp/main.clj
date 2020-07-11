@@ -23,11 +23,13 @@
 (declare cargar-input)
 (declare evaluar-setq)
 (declare evaluar-quote)
+(declare evaluar-lambda)
 (declare de-define-params?)
 (declare evaluar-escalares)
 (declare evaluar-setq-unico)
 (declare es-numero-o-string?)
 (declare setq-insuficientes?)
+(declare lambda-define-param?)
 (declare is-non-nil-empty-list?)
 (declare evaluar-setq-multiples)
 (declare es-nombre-archivo-valido?)
@@ -119,8 +121,6 @@
 ; pasandole 4 argumentos: la evaluacion del primer elemento, una lista con las
 ;  evaluaciones de los demas, el ambiente global y el ambiente local.
 
-
-
 (defn evaluar
   "Evalua una expresion en los ambientes global y local
    Retorna un lista con el resultado y un ambiente"
@@ -133,10 +133,8 @@
    (igual? (first expre) 'setq) (evaluar-setq expre amb-global amb-local)   
    (igual? (first expre) 'de) (evaluar-de expre amb-global amb-local)
    (igual? (first expre) 'quote) (evaluar-quote expre amb-global amb-local)
-   (igual? (first expre) 'lambda) (cond
-                                    (< (count (next expre)) 1) (list (list '*error* 'list 'expected nil) amb-global)
-                                    (and (not (igual? (fnext expre) nil)) (not (seq? (fnext expre)))) (list (list '*error* 'list 'expected (fnext expre)) amb-global)
-                                    true (list expre amb-global))
+   (igual? (first expre) 'lambda) (evaluar-lambda expre amb-global amb-local)
+   
    (igual? (first expre) 'cond) (evaluar-cond (next expre) amb-global amb-local)
    true (aplicar (first (evaluar (first expre) amb-global amb-local)) (map (fn [x] (first (evaluar x amb-global amb-local))) (next expre)) amb-global amb-local))
 )
@@ -372,7 +370,7 @@
   (try
     (let [res (evaluar (read input) amb-global nil)]
       (cargar-arch (second res) nil input res))
-    (catch Exception e
+    (catch Exception _
       (imprimir nil) amb-global)))
 
 
@@ -469,3 +467,19 @@
   (if (igual? (second expre) nil)
     (list nil amb-global)
     (list (second expre) amb-global)))
+
+
+(defn lambda-define-param?
+  "Indica si la expresión lambda define correctamente sus parametros"
+  [expre]
+  (and (not (igual? (second expre) nil))
+       (not (seq? (second expre)))))
+
+
+(defn evaluar-lambda
+  "Evalua el comando lambda"
+  [expre amb-global _]
+  (cond
+    (< (count (next expre)) 1) (list (list '*error* 'list 'expected nil) amb-global)
+    (lambda-define-param? expre) (list (list '*error* 'list 'expected (second expre)) amb-global)
+    :else (list expre amb-global)))
