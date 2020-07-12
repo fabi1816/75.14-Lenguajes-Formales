@@ -301,3 +301,8 @@
   (testing "Errores"
     (is (= '((*error* too-few-args) (sub sub)) (evaluar '(sub 1) '(sub sub) nil)))
     (is (= '((*error* too-many-args) (sub sub)) (evaluar '(sub 1 1 1) '(sub sub) nil)))))
+
+(deftest test-suma-resta
+  (testing "Suma"
+    (is (= '(3 (+ add)) (evaluar '(+ 1 2) '(+ add) nil)))
+    (is (= '(2 (- sub)) (evaluar '(- 3 1) '(- sub) nil)))))

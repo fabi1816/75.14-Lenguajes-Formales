@@ -229,6 +229,8 @@
 ; equal: Done!
 ; length: Done!
 ; sub: Done!
+; +: Done!
+; -: Done!
 ; 
 ; append: retorna la fusión
 ; cons: retorna inserción de
@@ -244,8 +246,6 @@
 ; rest: retorna una lista sin su 1ra. posición
 ; reverse: 
 ; terpri: imprime un salto de línea
-; +: equivale a add
-; -: equivale a sub
 
 ; Controla la aridad (cantidad de argumentos de una funcion).
 ; Recibe una lista y un numero. Si la longitud de la lista coincide con el
