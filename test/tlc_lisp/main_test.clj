@@ -175,15 +175,15 @@
     (is (= '((lambda () (1)) (A B)) (evaluar '(lambda () (1)) '(A B) nil)))
     (is (= '((lambda (x) (* 2 x)) (A B)) (evaluar '(lambda (x) (* 2 x)) '(A B) nil)))))
 
-(deftest test-evaluar-commando-cond
-  (testing "Lista de comandos vacia"
-    (is (= '(nil ()) (evaluar '(cond) '() nil)))
-    (is (= '(nil ()) (evaluar '(cond ()) '() nil)))
-    (is (= '(nil ()) (evaluar '(cond nil) '() nil)))
-    (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) nil)))
-    (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) '(C D)))))
-  (testing "Cond simple en formato TLC-Lisp"
-    (is (= '(A ()) (evaluar '(cond ((t 'A))) '(t t) nil)))))
+;; (deftest test-evaluar-commando-cond
+;;   (testing "Lista de comandos vacia"
+;;     (is (= '(nil ()) (evaluar '(cond) '() nil)))
+;;     (is (= '(nil ()) (evaluar '(cond ()) '() nil)))
+;;     (is (= '(nil ()) (evaluar '(cond nil) '() nil)))
+;;     (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) nil)))
+;;     (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) '(C D)))))
+;;   (testing "Cond simple en formato TLC-Lisp"
+;;     (is (= '(A ()) (evaluar '(cond ((t 'A))) '(t t) nil)))))
 
 ; un cond en TLC-Lisp es:
 ; (cond
