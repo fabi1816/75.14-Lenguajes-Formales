@@ -1,17 +1,16 @@
 (ns tlc-lisp.main-test
   (:require [clojure.test :refer [deftest is testing]]
-            [tlc-lisp.main :refer [
-                                   controlar-aridad
-                                   igual?
-                                   actualizar-amb
-                                   revisar-f
-                                   revisar-lae
+            [tlc-lisp.main :refer [actualizar-amb
+                                   aplicar
                                    buscar
-                                   imprimir
+                                   controlar-aridad
                                    evaluar
                                    evaluar-cond
-                                   evaluar-secuencia-en-cond]]))
-
+                                   evaluar-secuencia-en-cond
+                                   igual?
+                                   imprimir
+                                   revisar-f
+                                   revisar-lae]]))
 
 (deftest test-controlar-aridad
   (testing "La aridad es correcta"
@@ -62,9 +61,10 @@
     (is (= '(*error*) (revisar-f '(*error*))))
     (is (= '(*error* A B) (revisar-f '(*error* A B)))))
   (testing "No es un error"
+    (is (nil? (revisar-f 'A)))
+    (is (nil? (revisar-f 'B)))
     (is (nil? (revisar-f '())))
-    (is (nil? (revisar-f '(A))))
-    (is (nil? (revisar-f '(A B))))))
+    (is (nil? (revisar-f nil)))))
 
 (deftest test-revisar-lae
   (testing "No hay error en la lista"
@@ -176,43 +176,45 @@
     (is (= '((lambda () (1)) (A B)) (evaluar '(lambda () (1)) '(A B) nil)))
     (is (= '((lambda (x) (* 2 x)) (A B)) (evaluar '(lambda (x) (* 2 x)) '(A B) nil)))))
 
-#_(deftest test-evaluar-commando-cond
-  (testing "Lista de comandos vacia"
-    (is (= '(nil ()) (evaluar '(cond) '() nil)))
-    (is (= '(nil ()) (evaluar '(cond ()) '() nil)))
-    (is (= '(nil ()) (evaluar '(cond nil) '() nil)))
-    (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) nil)))
-    (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) '(C D)))))
-  (testing "Cond simple en formato TLC-Lisp"
-      (is (= '(A ()) (evaluar '(cond (t 'A)) '() nil)))))
 
-#_(deftest test-evaluar-secuencia-en-cond
-  (testing "No hay nada para evaluar"
-    (is (= nil (evaluar-secuencia-en-cond nil '() nil)))
-    (is (= nil (evaluar-secuencia-en-cond '() '() nil)))
-    (is (= nil (evaluar-secuencia-en-cond '(()) '() nil)))
-    (is (= nil (evaluar-secuencia-en-cond '(nil) '() nil))))
-  (testing "Evaluar escalares"
-    (is (= 1 (evaluar-secuencia-en-cond '(1) '() nil)))
-    (is (= 'A (evaluar-secuencia-en-cond '('A) '() nil)))
-    (is (= "TEXTO" (evaluar-secuencia-en-cond '("TEXTO") '() nil)))
-    (is (= 1 (evaluar-secuencia-en-cond '((1)) '() nil)))
-    (is (= 'A (evaluar-secuencia-en-cond '(('A)) '() nil)))
-    (is (= "TEXTO" (evaluar-secuencia-en-cond '(("TEXTO")) '() nil))))
-  (testing "Evaluar simbolos"
-    (is (= 'B (evaluar-secuencia-en-cond '(A) '(A B) nil)))
-    (is (= 'D (evaluar-secuencia-en-cond '(C) '(A B C D) nil)))
-    (is (= '(*error* unbound-symbol X) (evaluar-secuencia-en-cond '(X) '(A B) nil))))
-  (testing "Evaluaciones multiples de escalares"
-    (is (= 'B (evaluar-secuencia-en-cond '(1 A) '(A B) nil)))
-    (is (= 9 (evaluar-secuencia-en-cond '(1 A 9) '(A B) nil)))
-    (is (= 'D (evaluar-secuencia-en-cond '(1 A 9 C) '(A B C D) nil))))
-  (testing "Evaluaciones de escalares con ambiente local"
-    (is (= 'D (evaluar-secuencia-en-cond '(C) '(A B) '(C D))))
-    (is (= 'B (evaluar-secuencia-en-cond '(1 C 2 A) '(A B) '(C D))))
-    (is (= 'F (evaluar-secuencia-en-cond '(1 C 2 A E) '(A B) '(C D E F)))))
-  (testing "Evaluaciones de funciones"
-    (is (= 3 (evaluar-secuencia-en-cond '((add 1 2)) '(add add) nil)))))
+;; (deftest test-evaluar-commando-cond
+;;   (testing "Lista de comandos vacia"
+;;     (is (= '(nil ()) (evaluar '(cond) '() nil)))
+;;     (is (= '(nil ()) (evaluar '(cond ()) '() nil)))
+;;     (is (= '(nil ()) (evaluar '(cond nil) '() nil)))
+;;     (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) nil)))
+;;     (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) '(C D)))))
+;;   (testing "Cond simple en formato TLC-Lisp"
+;;       #_(is (= '(A ()) (evaluar '(cond (t 'A)) '() nil)))))
+
+;; (deftest test-evaluar-secuencia-en-cond
+;;   (testing "No hay nada para evaluar"
+;;     (is (= nil (evaluar-secuencia-en-cond nil '() nil)))
+;;     (is (= nil (evaluar-secuencia-en-cond '() '() nil)))
+;;     (is (= nil (evaluar-secuencia-en-cond '(()) '() nil)))
+;;     (is (= nil (evaluar-secuencia-en-cond '(nil) '() nil))))
+;;   (testing "Evaluar escalares"
+;;     (is (= 1 (evaluar-secuencia-en-cond '(1) '() nil)))
+;;     (is (= 'A (evaluar-secuencia-en-cond '('A) '() nil)))
+;;     (is (= "TEXTO" (evaluar-secuencia-en-cond '("TEXTO") '() nil)))
+;;     (is (= 1 (evaluar-secuencia-en-cond '((1)) '() nil)))
+;;     (is (= 'A (evaluar-secuencia-en-cond '(('A)) '() nil)))
+;;     (is (= "TEXTO" (evaluar-secuencia-en-cond '(("TEXTO")) '() nil))))
+;;   (testing "Evaluar simbolos"
+;;     (is (= 'B (evaluar-secuencia-en-cond '(A) '(A B) nil)))
+;;     (is (= 'D (evaluar-secuencia-en-cond '(C) '(A B C D) nil)))
+;;     (is (= '(*error* unbound-symbol X) (evaluar-secuencia-en-cond '(X) '(A B) nil))))
+;;   (testing "Evaluaciones multiples de escalares"
+;;     (is (= 'B (evaluar-secuencia-en-cond '(1 A) '(A B) nil)))
+;;     (is (= 9 (evaluar-secuencia-en-cond '(1 A 9) '(A B) nil)))
+;;     (is (= 'D (evaluar-secuencia-en-cond '(1 A 9 C) '(A B C D) nil))))
+;;   (testing "Evaluaciones de escalares con ambiente local"
+;;     (is (= 'D (evaluar-secuencia-en-cond '(C) '(A B) '(C D))))
+;;     (is (= 'B (evaluar-secuencia-en-cond '(1 C 2 A) '(A B) '(C D))))
+;;     (is (= 'F (evaluar-secuencia-en-cond '(1 C 2 A E) '(A B) '(C D E F)))))
+;;   (testing "Evaluaciones de funciones"
+;;     (is (= 3 (evaluar-secuencia-en-cond '((add 1 2)) '(add add) nil)))))
+
 
 ; un cond en TLC-Lisp es:
 ; (cond
@@ -220,3 +222,54 @@
 ;      ( (<True o False>) (ope_3) (ope_4) )
 ;      ( True (ope_5) (ope_6) )
 ; )
+
+(deftest test-aplicar
+  (testing "Maneja errores en las funciones por aplicar"
+    (is (= '((*error*) ()) (aplicar '(*error*) '() '() nil)))
+    (is (= '((*error*) (A B)) (aplicar '(*error*) '() '(A B) nil)))
+    (is (= '((*error* descrip) (A B)) (aplicar '(*error* descrip) '() '(A B) nil))))
+  (testing "Maneja errores en los argumentos por aplicar"
+    (is (= '((*error*) ()) (aplicar '() '((*error*)) '() nil)))
+    (is (= '((*error*) (A B)) (aplicar '() '((*error*)) '(A B) nil)))
+    (is (= '((*error* descrip) (A B)) (aplicar '() '((*error* descrip)) '(A B) nil))))
+  (testing "Manejo de la función 'env'"
+    (is (= '(() ()) (aplicar 'env '() '() nil)))
+    (is (= '((A B) (A B)) (aplicar 'env '() '(A B) nil)))
+    (is (= '((A B C D) (A B)) (aplicar 'env '() '(A B) '(C D)))))
+  (testing "Errores de la función 'env'"
+    (is (= '((*error* too-many-args) ()) (aplicar 'env '(1) '() nil)))
+    (is (= '((*error* too-many-args) ()) (aplicar 'env '(A) '() nil))))
+  (testing "Errores de la función 'first'"
+    (is (= '((*error* too-few-args) ()) (aplicar 'first '() '() nil)))
+    (is (= '((*error* list expected A) ()) (aplicar 'first '(A) '() nil))))
+  (testing "Manejo de la función 'first'"
+    (is (= '(nil ()) (aplicar 'first '(()) '() nil)))
+    (is (= '(nil ()) (aplicar 'first '(nil) '() nil)))
+    (is (= '(1 ()) (aplicar 'first '((1)) '() nil)))
+    (is (= '(1 ()) (aplicar 'first '((1 2)) '() nil)))
+    (is (= '(1 (A B)) (aplicar 'first '((1 2)) '(A B) nil)))
+    (is (= '(1 (A B)) (aplicar 'first '((1 2)) '(A B) '(C D)))))
+  (testing "Manejo de la función 'add'"
+    (is (= '(3 ()) (aplicar 'add '(1 2) '() nil)))
+    (is (= '(5 (A B)) (aplicar 'add '(2 3) '(A B) nil))))
+  (testing "Errores de la función 'add'"
+    (is (= '((*error* too-few-args) ()) (aplicar 'add '() '() nil)))
+    (is (= '((*error* too-few-args) ()) (aplicar 'add '(1) '() nil)))
+    (is (= '((*error* too-few-args) (A B)) (aplicar 'add '(1) '(A B) nil)))
+    (is (= '((*error* number-expected) ()) (aplicar 'add '(1 X) '() nil)))
+    (is (= '((*error* number-expected) ()) (aplicar 'add '(X 1) '() nil)))
+    (is (= '((*error* number-expected) (A B)) (aplicar 'add '(X Y) '(A B) nil))))
+  (testing "Error en aplicar funciones definidas por el usuario"
+    (is (= '((*error* unbound-symbol X) ()) (aplicar 'X '() '() nil)))
+    (is (= '((*error* unbound-symbol X) (A 1)) (aplicar 'X '() '(A 1) '(B 1))))
+    (is (= '((*error* non-applicable-type t) (A t)) (aplicar 'A '() '(A t) nil)))
+    (is (= '((*error* non-applicable-type nil) (A nil)) (aplicar 'A '() '(A nil) nil)))
+    (is (= '((*error* non-applicable-type 1) (A 1)) (aplicar 'A '() '(A 1) nil)))
+    (is (= '((*error* non-applicable-type 2) (A 1)) (aplicar 'B '() '(A 1) '(B 2))))
+    (is (= '((*error* non-applicable-type 1) ()) (aplicar 1 '() '() nil)))
+    (is (= '((*error* non-applicable-type t) ()) (aplicar 't '() '() nil)))
+    (is (= '((*error* non-applicable-type nil) ()) (aplicar nil '() '() nil)))
+    (is (= '((*error* random-error) ()) (aplicar '(*error* random-error) '() '() nil))))
+  (testing "Aplicar funciones definidas por el usuario"
+    (is (= '(3 (sumar add)) (aplicar 'sumar '(1 2) '(sumar add) nil)))
+    ))

@@ -136,7 +136,7 @@
     (igual? (first expre) 'cond) (evaluar-cond (next expre) amb-global amb-local)
     (igual? (first expre) 'quote) (evaluar-quote expre amb-global amb-local)
     (igual? (first expre) 'lambda) (evaluar-lambda expre amb-global amb-local)
-    :else (aplicar #break (resultado-de-evaluar (first expre) amb-global amb-local)         ; Función a evaluar
+    :else (aplicar (resultado-de-evaluar (first expre) amb-global amb-local)         ; Función a evaluar
                    (map #(resultado-de-evaluar % amb-global amb-local) (next expre)) ; Lista de argumentos
                    amb-global amb-local)))
 
@@ -177,45 +177,75 @@
 ; el amb. global actualizado con la eval. del 1er. cuerpo (usando el amb.
 ;  global intacto y el local actualizado con los params. ligados a los args.)
 ;   y el amb. local intacto. 
+
+(defn fun-env
+  "Devuelve la union de los ambientes global y local."
+  [lae amb-global amb-local]
+  (if (> (count lae) 0)
+    (list '*error* 'too-many-args)
+    (concat amb-global amb-local)))
+
+(defn fun-first
+  "Devuelve el primer elemento de una lista"
+  [lae]
+  (let [ari (controlar-aridad lae 1)]
+    (cond
+      (seq? ari) ari
+      (igual? (first lae) nil) nil
+      (not (seq? (first lae))) (list '*error* 'list 'expected (first lae))
+      :else (ffirst lae))))
+
+(defn fun-sumar
+  "Suma los elementos de la lista.
+   Minimo 2 elementos"
+  [lae]
+  (if (< (count lae) 2)
+    (list '*error* 'too-few-args)
+    (try (reduce + lae)
+         (catch Exception _ (list '*error* 'number-expected)))))
+
+(defn fun-definidas-por-el-usuario
+  "Aplica la función definida por el usuario si esta ya existe
+   en el ambiente global o local"
+  [f lae amb-global amb-local])
+
 (defn aplicar
+  "Aplica a la lista de argumentos `lae` la función `f` en los ambientes datos"
    ([f lae amb-global amb-local]
       (aplicar (revisar-f f) (revisar-lae lae) f lae amb-global amb-local))
    ([resu1 resu2 f lae amb-global amb-local]
       (cond
-        resu1 (list resu1 amb-global)
-        resu2 (list resu2 amb-global)
-        true  (if (not (seq? f))
-                (list (cond
-                        (igual? f 'env) (if (> (count lae) 0)
-                                          (list '*error* 'too-many-args)
-                                          (concat amb-global amb-local))
-                        (igual? f 'first) (let [ari (controlar-aridad lae 1)]
-                                            (cond (seq? ari) ari
-                                                  (igual? (first lae) nil) nil
-                                                  (not (seq? (first lae))) (list '*error* 'list 'expected (first lae))
-                                                  true (ffirst lae)))
-                        (igual? f 'add) (if (< (count lae) 2)
-                                          (list '*error* 'too-few-args)
-                                          (try (reduce + lae)
-                                               (catch Exception e (list '*error* 'number-expected))))
-                        true (let [lamb (buscar f (concat amb-local amb-global))]
-                               (cond (or (number? lamb) (igual? lamb 't) (igual? lamb nil)) (list '*error* 'non-applicable-type lamb)
-                                     (or (number? f) (igual? f 't) (igual? f nil)) (list '*error* 'non-applicable-type f)
-                                     (igual? (first lamb) '*error*) lamb
-                                     true (aplicar lamb lae amb-global amb-local)))) amb-global)
-                (cond (< (count lae) (count (fnext f))) (list (list '*error* 'too-few-args) amb-global)
-                      (> (count lae) (count (fnext f))) (list (list '*error* 'too-many-args) amb-global)
-                      true (if (nil? (next (nnext f)))
-                             (evaluar (first (nnext f))
-                                      amb-global
-                                      (concat (reduce concat (map list (fnext f) lae)) amb-local))
-                             (aplicar (cons 'lambda (cons (fnext f) (next (nnext f))))
-                                      lae
-                                      (fnext (evaluar (first (nnext f))
-                                                      amb-global
-                                                      (concat (reduce concat (map list (fnext f) lae)) amb-local)))
-                                      amb-local))))))
-)
+        (not (nil? resu1)) (list resu1 amb-global)    ; La función es un mensaje de error
+        (not (nil? resu2)) (list resu2 amb-global)    ; La lista de argumentos es un mensaje de error
+        
+        ; Si f no es una lista
+        (not (seq? f)) (list
+                        (cond
+                          (igual? f 'env) (fun-env lae amb-global amb-local)
+                          (igual? f 'first) (fun-first lae)
+                          (igual? f 'add) (fun-sumar lae)
+                          :else (let [lamb (buscar f (concat amb-local amb-global))]
+                                  (cond
+                                    (or (number? lamb) (igual? lamb 't) (igual? lamb nil)) (list '*error* 'non-applicable-type lamb)
+                                    (or (number? f) (igual? f 't) (igual? f nil)) (list '*error* 'non-applicable-type f)
+                                    (and (seq? lamb) (igual? (first lamb) '*error*)) lamb
+                                    :else (aplicar lamb lae amb-global amb-local))))
+                        amb-global)
+        ; Si f es una lista
+        :else (cond
+                (< (count lae) (count (fnext f))) (list (list '*error* 'too-few-args) amb-global)
+                (> (count lae) (count (fnext f))) (list (list '*error* 'too-many-args) amb-global)
+                true (if (nil? (next (nnext f)))
+                       (evaluar (first (nnext f))
+                                amb-global
+                                (concat (reduce concat (map list (fnext f) lae)) amb-local))
+                       (aplicar (cons 'lambda (cons (fnext f) (next (nnext f))))
+                                lae
+                                (fnext (evaluar (first (nnext f))
+                                                amb-global
+                                                (concat (reduce concat (map list (fnext f) lae)) amb-local)))
+                                amb-local))))))
+
 
 ; TODO: La lista de funciones deberia ser implementada en `aplicar`
 
@@ -311,11 +341,10 @@
 ; Recibe la lista y, si esta comienza con '*error*, la retorna.
 ;  Si no, retorna nil.
 (defn revisar-f 
-  "Chequea que la lista no sea un error,
-   Si es un error retorna nil"
+  "Si la `lis` contiene un error lo devuelve, si no devuelve nil"
   [lis] 
   (cond
-    (= '*error* (first lis)) lis
+    (and (seq? lis) (= '*error* (first lis))) lis
     :else nil))
 
 
