@@ -185,7 +185,7 @@
 ;;     (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) nil)))
 ;;     (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) '(C D)))))
 ;;   (testing "Cond simple en formato TLC-Lisp"
-;;       #_(is (= '(A ()) (evaluar '(cond (t 'A)) '() nil)))))
+;;     (is (= '(A ()) (evaluar '(cond (t 'A)) '(t true) nil)))))
 
 ;; (deftest test-evaluar-secuencia-en-cond
 ;;   (testing "No hay nada para evaluar"
@@ -272,5 +272,4 @@
     (is (= '((*error* random-error) ()) (aplicar '(*error* random-error) '() '() nil))))
   (testing "Aplicar funciones definidas por el usuario"
     (is (= '(3 (sumar add)) (aplicar 'sumar '(1 2) '(sumar add) nil)))
-    (is (= '(3 (pepe add sumar pepe)) (aplicar 'sumar '(1 2) '(pepe add sumar pepe) nil)))
-    ))
+    (is (= '(5 (pepe add sumar pepe)) (aplicar 'sumar '(2 3) '(pepe add sumar pepe) nil)))))
