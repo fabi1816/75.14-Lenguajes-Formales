@@ -5,7 +5,6 @@
                                    buscar
                                    controlar-aridad
                                    evaluar
-                                   evaluar-cond
                                    evaluar-secuencia-en-cond
                                    igual?
                                    imprimir
@@ -176,16 +175,22 @@
     (is (= '((lambda () (1)) (A B)) (evaluar '(lambda () (1)) '(A B) nil)))
     (is (= '((lambda (x) (* 2 x)) (A B)) (evaluar '(lambda (x) (* 2 x)) '(A B) nil)))))
 
+(deftest test-evaluar-commando-cond
+  (testing "Lista de comandos vacia"
+    (is (= '(nil ()) (evaluar '(cond) '() nil)))
+    (is (= '(nil ()) (evaluar '(cond ()) '() nil)))
+    (is (= '(nil ()) (evaluar '(cond nil) '() nil)))
+    (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) nil)))
+    (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) '(C D)))))
+  (testing "Cond simple en formato TLC-Lisp"
+    (is (= '(A ()) (evaluar '(cond ((t 'A))) '(t t) nil)))))
 
-;; (deftest test-evaluar-commando-cond
-;;   (testing "Lista de comandos vacia"
-;;     (is (= '(nil ()) (evaluar '(cond) '() nil)))
-;;     (is (= '(nil ()) (evaluar '(cond ()) '() nil)))
-;;     (is (= '(nil ()) (evaluar '(cond nil) '() nil)))
-;;     (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) nil)))
-;;     (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) '(C D)))))
-;;   (testing "Cond simple en formato TLC-Lisp"
-;;     (is (= '(A ()) (evaluar '(cond (t 'A)) '(t true) nil)))))
+; un cond en TLC-Lisp es:
+; (cond
+;      ( (<True o False>) (ope_1) (ope_2) )
+;      ( (<True o False>) (ope_3) (ope_4) )
+;      ( True (ope_5) (ope_6) )
+; )
 
 (deftest test-evaluar-secuencia-en-cond
   (testing "No hay nada para evaluar"
@@ -201,13 +206,6 @@
     (is (= 9 (evaluar-secuencia-en-cond '((+ 1 2) 9) '(+ add) nil)))
     (is (= 6 (evaluar-secuencia-en-cond '((+ 1 2) 9 (+ 3 3)) '(+ add) nil)))
     (is (= 'A (evaluar-secuencia-en-cond '((+ 1 2) 9 (+ 3 3) 'A) '(+ add) nil)))))
-
-; un cond en TLC-Lisp es:
-; (cond
-;      ( (<True o False>) (ope_1) (ope_2) )
-;      ( (<True o False>) (ope_3) (ope_4) )
-;      ( True (ope_5) (ope_6) )
-; )
 
 (deftest test-aplicar
   (testing "Maneja errores en las funciones por aplicar"

@@ -364,6 +364,7 @@
 ; En caso contrario, sigue con las demas sublistas.
 (defn evaluar-cond
   [lis amb-global amb-local]
+  (println lis)
   (cond
     (igual? lis nil) (list nil amb-global)
     :else (evaluar (first lis) amb-global amb-local)))
