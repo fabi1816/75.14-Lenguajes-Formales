@@ -65,10 +65,11 @@
    (println "Inspirado en:")
    (println "TLC-LISP Version 1.51 for the IBM Personal Computer")
    (println "Copyright (c) 1982, 1983, 1984, 1985 The Lisp Company") (flush)
-   (repl '(add add append append cond cond cons cons de de env env equal equal eval eval exit exit
-               first first ge ge gt gt if if lambda lambda length length list list load load lt lt nil nil not not
-               null null or or prin3 prin3 quote quote read read rest rest reverse reverse setq setq sub sub
-               t t terpri terpri + add - sub)))
+   (repl '(add add append append cond cond cons cons de de env env equal equal
+               eval eval exit exit first first ge ge gt gt if if lambda lambda
+               length length list list load load lt lt nil nil not not null null
+               or or prin3 prin3 quote quote read read rest rest reverse reverse
+               setq setq sub sub t t terpri terpri + add - sub)))
   ([amb]
    (print ">>> ") (flush)
    (try
@@ -202,6 +203,15 @@
      (not (nil? resu2)) (list resu2 amb-global)    ; La lista de argumentos es un mensaje de error
      (not (seq? f)) (aplicar-fun-escalares f lae amb-global amb-local)
      :else (aplicar-fun-lambda f lae amb-global amb-local))))
+
+(defn aplicar-fun-escalares
+  "Aplica las funciones escalares estandares o las definidas por el usuario"
+  [f lae amb-global amb-local]
+  (cond
+    (igual? f 'add) (list (fun-sumar lae) amb-global)
+    (igual? f 'env) (list (fun-env lae amb-global amb-local) amb-global)
+    (igual? f 'first) (list (fun-first lae) amb-global)
+    :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
 
 
 ; TODO: La lista de funciones deberia ser implementada en `aplicar`
@@ -575,16 +585,6 @@
       (no-aplicable? f) (list (list '*error* 'non-applicable-type f) amb-global)
       (error? lamb) (list lamb amb-global)
       :else (aplicar lamb lae amb-global amb-local))))
-
-
-(defn aplicar-fun-escalares
-  "Aplica las funciones escalares estandares o las definidas por el usuario"
-  [f lae amb-global amb-local]
-  (cond
-    (igual? f 'add) (list (fun-sumar lae) amb-global)
-    (igual? f 'env) (list (fun-env lae amb-global amb-local) amb-global)
-    (igual? f 'first) (list (fun-first lae) amb-global)
-    :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
 
 
 (defn cuerpo-lambda
