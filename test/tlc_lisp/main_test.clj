@@ -303,6 +303,12 @@
     (is (= '((*error* too-many-args) (sub sub)) (evaluar '(sub 1 1 1) '(sub sub) nil)))))
 
 (deftest test-suma-resta
-  (testing "Suma"
+  (testing "Suma y resta"
     (is (= '(3 (+ add)) (evaluar '(+ 1 2) '(+ add) nil)))
     (is (= '(2 (- sub)) (evaluar '(- 3 1) '(- sub) nil)))))
+
+(deftest test-evaluar-not
+  (testing "Niega lo que tiene enfrente"
+    (is (= '(t (not not)) (evaluar '(not ()) '(not not) nil)))
+    (is (= '(t (not not)) (evaluar '(not nil) '(not not) nil)))
+    (is (= '(nil (not not)) (evaluar '(not 't) '(not not) nil)))))

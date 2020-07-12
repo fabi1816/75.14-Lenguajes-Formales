@@ -20,6 +20,7 @@
 (declare error?)
 (declare fun-env)
 (declare fun-sub)
+(declare fun-not)
 (declare escalar?)
 (declare fun-equal)
 (declare fun-first)
@@ -208,7 +209,6 @@
      :else (aplicar-fun-lambda f lae amb-global amb-local))))
 
 
-
 (defn aplicar-fun-escalares
   "Aplica las funciones escalares estandares o las definidas por el usuario"
   [f lae amb-global amb-local]
@@ -218,6 +218,7 @@
     (igual? f 'equal) (list (fun-equal lae) amb-global)
     (igual? f 'first) (list (fun-first lae) amb-global)
     (igual? f 'length) (list (fun-length lae) amb-global)
+    (igual? f 'not) (list (fun-not lae) amb-global)
     (igual? f 'sub) (list (fun-sub lae) amb-global)
     :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
 
@@ -231,6 +232,7 @@
 ; sub: Done!
 ; +: Done!
 ; -: Done!
+; not: Done!
 ; 
 ; append: retorna la fusión
 ; cons: retorna inserción de
@@ -239,7 +241,6 @@
 ; gt: 
 ; list: retorna una lista formada por los args.
 ; lt: 
-; not: 
 ; null: retorna t si un elemento es
 ; prin3: imprime un elemento
 ; read: retorna la lectura de un elemento
@@ -665,3 +666,11 @@
     (if (seq? ari)
       ari
       (- (first lae) (second lae)))))
+
+
+(defn fun-not
+  "Niega el argumento"
+  [lae]
+  (cond
+    (igual? (first lae) nil) 't
+    (= (first lae) 't) nil))
