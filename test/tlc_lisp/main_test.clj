@@ -1,6 +1,6 @@
 (ns tlc-lisp.main-test
   (:require [clojure.test :refer [deftest is testing]]
-            [tlc-lisp.main :refer [aplicar
+            [tlc-lisp.main :refer [
                                    controlar-aridad
                                    igual?
                                    actualizar-amb
@@ -176,24 +176,29 @@
     (is (= '((lambda () (1)) (A B)) (evaluar '(lambda () (1)) '(A B) nil)))
     (is (= '((lambda (x) (* 2 x)) (A B)) (evaluar '(lambda (x) (* 2 x)) '(A B) nil)))))
 
-(deftest test-evaluar-commando-cond
+#_(deftest test-evaluar-commando-cond
   (testing "Lista de comandos vacia"
     (is (= '(nil ()) (evaluar '(cond) '() nil)))
     (is (= '(nil ()) (evaluar '(cond ()) '() nil)))
     (is (= '(nil ()) (evaluar '(cond nil) '() nil)))
     (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) nil)))
     (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) '(C D)))))
-  #_(testing "Cond simple en formato TLC-Lisp"
+  (testing "Cond simple en formato TLC-Lisp"
       (is (= '(A ()) (evaluar '(cond (t 'A)) '() nil)))))
 
-(deftest test-evaluar-secuencia-en-cond
+#_(deftest test-evaluar-secuencia-en-cond
   (testing "No hay nada para evaluar"
     (is (= nil (evaluar-secuencia-en-cond nil '() nil)))
-    (is (= nil (evaluar-secuencia-en-cond '() '() nil))))
+    (is (= nil (evaluar-secuencia-en-cond '() '() nil)))
+    (is (= nil (evaluar-secuencia-en-cond '(()) '() nil)))
+    (is (= nil (evaluar-secuencia-en-cond '(nil) '() nil))))
   (testing "Evaluar escalares"
     (is (= 1 (evaluar-secuencia-en-cond '(1) '() nil)))
     (is (= 'A (evaluar-secuencia-en-cond '('A) '() nil)))
-    (is (= "TEXTO" (evaluar-secuencia-en-cond '("TEXTO") '() nil))))
+    (is (= "TEXTO" (evaluar-secuencia-en-cond '("TEXTO") '() nil)))
+    (is (= 1 (evaluar-secuencia-en-cond '((1)) '() nil)))
+    (is (= 'A (evaluar-secuencia-en-cond '(('A)) '() nil)))
+    (is (= "TEXTO" (evaluar-secuencia-en-cond '(("TEXTO")) '() nil))))
   (testing "Evaluar simbolos"
     (is (= 'B (evaluar-secuencia-en-cond '(A) '(A B) nil)))
     (is (= 'D (evaluar-secuencia-en-cond '(C) '(A B C D) nil)))
@@ -209,3 +214,9 @@
   (testing "Evaluaciones de funciones"
     (is (= 3 (evaluar-secuencia-en-cond '((add 1 2)) '(add add) nil)))))
 
+; un cond en TLC-Lisp es:
+; (cond
+;      ( (<True o False>) (ope_1) (ope_2) )
+;      ( (<True o False>) (ope_3) (ope_4) )
+;      ( True (ope_5) (ope_6) )
+; )

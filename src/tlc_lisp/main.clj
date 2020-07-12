@@ -136,7 +136,7 @@
     (igual? (first expre) 'cond) (evaluar-cond (next expre) amb-global amb-local)
     (igual? (first expre) 'quote) (evaluar-quote expre amb-global amb-local)
     (igual? (first expre) 'lambda) (evaluar-lambda expre amb-global amb-local)
-    :else (aplicar (resultado-de-evaluar (first expre) amb-global amb-local)         ; Función a evaluar
+    :else (aplicar #break (resultado-de-evaluar (first expre) amb-global amb-local)         ; Función a evaluar
                    (map #(resultado-de-evaluar % amb-global amb-local) (next expre)) ; Lista de argumentos
                    amb-global amb-local)))
 
