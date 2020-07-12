@@ -217,6 +217,7 @@
                                       amb-local))))))
 )
 
+; TODO: La lista de funciones deberia ser implementada en `aplicar`
 
 ; Controla la aridad (cantidad de argumentos de una funcion).
 ; Recibe una lista y un numero. Si la longitud de la lista coincide con el
@@ -352,11 +353,26 @@
 ;  no es nil, retorna el res. de invocar a evaluar-secuencia-en-cond con la
 ;  cola de esa sublista
 ; En caso contrario, sigue con las demas sublistas.
-(defn evaluar-cond [lis amb-global amb-local] "TODO...")
+(defn evaluar-cond 
+  [lis amb-global amb-local] 
+  (cond
+    (igual? lis nil) (list nil amb-global)
+    :else (evaluar (first lis) amb-global amb-local)
+    ))
+
 
 ; Evalua (con evaluar) secuencialmente las sublistas de una lista y retorna
 ;  el valor de la ultima evaluacion.
-(defn evaluar-secuencia-en-cond [lis amb-global amd-local] "TODO...")
+(defn evaluar-secuencia-en-cond
+  "Evalua secuencialmente las sublistas de `lis`.
+   Retorna el valor de la ultima evaluacion."
+  [lis amb-global amb-local] 
+  (cond
+    (igual? lis nil) nil
+    (= (count lis) 1) (first (evaluar (first lis) amb-global amb-local))
+    :else (do
+            (first (evaluar (first lis) amb-global amb-local))
+            (evaluar-secuencia-en-cond (next lis) amb-global amb-local))))
 
 ; Al terminar de cargar el archivo, se retorna true.
 
