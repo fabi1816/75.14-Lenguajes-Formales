@@ -19,11 +19,13 @@
 (declare salir)
 (declare error?)
 (declare fun-env)
+(declare fun-sub)
 (declare escalar?)
 (declare fun-equal)
 (declare fun-first)
 (declare fun-sumar)
 (declare evaluar-de)
+(declare fun-length)
 (declare next-lambda)
 (declare cargar-input)
 (declare evaluar-setq)
@@ -206,6 +208,7 @@
      :else (aplicar-fun-lambda f lae amb-global amb-local))))
 
 
+
 (defn aplicar-fun-escalares
   "Aplica las funciones escalares estandares o las definidas por el usuario"
   [f lae amb-global amb-local]
@@ -214,6 +217,8 @@
     (igual? f 'env) (list (fun-env lae amb-global amb-local) amb-global)
     (igual? f 'equal) (list (fun-equal lae) amb-global)
     (igual? f 'first) (list (fun-first lae) amb-global)
+    (igual? f 'length) (list (fun-length lae) amb-global)
+    (igual? f 'sub) (list (fun-sub lae) amb-global)
     :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
 
 
@@ -222,13 +227,14 @@
 ; env: Done!
 ; first: Done!
 ; equal: Done!
+; length: Done!
+; sub: Done!
 ; 
 ; append: retorna la fusión
 ; cons: retorna inserción de
 ; eval: retorna la evaluación de
 ; ge: 
 ; gt: 
-; length: 
 ; list: retorna una lista formada por los args.
 ; lt: 
 ; not: 
@@ -237,7 +243,6 @@
 ; read: retorna la lectura de un elemento
 ; rest: retorna una lista sin su 1ra. posición
 ; reverse: 
-; sub: 
 ; terpri: imprime un salto de línea
 ; +: equivale a add
 ; -: equivale a sub
@@ -646,3 +651,17 @@
       (seq? aridad) aridad
       (igual? (first largs) (second largs)) 't
       :else nil)))
+
+
+(defn fun-length
+  "Devuelve la longitud de una lista"
+  [lae] (count (first lae)))
+
+
+(defn fun-sub
+  "Resta dos elementos"
+  [lae]
+  (let [ari (controlar-aridad lae 2)]
+    (if (seq? ari)
+      ari
+      (- (first lae) (second lae)))))

@@ -283,3 +283,21 @@
   (testing "Errores"
     (is (= '((*error* too-few-args) (equal equal)) (evaluar '(equal 1) '(equal equal) nil)))
     (is (= '((*error* too-many-args) (equal equal)) (evaluar '(equal 1 1 1) '(equal equal) nil)))))
+
+(deftest test-evaluar-length
+  (testing "Longitud de listas"
+    (is (= '(0 (length length)) (evaluar '(length '()) '(length length) nil)))
+    (is (= '(0 (length length)) (evaluar '(length nil) '(length length) nil)))
+    (is (= '(1 (length length)) (evaluar '(length '(1)) '(length length) nil)))
+    (is (= '(1 (length length)) (evaluar '(length '(A)) '(length length) nil)))
+    (is (= '(2 (length length)) (evaluar '(length '(1 1)) '(length length) nil)))
+    (is (= '(2 (length length)) (evaluar '(length '(A A)) '(length length) nil)))))
+
+(deftest test-evaluar-sub
+  (testing "Restas"
+    (is (= '(0 (sub sub)) (evaluar '(sub 1 1) '(sub sub) nil)))
+    (is (= '(3 (sub sub)) (evaluar '(sub 4 1) '(sub sub) nil)))
+    (is (= '(-2 (sub sub)) (evaluar '(sub 3 5) '(sub sub) nil))))
+  (testing "Errores"
+    (is (= '((*error* too-few-args) (sub sub)) (evaluar '(sub 1) '(sub sub) nil)))
+    (is (= '((*error* too-many-args) (sub sub)) (evaluar '(sub 1 1 1) '(sub sub) nil)))))
