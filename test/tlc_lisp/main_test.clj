@@ -187,34 +187,20 @@
 ;;   (testing "Cond simple en formato TLC-Lisp"
 ;;     (is (= '(A ()) (evaluar '(cond (t 'A)) '(t true) nil)))))
 
-;; (deftest test-evaluar-secuencia-en-cond
-;;   (testing "No hay nada para evaluar"
-;;     (is (= nil (evaluar-secuencia-en-cond nil '() nil)))
-;;     (is (= nil (evaluar-secuencia-en-cond '() '() nil)))
-;;     (is (= nil (evaluar-secuencia-en-cond '(()) '() nil)))
-;;     (is (= nil (evaluar-secuencia-en-cond '(nil) '() nil))))
-;;   (testing "Evaluar escalares"
-;;     (is (= 1 (evaluar-secuencia-en-cond '(1) '() nil)))
-;;     (is (= 'A (evaluar-secuencia-en-cond '('A) '() nil)))
-;;     (is (= "TEXTO" (evaluar-secuencia-en-cond '("TEXTO") '() nil)))
-;;     (is (= 1 (evaluar-secuencia-en-cond '((1)) '() nil)))
-;;     (is (= 'A (evaluar-secuencia-en-cond '(('A)) '() nil)))
-;;     (is (= "TEXTO" (evaluar-secuencia-en-cond '(("TEXTO")) '() nil))))
-;;   (testing "Evaluar simbolos"
-;;     (is (= 'B (evaluar-secuencia-en-cond '(A) '(A B) nil)))
-;;     (is (= 'D (evaluar-secuencia-en-cond '(C) '(A B C D) nil)))
-;;     (is (= '(*error* unbound-symbol X) (evaluar-secuencia-en-cond '(X) '(A B) nil))))
-;;   (testing "Evaluaciones multiples de escalares"
-;;     (is (= 'B (evaluar-secuencia-en-cond '(1 A) '(A B) nil)))
-;;     (is (= 9 (evaluar-secuencia-en-cond '(1 A 9) '(A B) nil)))
-;;     (is (= 'D (evaluar-secuencia-en-cond '(1 A 9 C) '(A B C D) nil))))
-;;   (testing "Evaluaciones de escalares con ambiente local"
-;;     (is (= 'D (evaluar-secuencia-en-cond '(C) '(A B) '(C D))))
-;;     (is (= 'B (evaluar-secuencia-en-cond '(1 C 2 A) '(A B) '(C D))))
-;;     (is (= 'F (evaluar-secuencia-en-cond '(1 C 2 A E) '(A B) '(C D E F)))))
-;;   (testing "Evaluaciones de funciones"
-;;     (is (= 3 (evaluar-secuencia-en-cond '((add 1 2)) '(add add) nil)))))
-
+(deftest test-evaluar-secuencia-en-cond
+  (testing "No hay nada para evaluar"
+    (is (= nil (evaluar-secuencia-en-cond nil '() nil)))
+    (is (= nil (evaluar-secuencia-en-cond '() '() nil)))
+    (is (= nil (evaluar-secuencia-en-cond '(()) '() nil)))
+    (is (= nil (evaluar-secuencia-en-cond '(nil) '() nil))))
+  (testing "La lista solo tiene una evaluación"
+    (is (= 1 (evaluar-secuencia-en-cond '(1) '() nil)))
+    (is (= 'A (evaluar-secuencia-en-cond '('A) '() nil)))
+    (is (= 3 (evaluar-secuencia-en-cond '((+ 1 2)) '(+ add) nil))))
+  (testing "La lista tiene varias evaluaciones"
+    (is (= 9 (evaluar-secuencia-en-cond '((+ 1 2) 9) '(+ add) nil)))
+    (is (= 6 (evaluar-secuencia-en-cond '((+ 1 2) 9 (+ 3 3)) '(+ add) nil)))
+    (is (= 'A (evaluar-secuencia-en-cond '((+ 1 2) 9 (+ 3 3) 'A) '(+ add) nil)))))
 
 ; un cond en TLC-Lisp es:
 ; (cond

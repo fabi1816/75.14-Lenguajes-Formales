@@ -13,7 +13,7 @@
 (declare evaluar-cond)
 (declare actualizar-amb)    ; Done!
 (declare controlar-aridad)    ; Done!
-(declare evaluar-secuencia-en-cond)
+(declare evaluar-secuencia-en-cond)    ; Done!
 
 ;; Funciones auxiliares al final del archivo
 (declare salir)
