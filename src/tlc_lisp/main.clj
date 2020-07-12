@@ -18,10 +18,14 @@
 ;; Funciones auxiliares al final del archivo
 (declare salir)
 (declare error?)
+(declare fun-env)
 (declare escalar?)
+(declare fun-first)
+(declare fun-sumar)
 (declare evaluar-de)
 (declare cargar-input)
 (declare evaluar-setq)
+(declare no-aplicable?)
 (declare evaluar-quote)
 (declare evaluar-lambda)
 (declare numero-o-string?)
@@ -32,8 +36,10 @@
 (declare setq-insuficientes?)
 (declare lambda-define-param?)
 (declare resultado-de-evaluar)
+(declare aplicar-fun-escalares)
 (declare evaluar-setq-multiples)
 (declare nombre-archivo-valido?)
+(declare fun-definida-por-el-usuario)
 
 
 ; REPL (read–eval–print loop).
@@ -151,6 +157,8 @@
 ; if
 ; load
 ; or
+; nil: No estoy seguro
+; t: No estoy seguro
 
 
 ; Aplica una funcion a una lista de argumentos evaluados, usando los ambientes
@@ -177,58 +185,6 @@
 ; el amb. global actualizado con la eval. del 1er. cuerpo (usando el amb.
 ;  global intacto y el local actualizado con los params. ligados a los args.)
 ;   y el amb. local intacto. 
-
-(defn fun-env
-  "Devuelve la union de los ambientes global y local."
-  [lae amb-global amb-local]
-  (if (> (count lae) 0)
-    (list '*error* 'too-many-args)
-    (concat amb-global amb-local)))
-
-(defn fun-first
-  "Devuelve el primer elemento de una lista"
-  [lae]
-  (let [ari (controlar-aridad lae 1)]
-    (cond
-      (seq? ari) ari
-      (igual? (first lae) nil) nil
-      (not (seq? (first lae))) (list '*error* 'list 'expected (first lae))
-      :else (ffirst lae))))
-
-(defn fun-sumar
-  "Suma los elementos de la lista.
-   Minimo 2 elementos"
-  [lae]
-  (if (< (count lae) 2)
-    (list '*error* 'too-few-args)
-    (try (reduce + lae)
-         (catch Exception _ (list '*error* 'number-expected)))))
-
-(defn no-aplicable?
-  "Chequea si `elem` es un número, 't' (true), nil o una lista vacia"
-  [elem]
-  (or (number? elem) (igual? elem 't) (igual? elem nil)))
-
-(defn fun-definida-por-el-usuario
-  "Aplica la función definida por el usuario si esta ya existe
-   en el ambiente global o local"
-  [f lae amb-global amb-local]
-  (let [lamb (buscar f (concat amb-local amb-global))]
-    (cond
-      (no-aplicable? lamb) (list (list '*error* 'non-applicable-type lamb) amb-global)
-      (no-aplicable? f) (list (list '*error* 'non-applicable-type f) amb-global)
-      (error? lamb) (list lamb amb-global)
-      :else (aplicar lamb lae amb-global amb-local))))
-
-(defn aplicar-fun-escalares
-  "Aplica las funciones escalares estandares o las definidas por el usuario"
-  [f lae amb-global amb-local]
-  (cond
-    (igual? f 'add) (list (fun-sumar lae) amb-global)
-    (igual? f 'env) (list (fun-env lae amb-global amb-local) amb-global)
-    (igual? f 'first) (list (fun-first lae) amb-global)
-    :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
-
 (defn aplicar
   "Aplica a la lista de argumentos `lae` la función `f` en los ambientes datos"
    ([f lae amb-global amb-local]
@@ -256,6 +212,29 @@
 
 
 ; TODO: La lista de funciones deberia ser implementada en `aplicar`
+; add: Done!
+; env: Done!
+; first: Done!
+; 
+; append: retorna la fusión
+; cons: retorna inserción de
+; equal: retorna t si dos elementos
+; eval: retorna la evaluación de
+; ge: retorna t si el 1° núm.
+; gt: retorna t si el 1° núm. es mayor que el 2°
+; length: retorna la longitud de una lista
+; list: retorna una lista formada por los args.
+; lt: retorna t si el 1° núm. es menor que el 2°
+; not: retorna la negación de un valor
+; null: retorna t si un elemento es
+; prin3: imprime un elemento
+; read: retorna la lectura de un elemento
+; rest: retorna una lista sin su 1ra. posición
+; reverse: retorna una lista
+; sub: retorna la resta de los argumentos
+; terpri: imprime un salto de línea
+; +: equivale a add
+; -: equivale a sub
 
 ; Controla la aridad (cantidad de argumentos de una funcion).
 ; Recibe una lista y un numero. Si la longitud de la lista coincide con el
@@ -556,3 +535,60 @@
   "Devuelve el resultado de evaluar `x` en los ambientes global y local"
   [x amb-global amb-local]
   (first (evaluar x amb-global amb-local)))
+
+
+(defn fun-env
+  "Devuelve la union de los ambientes global y local."
+  [lae amb-global amb-local]
+  (if (> (count lae) 0)
+    (list '*error* 'too-many-args)
+    (concat amb-global amb-local)))
+
+
+(defn fun-first
+  "Devuelve el primer elemento de una lista"
+  [lae]
+  (let [ari (controlar-aridad lae 1)]
+    (cond
+      (seq? ari) ari
+      (igual? (first lae) nil) nil
+      (not (seq? (first lae))) (list '*error* 'list 'expected (first lae))
+      :else (ffirst lae))))
+
+
+(defn fun-sumar
+  "Suma los elementos de la lista.
+   Minimo 2 elementos"
+  [lae]
+  (if (< (count lae) 2)
+    (list '*error* 'too-few-args)
+    (try (reduce + lae)
+         (catch Exception _ (list '*error* 'number-expected)))))
+
+
+(defn no-aplicable?
+  "Chequea si `elem` es un número, 't' (true), nil o una lista vacia"
+  [elem]
+  (or (number? elem) (igual? elem 't) (igual? elem nil)))
+
+
+(defn fun-definida-por-el-usuario
+  "Aplica la función definida por el usuario si esta ya existe
+   en el ambiente global o local"
+  [f lae amb-global amb-local]
+  (let [lamb (buscar f (concat amb-local amb-global))]
+    (cond
+      (no-aplicable? lamb) (list (list '*error* 'non-applicable-type lamb) amb-global)
+      (no-aplicable? f) (list (list '*error* 'non-applicable-type f) amb-global)
+      (error? lamb) (list lamb amb-global)
+      :else (aplicar lamb lae amb-global amb-local))))
+
+
+(defn aplicar-fun-escalares
+  "Aplica las funciones escalares estandares o las definidas por el usuario"
+  [f lae amb-global amb-local]
+  (cond
+    (igual? f 'add) (list (fun-sumar lae) amb-global)
+    (igual? f 'env) (list (fun-env lae amb-global amb-local) amb-global)
+    (igual? f 'first) (list (fun-first lae) amb-global)
+    :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
