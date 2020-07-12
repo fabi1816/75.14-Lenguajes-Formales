@@ -20,6 +20,7 @@
 (declare error?)
 (declare fun-env)
 (declare escalar?)
+(declare fun-equal)
 (declare fun-first)
 (declare fun-sumar)
 (declare evaluar-de)
@@ -204,12 +205,14 @@
      (not (seq? f)) (aplicar-fun-escalares f lae amb-global amb-local)
      :else (aplicar-fun-lambda f lae amb-global amb-local))))
 
+
 (defn aplicar-fun-escalares
   "Aplica las funciones escalares estandares o las definidas por el usuario"
   [f lae amb-global amb-local]
   (cond
     (igual? f 'add) (list (fun-sumar lae) amb-global)
     (igual? f 'env) (list (fun-env lae amb-global amb-local) amb-global)
+    (igual? f 'equal) (list (fun-equal lae) amb-global)
     (igual? f 'first) (list (fun-first lae) amb-global)
     :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
 
@@ -218,23 +221,23 @@
 ; add: Done!
 ; env: Done!
 ; first: Done!
+; equal: Done!
 ; 
 ; append: retorna la fusión
 ; cons: retorna inserción de
-; equal: retorna t si dos elementos
 ; eval: retorna la evaluación de
-; ge: retorna t si el 1° núm.
-; gt: retorna t si el 1° núm. es mayor que el 2°
-; length: retorna la longitud de una lista
+; ge: 
+; gt: 
+; length: 
 ; list: retorna una lista formada por los args.
-; lt: retorna t si el 1° núm. es menor que el 2°
-; not: retorna la negación de un valor
+; lt: 
+; not: 
 ; null: retorna t si un elemento es
 ; prin3: imprime un elemento
 ; read: retorna la lectura de un elemento
 ; rest: retorna una lista sin su 1ra. posición
-; reverse: retorna una lista
-; sub: retorna la resta de los argumentos
+; reverse: 
+; sub: 
 ; terpri: imprime un salto de línea
 ; +: equivale a add
 ; -: equivale a sub
@@ -374,7 +377,6 @@
 ; En caso contrario, sigue con las demas sublistas.
 (defn evaluar-cond
   [lis amb-global amb-local]
-  (println lis)
   (cond
     (igual? lis nil) (list nil amb-global)
     :else (evaluar (first lis) amb-global amb-local)))
@@ -633,3 +635,14 @@
     (> (count lae) (count (second f))) (list '(*error* too-many-args) amb-global)
     (lambda-simple? f) (aplicar-fun-lambda-simple f lae amb-global amb-local)
     :else (aplicar-fun-lambda-multiple f lae amb-global amb-local)))
+
+
+(defn fun-equal
+  "Compara dos elementos, si son iguales devuelve 't'
+   Si son distintos 'nil'"
+  [largs]
+  (let [aridad (controlar-aridad largs 2)]
+    (cond
+      (seq? aridad) aridad
+      (igual? (first largs) (second largs)) 't
+      :else nil)))

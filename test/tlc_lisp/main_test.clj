@@ -265,3 +265,21 @@
   (testing "Aplicar lambdas"
     (is (= '(6 (+ add)) (aplicar '(lambda (x) (+ x x)) '(3) '(+ add) nil)))
     (is (= '(9 (+ add)) (aplicar '(lambda (x) (+ x x) (+ x x x)) '(3) '(+ add) nil)))))
+
+
+; Las nuevas funciones y macros que nosotros tenemos que agregar
+
+
+(deftest test-evaluar-equal
+  (testing "Son distintos"
+    (is (= '(nil (equal equal)) (evaluar '(equal 1 2) '(equal equal) nil)))
+    (is (= '(nil (equal equal)) (evaluar '(equal 'A 'B) '(equal equal) nil)))
+    (is (= '(nil (equal equal)) (evaluar '(equal "A" "B") '(equal equal) nil))))
+  (testing "Son iguales"
+    (is (= '(t (equal equal)) (evaluar '(equal 1 1) '(equal equal) nil)))
+    (is (= '(t (equal equal)) (evaluar '(equal 'A 'A) '(equal equal) nil)))
+    (is (= '(t (equal equal)) (evaluar '(equal "A" "A") '(equal equal) nil)))
+    (is (= '(t (equal equal)) (evaluar '(equal "a" "A") '(equal equal) nil))))
+  (testing "Errores"
+    (is (= '((*error* too-few-args) (equal equal)) (evaluar '(equal 1) '(equal equal) nil)))
+    (is (= '((*error* too-many-args) (equal equal)) (evaluar '(equal 1 1 1) '(equal equal) nil)))))
