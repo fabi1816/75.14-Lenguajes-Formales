@@ -272,4 +272,12 @@
     (is (= '((*error* random-error) ()) (aplicar '(*error* random-error) '() '() nil))))
   (testing "Aplicar funciones definidas por el usuario"
     (is (= '(3 (sumar add)) (aplicar 'sumar '(1 2) '(sumar add) nil)))
-    (is (= '(5 (pepe add sumar pepe)) (aplicar 'sumar '(2 3) '(pepe add sumar pepe) nil)))))
+    (is (= '(5 (pepe add sumar pepe)) (aplicar 'sumar '(2 3) '(pepe add sumar pepe) nil))))
+  (testing "Errores al aplicar lambdas"
+    (is (= '((*error* too-few-args) (+ add))
+           (aplicar '(lambda (x) (+ x x)) '() '(+ add) nil)))
+    (is (= '((*error* too-many-args) (+ add))
+           (aplicar '(lambda (x) (+ x x)) '(1 2) '(+ add) nil))))
+  (testing "Aplicar lambdas"
+    (is (= '(6 (+ add)) (aplicar '(lambda (x) (+ x x)) '(3) '(+ add) nil)))
+    (is (= '(9 (+ add)) (aplicar '(lambda (x) (+ x x) (+ x x x)) '(3) '(+ add) nil)))))

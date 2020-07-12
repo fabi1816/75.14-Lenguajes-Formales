@@ -23,14 +23,19 @@
 (declare fun-first)
 (declare fun-sumar)
 (declare evaluar-de)
+(declare next-lambda)
 (declare cargar-input)
 (declare evaluar-setq)
+(declare cuerpo-lambda)
 (declare no-aplicable?)
 (declare evaluar-quote)
 (declare evaluar-lambda)
+(declare lambda-simple?)
+(declare build-amb-lambda)
 (declare numero-o-string?)
 (declare de-define-params?)
 (declare evaluar-escalares)
+(declare aplicar-fun-lambda)
 (declare evaluar-setq-unico)
 (declare non-nil-empty-list?)
 (declare setq-insuficientes?)
@@ -39,6 +44,8 @@
 (declare aplicar-fun-escalares)
 (declare evaluar-setq-multiples)
 (declare nombre-archivo-valido?)
+(declare aplicar-fun-lambda-simple)
+(declare aplicar-fun-lambda-multiple)
 (declare fun-definida-por-el-usuario)
 
 
@@ -52,28 +59,28 @@
 ;  la 2da. pos. del resultado. 
 (defn repl
   "Inicia el REPL de TLC-Lisp"
-   ([]
-    (println "Interprete de TLC-LISP en Clojure")
-    (println "Trabajo Practico de 75.14/95.48 - Lenguajes Formales 2020")
-    (println "Inspirado en:")
-    (println "TLC-LISP Version 1.51 for the IBM Personal Computer")
-    (println "Copyright (c) 1982, 1983, 1984, 1985 The Lisp Company") (flush)
-    (repl '(add add append append cond cond cons cons de de env env equal equal eval eval exit exit
-            first first ge ge gt gt if if lambda lambda length length list list load load lt lt nil nil not not
-            null null or or prin3 prin3 quote quote read read rest rest reverse reverse setq setq sub sub
-            t t terpri terpri + add - sub)))
-   ([amb]  
-      (print ">>> ") (flush)
-      (try
-        (let [res (evaluar (read) amb nil)]    ; Bindea `res` al resultado de `evaluar`
-          (if (nil? (second res))              ; Chequea si la segunda posicion de `res` es `nil`
-            true
-            (do (imprimir (first res))         ; Imprime el primer elemento del resultado 
-                (repl (second res)))))         ; Se llama a si mismo con el resto del resultado
-        (catch Exception e
-          (println) (print "*error* ")
-          (println (get (Throwable->map e) :cause))
-          (repl amb)))))
+  ([]
+   (println "Interprete de TLC-LISP en Clojure")
+   (println "Trabajo Practico de 75.14/95.48 - Lenguajes Formales 2020")
+   (println "Inspirado en:")
+   (println "TLC-LISP Version 1.51 for the IBM Personal Computer")
+   (println "Copyright (c) 1982, 1983, 1984, 1985 The Lisp Company") (flush)
+   (repl '(add add append append cond cond cons cons de de env env equal equal eval eval exit exit
+               first first ge ge gt gt if if lambda lambda length length list list load load lt lt nil nil not not
+               null null or or prin3 prin3 quote quote read read rest rest reverse reverse setq setq sub sub
+               t t terpri terpri + add - sub)))
+  ([amb]
+   (print ">>> ") (flush)
+   (try
+     (let [res (evaluar (read) amb nil)]    ; Bindea `res` al resultado de `evaluar`
+       (if (nil? (second res))              ; Chequea si la segunda posicion de `res` es `nil`
+         true
+         (do (imprimir (first res))         ; Imprime el primer elemento del resultado 
+             (repl (second res)))))         ; Se llama a si mismo con el resto del resultado
+     (catch Exception e
+       (println) (print "*error* ")
+       (println (get (Throwable->map e) :cause))
+       (repl amb)))))
 
 
 ; Carga el contenido de un archivo.
@@ -89,24 +96,24 @@
 (defn cargar-arch
   "Carga el contenido de un archivo"
   ([amb-global amb-local arch]
-    (let [nomb (first (evaluar arch amb-global amb-local))]
-      (if (error? nomb)
-        (do (imprimir nomb) amb-global)    ; Mostrar el error
-        (let [nm (lower-case (str nomb))
-              nom (if (nombre-archivo-valido? nm) 
-                    nm 
-                    (str nm ".lsp"))       ; Si no es un nombre de archivo valido le agrega '.lsp' al final
-              ret (try (with-open [in (java.io.PushbackReader. (reader nom))]
-                         (binding [*read-eval* false]
-                           (cargar-input in amb-global)))
-                       (catch java.io.FileNotFoundException _
-                         (imprimir (list '*error* 'file-open-error 'file-not-found nom '1 'READ)) amb-global))]
-          ret))))
+   (let [nomb (first (evaluar arch amb-global amb-local))]
+     (if (error? nomb)
+       (do (imprimir nomb) amb-global)    ; Mostrar el error
+       (let [nm (lower-case (str nomb))
+             nom (if (nombre-archivo-valido? nm)
+                   nm
+                   (str nm ".lsp"))       ; Si no es un nombre de archivo valido le agrega '.lsp' al final
+             ret (try (with-open [in (java.io.PushbackReader. (reader nom))]
+                        (binding [*read-eval* false]
+                          (cargar-input in amb-global)))
+                      (catch java.io.FileNotFoundException _
+                        (imprimir (list '*error* 'file-open-error 'file-not-found nom '1 'READ)) amb-global))]
+         ret))))
   ([amb-global _amb-local in res]
-    (try (let [res (evaluar (read in) amb-global nil)]    ; Identico a cargar-input pero maneja la excapción diferente
-           (cargar-arch (second res) nil in res))
-         (catch Exception _
-           (imprimir (first res)) amb-global))))
+   (try (let [res (evaluar (read in) amb-global nil)]    ; Identico a cargar-input pero maneja la excapción diferente
+          (cargar-arch (second res) nil in res))
+        (catch Exception _
+          (imprimir (first res)) amb-global))))
 
 
 ; Evalua una expresion usando los ambientes global y local.
@@ -187,28 +194,14 @@
 ;   y el amb. local intacto. 
 (defn aplicar
   "Aplica a la lista de argumentos `lae` la función `f` en los ambientes datos"
-   ([f lae amb-global amb-local]
-      (aplicar (revisar-f f) (revisar-lae lae) f lae amb-global amb-local))
-   ([resu1 resu2 f lae amb-global amb-local]
-      (cond
-        (not (nil? resu1)) (list resu1 amb-global)    ; La función es un mensaje de error
-        (not (nil? resu2)) (list resu2 amb-global)    ; La lista de argumentos es un mensaje de error
-        (not (seq? f)) (aplicar-fun-escalares f lae amb-global amb-local)    ; 'f' es una función escalar
-        
-        ; Si f es una lista
-        :else (cond
-                (< (count lae) (count (fnext f))) (list (list '*error* 'too-few-args) amb-global)
-                (> (count lae) (count (fnext f))) (list (list '*error* 'too-many-args) amb-global)
-                :else (if (nil? (next (nnext f)))
-                       (evaluar (first (nnext f))
-                                amb-global
-                                (concat (reduce concat (map list (fnext f) lae)) amb-local))
-                       (aplicar (cons 'lambda (cons (fnext f) (next (nnext f))))
-                                lae
-                                (fnext (evaluar (first (nnext f))
-                                                amb-global
-                                                (concat (reduce concat (map list (fnext f) lae)) amb-local)))
-                                amb-local))))))
+  ([f lae amb-global amb-local]
+   (aplicar (revisar-f f) (revisar-lae lae) f lae amb-global amb-local))
+  ([resu1 resu2 f lae amb-global amb-local]
+   (cond
+     (not (nil? resu1)) (list resu1 amb-global)    ; La función es un mensaje de error
+     (not (nil? resu2)) (list resu2 amb-global)    ; La lista de argumentos es un mensaje de error
+     (not (seq? f)) (aplicar-fun-escalares f lae amb-global amb-local)
+     :else (aplicar-fun-lambda f lae amb-global amb-local))))
 
 
 ; TODO: La lista de funciones deberia ser implementada en `aplicar`
@@ -241,10 +234,10 @@
 ;  numero, retorna el numero.
 ; Si es menor, retorna (list '*error* 'too-few-args).
 ; Si es mayor, retorna (list '*error* 'too-many-args).
-(defn controlar-aridad 
+(defn controlar-aridad
   "Devuelve la aridad de la lista si es la esperada,
    Si no devuelve una lista con un mensaje de error"
-  [lis val-esperado] 
+  [lis val-esperado]
   (cond
     (= val-esperado (count lis)) val-esperado
     (> val-esperado (count lis)) (list '*error* 'too-few-args)
@@ -307,11 +300,11 @@
   "Actualiza el ambiente con la clave (nombre de la función) y su valor (el 
    responsable de ejecutar esa función)
    Retorna el ambiente actualizado"
-  [amb-global clave valor] 
+  [amb-global clave valor]
   (cond
     ; No modifica el ambiente si el valor es un *error*
     (= '*error* valor) amb-global
-    
+
     ; El primer elemento es la clave buscada: Lo reemplazo junto con su valor
     (= clave (first amb-global)) (concat (list clave valor) (drop 2 amb-global))
 
@@ -327,9 +320,9 @@
 ; Revisa una lista que representa una funcion.
 ; Recibe la lista y, si esta comienza con '*error*, la retorna.
 ;  Si no, retorna nil.
-(defn revisar-f 
+(defn revisar-f
   "Si la `lis` contiene un error lo devuelve, si no devuelve nil"
-  [lis] 
+  [lis]
   (cond
     (and (seq? lis) (= '*error* (first lis))) lis
     :else nil))
@@ -369,12 +362,11 @@
 ;  no es nil, retorna el res. de invocar a evaluar-secuencia-en-cond con la
 ;  cola de esa sublista
 ; En caso contrario, sigue con las demas sublistas.
-(defn evaluar-cond 
-  [lis amb-global amb-local] 
+(defn evaluar-cond
+  [lis amb-global amb-local]
   (cond
     (igual? lis nil) (list nil amb-global)
-    :else (evaluar (first lis) amb-global amb-local)
-    ))
+    :else (evaluar (first lis) amb-global amb-local)))
 
 
 ; Evalua (con evaluar) secuencialmente las sublistas de una lista y retorna
@@ -382,7 +374,7 @@
 (defn evaluar-secuencia-en-cond
   "Evalua secuencialmente las sublistas de `lis`.
    Retorna el valor de la ultima evaluacion."
-  [lis amb-global amb-local] 
+  [lis amb-global amb-local]
   (cond
     (igual? lis nil) nil
     (= (count lis) 1) (first (evaluar (first lis) amb-global amb-local))
@@ -405,7 +397,7 @@
 
 (defn nombre-archivo-valido?
   "Checkquea que el string sea un nombre de archivo .lsp valido"
-  [nombre] 
+  [nombre]
   (and (> (count nombre) 4)
        (ends-with? nombre ".lsp")))
 
@@ -592,3 +584,51 @@
     (igual? f 'env) (list (fun-env lae amb-global amb-local) amb-global)
     (igual? f 'first) (list (fun-first lae) amb-global)
     :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
+
+
+(defn cuerpo-lambda
+  "Dada una expresión lambda `f` devuelve su cuerpo"
+  [f] (first (nnext f)))
+
+
+(defn build-amb-lambda
+  "Usa los parametros del lambda `f`, sus argumentos y los concatena al 
+   ambiente local para construir el ambiente donde se evaluará"
+  [f lae amb-local]
+  (concat (flatten (map list (second f) lae)) amb-local))
+
+
+(defn aplicar-fun-lambda-simple
+  "Evalua un lambda `f` con un cuerpo simple"
+  [f lae amb-global amb-local]
+  (evaluar (cuerpo-lambda f) amb-global (build-amb-lambda f lae amb-local)))
+
+
+(defn next-lambda
+  "Construye una expresión lambda con el resto de las funciones del cuerpo de
+   una función lambda `f`"
+  [f] (cons 'lambda (cons (second f) (next (nnext f)))))
+
+
+(defn aplicar-fun-lambda-multiple
+  "Evalua un lambda `f` cuyo cuerpo contiene varias funciones"
+  [f lae amb-global amb-local]
+  (aplicar (next-lambda f)
+           lae
+           (second (aplicar-fun-lambda-simple f lae amb-global amb-local))    ; Nuevo ambiente global
+           amb-local))
+
+
+(defn lambda-simple?
+  "Indica si la expresión lambda `f` tiene un cuerpo de una sola 'función'"
+  [f] (nil? (next (nnext f))))
+
+
+(defn aplicar-fun-lambda
+  "Aplica las funciones lambdas `f` a la lista de argumentos `lae`."
+  [f lae amb-global amb-local]
+  (cond
+    (< (count lae) (count (second f))) (list '(*error* too-few-args) amb-global)
+    (> (count lae) (count (second f))) (list '(*error* too-many-args) amb-global)
+    (lambda-simple? f) (aplicar-fun-lambda-simple f lae amb-global amb-local)
+    :else (aplicar-fun-lambda-multiple f lae amb-global amb-local)))
