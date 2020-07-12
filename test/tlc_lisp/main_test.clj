@@ -272,4 +272,5 @@
     (is (= '((*error* random-error) ()) (aplicar '(*error* random-error) '() '() nil))))
   (testing "Aplicar funciones definidas por el usuario"
     (is (= '(3 (sumar add)) (aplicar 'sumar '(1 2) '(sumar add) nil)))
+    (is (= '(3 (pepe add sumar pepe)) (aplicar 'sumar '(1 2) '(pepe add sumar pepe) nil)))
     ))

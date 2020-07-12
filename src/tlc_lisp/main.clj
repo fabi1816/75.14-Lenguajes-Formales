@@ -17,23 +17,23 @@
 
 ;; Funciones auxiliares al final del archivo
 (declare salir)
-(declare es-error?)
+(declare error?)
+(declare escalar?)
 (declare evaluar-de)
-(declare es-escalar?)
 (declare cargar-input)
 (declare evaluar-setq)
 (declare evaluar-quote)
 (declare evaluar-lambda)
+(declare numero-o-string?)
 (declare de-define-params?)
 (declare evaluar-escalares)
 (declare evaluar-setq-unico)
-(declare es-numero-o-string?)
+(declare non-nil-empty-list?)
 (declare setq-insuficientes?)
 (declare lambda-define-param?)
 (declare resultado-de-evaluar)
-(declare is-non-nil-empty-list?)
 (declare evaluar-setq-multiples)
-(declare es-nombre-archivo-valido?)
+(declare nombre-archivo-valido?)
 
 
 ; REPL (read–eval–print loop).
@@ -84,10 +84,10 @@
   "Carga el contenido de un archivo"
   ([amb-global amb-local arch]
     (let [nomb (first (evaluar arch amb-global amb-local))]
-      (if (es-error? nomb)
+      (if (error? nomb)
         (do (imprimir nomb) amb-global)    ; Mostrar el error
         (let [nm (lower-case (str nomb))
-              nom (if (es-nombre-archivo-valido? nm) 
+              nom (if (nombre-archivo-valido? nm) 
                     nm 
                     (str nm ".lsp"))       ; Si no es un nombre de archivo valido le agrega '.lsp' al final
               ret (try (with-open [in (java.io.PushbackReader. (reader nom))]
@@ -127,7 +127,7 @@
    Retorna un lista con el resultado y un ambiente"
   [expre amb-global amb-local]
   (cond
-    (es-escalar? expre) (evaluar-escalares expre amb-global amb-local)
+    (escalar? expre) (evaluar-escalares expre amb-global amb-local)
     (igual? expre nil) (list nil amb-global)
     (igual? (first expre) '*error*) (list expre amb-global)
     (igual? (first expre) 'de) (evaluar-de expre amb-global amb-local)
@@ -204,10 +204,30 @@
     (try (reduce + lae)
          (catch Exception _ (list '*error* 'number-expected)))))
 
-(defn fun-definidas-por-el-usuario
+(defn no-aplicable?
+  "Chequea si `elem` es un número, 't' (true), nil o una lista vacia"
+  [elem]
+  (or (number? elem) (igual? elem 't) (igual? elem nil)))
+
+(defn fun-definida-por-el-usuario
   "Aplica la función definida por el usuario si esta ya existe
    en el ambiente global o local"
-  [f lae amb-global amb-local])
+  [f lae amb-global amb-local]
+  (let [lamb (buscar f (concat amb-local amb-global))]
+    (cond
+      (no-aplicable? lamb) (list (list '*error* 'non-applicable-type lamb) amb-global)
+      (no-aplicable? f) (list (list '*error* 'non-applicable-type f) amb-global)
+      (error? lamb) (list lamb amb-global)
+      :else (aplicar lamb lae amb-global amb-local))))
+
+(defn aplicar-fun-escalares
+  "Aplica las funciones escalares estandares o las definidas por el usuario"
+  [f lae amb-global amb-local]
+  (cond
+    (igual? f 'add) (list (fun-sumar lae) amb-global)
+    (igual? f 'env) (list (fun-env lae amb-global amb-local) amb-global)
+    (igual? f 'first) (list (fun-first lae) amb-global)
+    :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
 
 (defn aplicar
   "Aplica a la lista de argumentos `lae` la función `f` en los ambientes datos"
@@ -217,25 +237,13 @@
       (cond
         (not (nil? resu1)) (list resu1 amb-global)    ; La función es un mensaje de error
         (not (nil? resu2)) (list resu2 amb-global)    ; La lista de argumentos es un mensaje de error
+        (not (seq? f)) (aplicar-fun-escalares f lae amb-global amb-local)    ; 'f' es una función escalar
         
-        ; Si f no es una lista
-        (not (seq? f)) (list
-                        (cond
-                          (igual? f 'env) (fun-env lae amb-global amb-local)
-                          (igual? f 'first) (fun-first lae)
-                          (igual? f 'add) (fun-sumar lae)
-                          :else (let [lamb (buscar f (concat amb-local amb-global))]
-                                  (cond
-                                    (or (number? lamb) (igual? lamb 't) (igual? lamb nil)) (list '*error* 'non-applicable-type lamb)
-                                    (or (number? f) (igual? f 't) (igual? f nil)) (list '*error* 'non-applicable-type f)
-                                    (and (seq? lamb) (igual? (first lamb) '*error*)) lamb
-                                    :else (aplicar lamb lae amb-global amb-local))))
-                        amb-global)
         ; Si f es una lista
         :else (cond
                 (< (count lae) (count (fnext f))) (list (list '*error* 'too-few-args) amb-global)
                 (> (count lae) (count (fnext f))) (list (list '*error* 'too-many-args) amb-global)
-                true (if (nil? (next (nnext f)))
+                :else (if (nil? (next (nnext f)))
                        (evaluar (first (nnext f))
                                 amb-global
                                 (concat (reduce concat (map list (fnext f) lae)) amb-local))
@@ -275,8 +283,8 @@
   [a b]
   (cond
     (and (string? a) (string? b)) (= (lower-case a) (lower-case b))
-    (and (nil? a) (is-non-nil-empty-list? b)) true
-    (and (nil? b) (is-non-nil-empty-list? a)) true
+    (and (nil? a) (non-nil-empty-list? b)) true
+    (and (nil? b) (non-nil-empty-list? a)) true
     :else (= a b)))
 
 
@@ -409,14 +417,14 @@
 
 ;; Funciones auxiliares
 
-(defn es-error?
+(defn error?
   "Es una secuencia cuyo primer elemento es '*error*'?"
   [elem]
   (and (seq? elem)
        (igual? (first elem) '*error*)))
 
 
-(defn es-nombre-archivo-valido?
+(defn nombre-archivo-valido?
   "Checkquea que el string sea un nombre de archivo .lsp valido"
   [nombre] 
   (and (> (count nombre) 4)
@@ -433,18 +441,18 @@
       (imprimir nil) amb-global)))
 
 
-(defn is-non-nil-empty-list?
-  "Checks that the parameter is an empty list and that it is not nil"
+(defn non-nil-empty-list?
+  "Chequea que el parametro sea una lista vacia no-nil"
   [l]
   (and (list? l) (empty? l)))
 
 
-(defn es-escalar?
+(defn escalar?
   "Chequea si `elem` es un escalar no-nulo"
   [elem] (and (not (seq? elem)) (not (nil? elem))))
 
 
-(defn es-numero-o-string?
+(defn numero-o-string?
   "Chequea si `elem` es un numero o un string"
   [elem] (or (number? elem) (string? elem)))
 
@@ -453,7 +461,7 @@
   "Evalua las expresiones que son escalares"
   [expre amb-global amb-local]
   (cond
-    (es-numero-o-string? expre) (list expre amb-global)
+    (numero-o-string? expre) (list expre amb-global)
     :else (list (buscar expre (concat amb-local amb-global)) amb-global)))
 
 
