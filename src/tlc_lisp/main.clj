@@ -21,6 +21,7 @@
 (declare fun-env)
 (declare fun-sub)
 (declare fun-not)
+(declare fun-null)
 (declare fun-cons)
 (declare escalar?)
 (declare fun-equal)
@@ -228,6 +229,7 @@
     (igual? f 'length) (list (fun-length lae) amb-global)
     (igual? f 'lt) (list (fun-less-than lae) amb-global)
     (igual? f 'not) (list (fun-not lae) amb-global)
+    (igual? f 'null) (list (fun-null lae) amb-global)
     (igual? f 'reverse) (list (fun-reverse lae) amb-global)
     (igual? f 'sub) (list (fun-sub lae) amb-global)
     :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
@@ -248,11 +250,11 @@
 ; ge: Done!
 ; reverse: Done!
 ; cons: Done!
+; null: Done!
 ; 
 ; append: retorna la fusión de dos listas
 ; eval: retorna la evaluación de una lista
 ; list: retorna una lista formada por los args.
-; null: retorna t si un elemento es nil
 ; prin3: imprime un elemento y lo retorna
 ; read: retorna la lectura de un elemento
 ; rest: retorna una lista sin su 1ra. posición
@@ -727,3 +729,8 @@
 (defn fun-cons
   "Retorna inserción del elem en la cabeza de la lista"
   [lae] (cons (ffirst lae) (second (first lae))))
+
+
+(defn fun-null
+  "Retorna t si un elemento es nil"
+  [lae] (if (nil? (first lae)) 't nil))

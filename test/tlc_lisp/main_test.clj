@@ -358,3 +358,11 @@
     (is (= '((1 2) (cons cons)) (evaluar '(cons '(1 (2))) '(cons cons) nil)))
     (is (= '((1 2 3) (cons cons)) (evaluar '(cons '(1 (2 3))) '(cons cons) nil)))
     (is (= '((A B C) (cons cons)) (evaluar '(cons '(A (B C))) '(cons cons) nil)))))
+
+(deftest test-evaluar-null
+  (testing "Es nil"
+    (is (= '(t (null null)) (evaluar '(null nil) '(null null) nil)))
+    (is (= '(t (null null)) (evaluar '(null ()) '(null null) nil))))
+  (testing "No es nil"
+    (is (= '(nil (null null)) (evaluar '(null 1) '(null null) nil)))
+    (is (= '(nil (null null)) (evaluar '(null 'A) '(null null) nil)))))
