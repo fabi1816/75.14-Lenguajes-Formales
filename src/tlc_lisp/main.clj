@@ -27,6 +27,7 @@
 (declare fun-sumar)
 (declare evaluar-de)
 (declare fun-length)
+(declare fun-reverse)
 (declare next-lambda)
 (declare cargar-input)
 (declare evaluar-setq)
@@ -225,8 +226,10 @@
     (igual? f 'length) (list (fun-length lae) amb-global)
     (igual? f 'lt) (list (fun-less-than lae) amb-global)
     (igual? f 'not) (list (fun-not lae) amb-global)
+    (igual? f 'reverse) (list (fun-reverse lae) amb-global)
     (igual? f 'sub) (list (fun-sub lae) amb-global)
     :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
+
 
 
 ; TODO: La lista de funciones deberia ser implementada en `aplicar`
@@ -242,6 +245,7 @@
 ; lt: Done!
 ; gt: Done!
 ; ge: Done!
+; reverse: Done!
 ; 
 ; append: retorna la fusión de dos listas
 ; cons: retorna inserción del elem en la cabeza de la lista
@@ -251,7 +255,6 @@
 ; prin3: imprime un elemento y lo retorna
 ; read: retorna la lectura de un elemento
 ; rest: retorna una lista sin su 1ra. posición
-; reverse: 
 ; terpri: imprime un salto de línea y retorna nil
 
 ; Controla la aridad (cantidad de argumentos de una funcion).
@@ -713,3 +716,8 @@
       (seq? ari) ari
       (>= (first lae) (second lae)) 't
       :else nil)))
+
+
+(defn fun-reverse
+  "Devuelve una lista con los elementos de `lae` en orden inverso"
+  [lae] (reverse (first lae)))

@@ -341,3 +341,13 @@
   (testing "Mayor o igual que... error!"
     (is (= '((*error* too-few-args) (ge ge)) (evaluar '(ge 1) '(ge ge) nil)))
     (is (= '((*error* too-many-args) (ge ge)) (evaluar '(ge 1 1 1) '(ge ge) nil)))))
+
+(deftest test-evaluar-reverse
+  (testing "Reverse una lista"
+    (is (= '(() (reverse reverse)) (evaluar '(reverse '()) '(reverse reverse) nil)))
+    (is (= '((1) (reverse reverse)) (evaluar '(reverse '(1)) '(reverse reverse) nil)))
+    (is (= '((A) (reverse reverse)) (evaluar '(reverse '(A)) '(reverse reverse) nil)))
+    (is (= '((2 1) (reverse reverse)) (evaluar '(reverse '(1 2)) '(reverse reverse) nil)))
+    (is (= '((3 2 1) (reverse reverse)) (evaluar '(reverse '(1 2 3)) '(reverse reverse) nil)))
+    (is (= '((3 (2) 1) (reverse reverse)) (evaluar '(reverse '(1 (2) 3)) '(reverse reverse) nil)))
+    (is (= '((3 (2 4) 1) (reverse reverse)) (evaluar '(reverse '(1 (2 4) 3)) '(reverse reverse) nil)))))
