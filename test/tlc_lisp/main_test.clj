@@ -351,3 +351,10 @@
     (is (= '((3 2 1) (reverse reverse)) (evaluar '(reverse '(1 2 3)) '(reverse reverse) nil)))
     (is (= '((3 (2) 1) (reverse reverse)) (evaluar '(reverse '(1 (2) 3)) '(reverse reverse) nil)))
     (is (= '((3 (2 4) 1) (reverse reverse)) (evaluar '(reverse '(1 (2 4) 3)) '(reverse reverse) nil)))))
+
+(deftest test-evaluar-cons
+  (testing "Cons una lista"
+    (is (= '((1) (cons cons)) (evaluar '(cons '(1 ())) '(cons cons) nil)))
+    (is (= '((1 2) (cons cons)) (evaluar '(cons '(1 (2))) '(cons cons) nil)))
+    (is (= '((1 2 3) (cons cons)) (evaluar '(cons '(1 (2 3))) '(cons cons) nil)))
+    (is (= '((A B C) (cons cons)) (evaluar '(cons '(A (B C))) '(cons cons) nil)))))

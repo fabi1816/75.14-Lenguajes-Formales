@@ -21,6 +21,7 @@
 (declare fun-env)
 (declare fun-sub)
 (declare fun-not)
+(declare fun-cons)
 (declare escalar?)
 (declare fun-equal)
 (declare fun-first)
@@ -218,6 +219,7 @@
   [f lae amb-global amb-local]
   (cond
     (igual? f 'add) (list (fun-sumar lae) amb-global)
+    (igual? f 'cons) (list (fun-cons lae) amb-global)
     (igual? f 'env) (list (fun-env lae amb-global amb-local) amb-global)
     (igual? f 'equal) (list (fun-equal lae) amb-global)
     (igual? f 'first) (list (fun-first lae) amb-global)
@@ -229,7 +231,6 @@
     (igual? f 'reverse) (list (fun-reverse lae) amb-global)
     (igual? f 'sub) (list (fun-sub lae) amb-global)
     :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
-
 
 
 ; TODO: La lista de funciones deberia ser implementada en `aplicar`
@@ -246,9 +247,9 @@
 ; gt: Done!
 ; ge: Done!
 ; reverse: Done!
+; cons: Done!
 ; 
 ; append: retorna la fusión de dos listas
-; cons: retorna inserción del elem en la cabeza de la lista
 ; eval: retorna la evaluación de una lista
 ; list: retorna una lista formada por los args.
 ; null: retorna t si un elemento es nil
@@ -721,3 +722,8 @@
 (defn fun-reverse
   "Devuelve una lista con los elementos de `lae` en orden inverso"
   [lae] (reverse (first lae)))
+
+
+(defn fun-cons
+  "Retorna inserción del elem en la cabeza de la lista"
+  [lae] (cons (ffirst lae) (second (first lae))))
