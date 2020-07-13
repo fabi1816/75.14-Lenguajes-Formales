@@ -30,6 +30,7 @@
 (declare fun-first)
 (declare fun-sumar)
 (declare evaluar-de)
+(declare fun-append)
 (declare fun-length)
 (declare fun-terpri)
 (declare fun-reverse)
@@ -223,6 +224,7 @@
   [f lae amb-global amb-local]
   (cond
     (igual? f 'add) (list (fun-sumar lae) amb-global)
+    (igual? f 'append) (list (fun-append lae) amb-global)
     (igual? f 'cons) (list (fun-cons lae) amb-global)
     (igual? f 'env) (list (fun-env lae amb-global amb-local) amb-global)
     (igual? f 'equal) (list (fun-equal lae) amb-global)
@@ -260,8 +262,8 @@
 ; list: Done!
 ; rest: Done!
 ; terpri: Done!
+; append: 
 ; 
-; append: retorna la fusión de dos listas
 ; eval: retorna la evaluación de una lista
 ; prin3: imprime un elemento y lo retorna
 ; read: retorna la lectura de un elemento
@@ -759,3 +761,12 @@
     (cond
       (seq? ari) ari
       :else (newline))))
+
+
+(defn fun-append
+  "Retorna la fusión de dos listas"
+  [lae]
+  (let [ari (controlar-aridad lae 2)]
+    (cond
+      (seq? ari) ari
+      :else (concat (first lae) (second lae)))))

@@ -389,3 +389,19 @@
   (testing "Cuidado con la cantidad de params"
     (is (= '((*error* too-many-args) (terpri terpri))
            (evaluar '(terpri 1) '(terpri terpri) nil)))))
+
+(deftest test-evaluar-append
+  (testing "Error en la cantidad de argumentos"
+    (is (= '((*error* too-few-args) (append append))
+           (evaluar '(append) '(append append) nil)))
+    (is (= '((*error* too-few-args) (append append))
+           (evaluar '(append '(A)) '(append append) nil)))
+    (is (= '((*error* too-many-args) (append append))
+           (evaluar '(append '(A) '(B) '(C)) '(append append) nil))))
+  (testing "Appendear las listas"
+    (is (= '(() (append append)) (evaluar '(append '() '()) '(append append) nil)))
+    (is (= '((1 2) (append append)) (evaluar '(append '(1) '(2)) '(append append) nil)))
+    (is (= '((1 2) (append append)) (evaluar '(append '() '(1 2)) '(append append) nil)))
+    (is (= '((1 2) (append append)) (evaluar '(append '(1 2) '()) '(append append) nil)))
+    (is (= '((1 1 2 2) (append append))
+           (evaluar '(append '(1 1) '(2 2)) '(append append) nil)))))
