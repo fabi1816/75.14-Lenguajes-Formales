@@ -26,6 +26,7 @@
 (declare fun-eval)
 (declare fun-list)
 (declare fun-null)
+(declare fun-read)
 (declare fun-rest)
 (declare fun-equal)
 (declare fun-first)
@@ -240,6 +241,7 @@
     (igual? f 'not) (list (fun-not lae) amb-global)
     (igual? f 'null) (list (fun-null lae) amb-global)
     (igual? f 'prin3) (list (fun-prin3 lae) amb-global)
+    (igual? f 'read) (list (fun-read lae) amb-global)
     (igual? f 'rest) (list (fun-rest lae) amb-global)
     (igual? f 'reverse) (list (fun-reverse lae) amb-global)
     (igual? f 'sub) (list (fun-sub lae) amb-global)
@@ -269,8 +271,7 @@
 ; append: Done!
 ; eval: Done!
 ; prin3: Done!
-; 
-; read: retorna la lectura de un elemento
+; read: Done!
 
 ; Controla la aridad (cantidad de argumentos de una funcion).
 ; Recibe una lista y un numero. Si la longitud de la lista coincide con el
@@ -787,3 +788,8 @@
   [lae]
   (print (first lae))
   (first lae))
+
+
+(defn fun-read
+  "Retorna la lectura de un elemento desde input standard"
+  [_] (read))

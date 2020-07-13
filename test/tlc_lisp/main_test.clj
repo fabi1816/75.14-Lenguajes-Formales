@@ -416,3 +416,4 @@
     (is (= '(1 (prin3 prin3)) (evaluar '(prin3 1) '(prin3 prin3) nil)))
     (is (= '(A (prin3 prin3)) (evaluar '(prin3 'A) '(prin3 prin3) nil)))
     (is (= '((1 2 3) (prin3 prin3)) (evaluar '(prin3 '(1 2 3)) '(prin3 prin3) nil)))))
+
