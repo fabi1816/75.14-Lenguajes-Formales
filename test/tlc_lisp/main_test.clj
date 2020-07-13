@@ -366,3 +366,11 @@
   (testing "No es nil"
     (is (= '(nil (null null)) (evaluar '(null 1) '(null null) nil)))
     (is (= '(nil (null null)) (evaluar '(null 'A) '(null null) nil)))))
+
+(deftest test-evaluar-list
+  (testing "Construir una lista"
+    (is (= '(() (list list)) (evaluar '(list) '(list list) nil)))
+    (is (= '((1) (list list)) (evaluar '(list 1) '(list list) nil)))
+    (is (= '((1 2) (list list)) (evaluar '(list 1 2) '(list list) nil)))
+    (is (= '((1 2 3) (list list)) (evaluar '(list 1 2 3) '(list list) nil)))
+    (is (= '((A B C) (list list)) (evaluar '(list 'A 'B 'C) '(list list) nil)))))

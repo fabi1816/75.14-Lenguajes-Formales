@@ -19,11 +19,12 @@
 (declare salir)
 (declare error?)
 (declare fun-env)
-(declare fun-sub)
 (declare fun-not)
-(declare fun-null)
-(declare fun-cons)
+(declare fun-sub)
 (declare escalar?)
+(declare fun-cons)
+(declare fun-list)
+(declare fun-null)
 (declare fun-equal)
 (declare fun-first)
 (declare fun-sumar)
@@ -34,9 +35,9 @@
 (declare cargar-input)
 (declare evaluar-setq)
 (declare cuerpo-lambda)
+(declare evaluar-quote)
 (declare fun-less-than)
 (declare no-aplicable?)
-(declare evaluar-quote)
 (declare evaluar-lambda)
 (declare lambda-simple?)
 (declare build-amb-lambda)
@@ -227,6 +228,7 @@
     (igual? f 'ge) (list (fun-greater-or-equal-than lae) amb-global)
     (igual? f 'gt) (list (fun-greater-than lae) amb-global)
     (igual? f 'length) (list (fun-length lae) amb-global)
+    (igual? f 'list) (list (fun-list lae) amb-global)
     (igual? f 'lt) (list (fun-less-than lae) amb-global)
     (igual? f 'not) (list (fun-not lae) amb-global)
     (igual? f 'null) (list (fun-null lae) amb-global)
@@ -251,10 +253,10 @@
 ; reverse: Done!
 ; cons: Done!
 ; null: Done!
+; list: Done!
 ; 
 ; append: retorna la fusión de dos listas
 ; eval: retorna la evaluación de una lista
-; list: retorna una lista formada por los args.
 ; prin3: imprime un elemento y lo retorna
 ; read: retorna la lectura de un elemento
 ; rest: retorna una lista sin su 1ra. posición
@@ -734,3 +736,8 @@
 (defn fun-null
   "Retorna t si un elemento es nil"
   [lae] (if (nil? (first lae)) 't nil))
+
+
+(defn fun-list
+  "Retorna una lista formada por los args."
+  [lae] lae)
