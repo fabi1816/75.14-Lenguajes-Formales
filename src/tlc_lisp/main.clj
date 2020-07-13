@@ -4,7 +4,7 @@
 
 (declare buscar)    ; Done!
 (declare igual?)    ; Done!
-(declare aplicar)    ; TODO: Terminar
+(declare aplicar)    ; Done!
 (declare evaluar)    ; TODO: Terminar
 (declare imprimir)    ; Done!
 (declare revisar-f)    ; Done!
@@ -178,6 +178,7 @@
 ; setq: Done!
 ; quote: Done!
 ; lambda: Done!
+; 
 ; cond: WIP
 ; if
 ; load
@@ -248,30 +249,6 @@
     (igual? f 'terpri) (list (fun-terpri lae) amb-global)
     :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
 
-
-; TODO: La lista de funciones deberia ser implementada en `aplicar`
-; add: Done!
-; env: Done!
-; first: Done!
-; equal: Done!
-; length: Done!
-; sub: Done!
-; +: Done!
-; -: Done!
-; not: Done!
-; lt: Done!
-; gt: Done!
-; ge: Done!
-; reverse: Done!
-; cons: Done!
-; null: Done!
-; list: Done!
-; rest: Done!
-; terpri: Done!
-; append: Done!
-; eval: Done!
-; prin3: Done!
-; read: Done!
 
 ; Controla la aridad (cantidad de argumentos de una funcion).
 ; Recibe una lista y un numero. Si la longitud de la lista coincide con el
