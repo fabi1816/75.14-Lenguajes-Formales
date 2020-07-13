@@ -29,6 +29,7 @@
 (declare fun-rest)
 (declare fun-equal)
 (declare fun-first)
+(declare fun-prin3)
 (declare fun-sumar)
 (declare evaluar-de)
 (declare fun-append)
@@ -238,6 +239,7 @@
     (igual? f 'lt) (list (fun-less-than lae) amb-global)
     (igual? f 'not) (list (fun-not lae) amb-global)
     (igual? f 'null) (list (fun-null lae) amb-global)
+    (igual? f 'prin3) (list (fun-prin3 lae) amb-global)
     (igual? f 'rest) (list (fun-rest lae) amb-global)
     (igual? f 'reverse) (list (fun-reverse lae) amb-global)
     (igual? f 'sub) (list (fun-sub lae) amb-global)
@@ -266,8 +268,8 @@
 ; terpri: Done!
 ; append: Done!
 ; eval: Done!
+; prin3: Done!
 ; 
-; prin3: imprime un elemento y lo retorna
 ; read: retorna la lectura de un elemento
 
 ; Controla la aridad (cantidad de argumentos de una funcion).
@@ -778,3 +780,10 @@
   "Retorna la evaluación de una lista en TLC-Lisp"
   [lae amb-global amb-local]
   (evaluar (first lae) amb-global amb-local))
+
+
+(defn fun-prin3
+  "Imprime un elemento y lo retorna"
+  [lae]
+  (print (first lae))
+  (first lae))

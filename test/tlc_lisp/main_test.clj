@@ -408,5 +408,11 @@
 
 (deftest test-evaluar-eval
   (testing "Eval deberia evaluar de la misma forma que 'evaluar'"
-    (is (= '(t (eval eval equal equal)) 
+    (is (= '(t (eval eval equal equal))
            (evaluar '(eval '(equal nil '())) '(eval eval equal equal) nil)))))
+
+(deftest test-evaluar-prin3
+  (testing "Devuelve el mismo elemento que imprime"
+    (is (= '(1 (prin3 prin3)) (evaluar '(prin3 1) '(prin3 prin3) nil)))
+    (is (= '(A (prin3 prin3)) (evaluar '(prin3 'A) '(prin3 prin3) nil)))
+    (is (= '((1 2 3) (prin3 prin3)) (evaluar '(prin3 '(1 2 3)) '(prin3 prin3) nil)))))
