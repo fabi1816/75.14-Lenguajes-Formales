@@ -403,11 +403,9 @@
             (first (evaluar (first lis) amb-global amb-local))
             (evaluar-secuencia-en-cond (next lis) amb-global amb-local))))
 
-; Al terminar de cargar el archivo, se retorna true.
-
-; TODO: Falta hacer que la carga del interprete en Clojure (tlc-lisp.clj) retorne true
 
 ;; Funciones auxiliares
+
 
 (defn error?
   "Es una secuencia cuyo primer elemento es '*error*'?"
@@ -770,3 +768,8 @@
 (defn fun-read
   "Retorna la lectura de un elemento desde input standard"
   [_] (read))
+
+
+; Al terminar de cargar el archivo, se retorna true.
+
+; TODO: Falta hacer que la carga del interprete en Clojure (tlc-lisp.clj) retorne true
