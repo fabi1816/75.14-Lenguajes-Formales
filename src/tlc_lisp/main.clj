@@ -31,6 +31,7 @@
 (declare fun-sumar)
 (declare evaluar-de)
 (declare fun-length)
+(declare fun-terpri)
 (declare fun-reverse)
 (declare next-lambda)
 (declare cargar-input)
@@ -236,6 +237,7 @@
     (igual? f 'rest) (list (fun-rest lae) amb-global)
     (igual? f 'reverse) (list (fun-reverse lae) amb-global)
     (igual? f 'sub) (list (fun-sub lae) amb-global)
+    (igual? f 'terpri) (list (fun-terpri lae) amb-global)
     :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
 
 
@@ -257,12 +259,12 @@
 ; null: Done!
 ; list: Done!
 ; rest: Done!
+; terpri: Done!
 ; 
 ; append: retorna la fusión de dos listas
 ; eval: retorna la evaluación de una lista
 ; prin3: imprime un elemento y lo retorna
 ; read: retorna la lectura de un elemento
-; terpri: imprime un salto de línea y retorna nil
 
 ; Controla la aridad (cantidad de argumentos de una funcion).
 ; Recibe una lista y un numero. Si la longitud de la lista coincide con el
@@ -748,3 +750,12 @@
 (defn fun-rest
   "Retorna una lista sin su 1ra. posición"
   [lae] (rest (first lae)))
+
+
+(defn fun-terpri
+  "Imprime un salto de línea y retorna nil"
+  [lae]
+  (let [ari (controlar-aridad lae 0)]
+    (cond
+      (seq? ari) ari
+      :else (newline))))

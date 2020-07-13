@@ -382,3 +382,10 @@
   (testing "Devuelve algo"
     (is (= '((2) (rest rest)) (evaluar '(rest '(1 2)) '(rest rest) nil)))
     (is (= '((2 3) (rest rest)) (evaluar '(rest '(1 2 3)) '(rest rest) nil)))))
+
+(deftest test-evaluar-terpri
+  (testing "Llamar a terpri"
+    (is (= '(nil (terpri terpri)) (evaluar '(terpri) '(terpri terpri) nil))))
+  (testing "Cuidado con la cantidad de params"
+    (is (= '((*error* too-many-args) (terpri terpri))
+           (evaluar '(terpri 1) '(terpri terpri) nil)))))
