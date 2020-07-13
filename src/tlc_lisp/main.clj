@@ -262,7 +262,7 @@
 ; list: Done!
 ; rest: Done!
 ; terpri: Done!
-; append: 
+; append: Done!
 ; 
 ; eval: retorna la evaluación de una lista
 ; prin3: imprime un elemento y lo retorna
