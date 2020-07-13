@@ -23,6 +23,7 @@
 (declare fun-sub)
 (declare escalar?)
 (declare fun-cons)
+(declare fun-eval)
 (declare fun-list)
 (declare fun-null)
 (declare fun-rest)
@@ -228,6 +229,7 @@
     (igual? f 'cons) (list (fun-cons lae) amb-global)
     (igual? f 'env) (list (fun-env lae amb-global amb-local) amb-global)
     (igual? f 'equal) (list (fun-equal lae) amb-global)
+    (igual? f 'eval) (fun-eval lae amb-global amb-local)
     (igual? f 'first) (list (fun-first lae) amb-global)
     (igual? f 'ge) (list (fun-greater-or-equal-than lae) amb-global)
     (igual? f 'gt) (list (fun-greater-than lae) amb-global)
@@ -263,8 +265,8 @@
 ; rest: Done!
 ; terpri: Done!
 ; append: Done!
+; eval: Done!
 ; 
-; eval: retorna la evaluación de una lista
 ; prin3: imprime un elemento y lo retorna
 ; read: retorna la lectura de un elemento
 
@@ -770,3 +772,9 @@
     (cond
       (seq? ari) ari
       :else (concat (first lae) (second lae)))))
+
+
+(defn fun-eval
+  "Retorna la evaluación de una lista en TLC-Lisp"
+  [lae amb-global amb-local]
+  (evaluar (first lae) amb-global amb-local))

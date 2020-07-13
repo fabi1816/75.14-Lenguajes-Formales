@@ -405,3 +405,8 @@
     (is (= '((1 2) (append append)) (evaluar '(append '(1 2) '()) '(append append) nil)))
     (is (= '((1 1 2 2) (append append))
            (evaluar '(append '(1 1) '(2 2)) '(append append) nil)))))
+
+(deftest test-evaluar-eval
+  (testing "Eval deberia evaluar de la misma forma que 'evaluar'"
+    (is (= '(t (eval eval equal equal)) 
+           (evaluar '(eval '(equal nil '())) '(eval eval equal equal) nil)))))
