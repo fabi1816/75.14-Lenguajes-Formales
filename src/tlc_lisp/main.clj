@@ -31,11 +31,13 @@
 (declare cargar-input)
 (declare evaluar-setq)
 (declare cuerpo-lambda)
+(declare fun-less-than)
 (declare no-aplicable?)
 (declare evaluar-quote)
 (declare evaluar-lambda)
 (declare lambda-simple?)
 (declare build-amb-lambda)
+(declare fun-greater-than)
 (declare numero-o-string?)
 (declare de-define-params?)
 (declare evaluar-escalares)
@@ -49,6 +51,7 @@
 (declare evaluar-setq-multiples)
 (declare nombre-archivo-valido?)
 (declare aplicar-fun-lambda-simple)
+(declare fun-greater-or-equal-than)
 (declare aplicar-fun-lambda-multiple)
 (declare fun-definida-por-el-usuario)
 
@@ -217,7 +220,10 @@
     (igual? f 'env) (list (fun-env lae amb-global amb-local) amb-global)
     (igual? f 'equal) (list (fun-equal lae) amb-global)
     (igual? f 'first) (list (fun-first lae) amb-global)
+    (igual? f 'ge) (list (fun-greater-or-equal-than lae) amb-global)
+    (igual? f 'gt) (list (fun-greater-than lae) amb-global)
     (igual? f 'length) (list (fun-length lae) amb-global)
+    (igual? f 'lt) (list (fun-less-than lae) amb-global)
     (igual? f 'not) (list (fun-not lae) amb-global)
     (igual? f 'sub) (list (fun-sub lae) amb-global)
     :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
@@ -233,20 +239,20 @@
 ; +: Done!
 ; -: Done!
 ; not: Done!
+; lt: Done!
+; gt: Done!
+; ge: Done!
 ; 
-; append: retorna la fusión
-; cons: retorna inserción de
-; eval: retorna la evaluación de
-; ge: 
-; gt: 
+; append: retorna la fusión de dos listas
+; cons: retorna inserción del elem en la cabeza de la lista
+; eval: retorna la evaluación de una lista
 ; list: retorna una lista formada por los args.
-; lt: 
-; null: retorna t si un elemento es
-; prin3: imprime un elemento
+; null: retorna t si un elemento es nil
+; prin3: imprime un elemento y lo retorna
 ; read: retorna la lectura de un elemento
 ; rest: retorna una lista sin su 1ra. posición
 ; reverse: 
-; terpri: imprime un salto de línea
+; terpri: imprime un salto de línea y retorna nil
 
 ; Controla la aridad (cantidad de argumentos de una funcion).
 ; Recibe una lista y un numero. Si la longitud de la lista coincide con el
@@ -674,3 +680,36 @@
   (cond
     (igual? (first lae) nil) 't
     (= (first lae) 't) nil))
+
+
+(defn fun-less-than
+  "Devuelve 't si el primer numero es menor que el segundo,
+   nil si no."
+  [lae]
+  (let [ari (controlar-aridad lae 2)]
+    (cond
+      (seq? ari) ari
+      (< (first lae) (second lae)) 't
+      :else nil)))
+
+
+(defn fun-greater-than
+  "Devuelve 't si el primer numero es mayor que el segundo,
+   nil si no."
+  [lae]
+  (let [ari (controlar-aridad lae 2)]
+    (cond
+      (seq? ari) ari
+      (> (first lae) (second lae)) 't
+      :else nil)))
+
+
+(defn fun-greater-or-equal-than
+  "Devuelve 't si el primer numero es mayor o igual que el segundo,
+   nil si no."
+  [lae]
+  (let [ari (controlar-aridad lae 2)]
+    (cond
+      (seq? ari) ari
+      (>= (first lae) (second lae)) 't
+      :else nil)))

@@ -312,3 +312,32 @@
     (is (= '(t (not not)) (evaluar '(not ()) '(not not) nil)))
     (is (= '(t (not not)) (evaluar '(not nil) '(not not) nil)))
     (is (= '(nil (not not)) (evaluar '(not 't) '(not not) nil)))))
+
+(deftest test-evaluar-comparaciones
+  (testing "Menor que..."
+    (is (= '(t (lt lt)) (evaluar '(lt 1 2) '(lt lt) nil)))
+    (is (= '(t (lt lt)) (evaluar '(lt 5 9) '(lt lt) nil)))
+    (is (= '(nil (lt lt)) (evaluar '(lt 2 1) '(lt lt) nil)))
+    (is (= '(nil (lt lt)) (evaluar '(lt 9 5) '(lt lt) nil)))
+    (is (= '(nil (lt lt)) (evaluar '(lt 1 1) '(lt lt) nil))))
+  (testing "Menor que... error!"
+    (is (= '((*error* too-few-args) (lt lt)) (evaluar '(lt 1) '(lt lt) nil)))
+    (is (= '((*error* too-many-args) (lt lt)) (evaluar '(lt 1 1 1) '(lt lt) nil))))
+  (testing "Mayor que..."
+    (is (= '(t (gt gt)) (evaluar '(gt 2 1) '(gt gt) nil)))
+    (is (= '(t (gt gt)) (evaluar '(gt 9 5) '(gt gt) nil)))
+    (is (= '(nil (gt gt)) (evaluar '(gt 1 1) '(gt gt) nil)))
+    (is (= '(nil (gt gt)) (evaluar '(gt 1 2) '(gt gt) nil)))
+    (is (= '(nil (gt gt)) (evaluar '(gt 5 9) '(gt gt) nil))))
+  (testing "Mayor que... error!"
+    (is (= '((*error* too-few-args) (gt gt)) (evaluar '(gt 1) '(gt gt) nil)))
+    (is (= '((*error* too-many-args) (gt gt)) (evaluar '(gt 1 1 1) '(gt gt) nil))))
+  (testing "Mayor o igual que..."
+    (is (= '(t (ge ge)) (evaluar '(ge 2 1) '(ge ge) nil)))
+    (is (= '(t (ge ge)) (evaluar '(ge 9 5) '(ge ge) nil)))
+    (is (= '(t (ge ge)) (evaluar '(ge 1 1) '(ge ge) nil)))
+    (is (= '(nil (ge ge)) (evaluar '(ge 1 2) '(ge ge) nil)))
+    (is (= '(nil (ge ge)) (evaluar '(ge 5 9) '(ge ge) nil))))
+  (testing "Mayor o igual que... error!"
+    (is (= '((*error* too-few-args) (ge ge)) (evaluar '(ge 1) '(ge ge) nil)))
+    (is (= '((*error* too-many-args) (ge ge)) (evaluar '(ge 1 1 1) '(ge ge) nil)))))
