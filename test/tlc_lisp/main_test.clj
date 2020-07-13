@@ -374,3 +374,11 @@
     (is (= '((1 2) (list list)) (evaluar '(list 1 2) '(list list) nil)))
     (is (= '((1 2 3) (list list)) (evaluar '(list 1 2 3) '(list list) nil)))
     (is (= '((A B C) (list list)) (evaluar '(list 'A 'B 'C) '(list list) nil)))))
+
+(deftest test-evaluar-rest
+  (testing "No hay nada para devolver"
+    (is (= '(() (rest rest)) (evaluar '(rest '()) '(rest rest) nil)))
+    (is (= '(() (rest rest)) (evaluar '(rest '(1)) '(rest rest) nil))))
+  (testing "Devuelve algo"
+    (is (= '((2) (rest rest)) (evaluar '(rest '(1 2)) '(rest rest) nil)))
+    (is (= '((2 3) (rest rest)) (evaluar '(rest '(1 2 3)) '(rest rest) nil)))))

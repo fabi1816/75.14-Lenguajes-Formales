@@ -25,6 +25,7 @@
 (declare fun-cons)
 (declare fun-list)
 (declare fun-null)
+(declare fun-rest)
 (declare fun-equal)
 (declare fun-first)
 (declare fun-sumar)
@@ -232,6 +233,7 @@
     (igual? f 'lt) (list (fun-less-than lae) amb-global)
     (igual? f 'not) (list (fun-not lae) amb-global)
     (igual? f 'null) (list (fun-null lae) amb-global)
+    (igual? f 'rest) (list (fun-rest lae) amb-global)
     (igual? f 'reverse) (list (fun-reverse lae) amb-global)
     (igual? f 'sub) (list (fun-sub lae) amb-global)
     :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
@@ -254,12 +256,12 @@
 ; cons: Done!
 ; null: Done!
 ; list: Done!
+; rest: Done!
 ; 
 ; append: retorna la fusión de dos listas
 ; eval: retorna la evaluación de una lista
 ; prin3: imprime un elemento y lo retorna
 ; read: retorna la lectura de un elemento
-; rest: retorna una lista sin su 1ra. posición
 ; terpri: imprime un salto de línea y retorna nil
 
 ; Controla la aridad (cantidad de argumentos de una funcion).
@@ -741,3 +743,8 @@
 (defn fun-list
   "Retorna una lista formada por los args."
   [lae] lae)
+
+
+(defn fun-rest
+  "Retorna una lista sin su 1ra. posición"
+  [lae] (rest (first lae)))
