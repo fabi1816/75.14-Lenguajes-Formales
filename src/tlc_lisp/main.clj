@@ -563,7 +563,7 @@
   [lae]
   (let [ari (controlar-aridad lae 1)]
     (cond
-      (seq? ari) ari
+      (error? ari) ari
       (igual? (first lae) nil) nil
       (not (seq? (first lae))) (list '*error* 'list 'expected (first lae))
       :else (ffirst lae))))
@@ -651,7 +651,7 @@
   [largs]
   (let [aridad (controlar-aridad largs 2)]
     (cond
-      (seq? aridad) aridad
+      (error? aridad) aridad
       (igual? (first largs) (second largs)) 't
       :else nil)))
 
@@ -665,7 +665,7 @@
   "Resta dos elementos"
   [lae]
   (let [ari (controlar-aridad lae 2)]
-    (if (seq? ari)
+    (if (error? ari)
       ari
       (- (first lae) (second lae)))))
 
@@ -684,7 +684,7 @@
   [lae]
   (let [ari (controlar-aridad lae 2)]
     (cond
-      (seq? ari) ari
+      (error? ari) ari
       (< (first lae) (second lae)) 't
       :else nil)))
 
@@ -695,7 +695,7 @@
   [lae]
   (let [ari (controlar-aridad lae 2)]
     (cond
-      (seq? ari) ari
+      (error? ari) ari
       (> (first lae) (second lae)) 't
       :else nil)))
 
@@ -706,7 +706,7 @@
   [lae]
   (let [ari (controlar-aridad lae 2)]
     (cond
-      (seq? ari) ari
+      (error? ari) ari
       (>= (first lae) (second lae)) 't
       :else nil)))
 
@@ -741,7 +741,7 @@
   [lae]
   (let [ari (controlar-aridad lae 0)]
     (cond
-      (seq? ari) ari
+      (error? ari) ari
       :else (newline))))
 
 
@@ -750,7 +750,7 @@
   [lae]
   (let [ari (controlar-aridad lae 2)]
     (cond
-      (seq? ari) ari
+      (error? ari) ari
       :else (concat (first lae) (second lae)))))
 
 
