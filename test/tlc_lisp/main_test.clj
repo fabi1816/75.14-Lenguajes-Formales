@@ -417,3 +417,24 @@
     (is (= '(A (prin3 prin3)) (evaluar '(prin3 'A) '(prin3 prin3) nil)))
     (is (= '((1 2 3) (prin3 prin3)) (evaluar '(prin3 '(1 2 3)) '(prin3 prin3) nil)))))
 
+(deftest test-evaluar-if
+  (testing "Simple 'if'"
+    (is (= '(1 (if if t t nil nil)) (evaluar '(if t 1 2) '(if if t t nil nil) nil)))
+    (is (= '(2 (if if t t nil nil)) (evaluar '(if nil 1 2) '(if if t t nil nil) nil))))
+  (testing "Se tiene que evaluar la condición"
+    (is (= '(1 (if if t t nil nil equal equal))
+           (evaluar '(if (equal 'A 'A) 1 2) '(if if t t nil nil equal equal) nil)))
+    (is (= '(2 (if if t t nil nil equal equal))
+           (evaluar '(if (equal 'A 'B) 1 2) '(if if t t nil nil equal equal) nil))))
+  (testing "Se tiene que evaluar las ramas"
+    (is (= '(3 (if if t t nil nil equal equal + add))
+           (evaluar '(if (equal 'A 'A) (+ 1 2) (+ 2 3))
+                    '(if if t t nil nil equal equal + add) nil)))
+    (is (= '(5 (if if t t nil nil equal equal + add))
+           (evaluar '(if (equal 'A 'B) (+ 1 2) (+ 2 3))
+                    '(if if t t nil nil equal equal + add) nil))))
+  (testing "Solo se aceptan, exactamente, 3 argumentos"
+    (is (= '((*error* too-few-args) (if if t t)) (evaluar '(if) '(if if t t) nil)))
+    (is (= '((*error* too-few-args) (if if t t)) (evaluar '(if t) '(if if t t) nil)))
+    (is (= '((*error* too-few-args) (if if t t)) (evaluar '(if t 1) '(if if t t) nil)))
+    (is (= '((*error* too-many-args) (if if t t)) (evaluar '(if t 1 2 3) '(if if t t) nil)))))

@@ -33,6 +33,7 @@
 (declare fun-prin3)
 (declare fun-sumar)
 (declare evaluar-de)
+(declare evaluar-if)
 (declare fun-append)
 (declare fun-length)
 (declare fun-terpri)
@@ -162,6 +163,7 @@
     (igual? expre nil) (list nil amb-global)
     (igual? (first expre) '*error*) (list expre amb-global)
     (igual? (first expre) 'de) (evaluar-de expre amb-global amb-local)
+    (igual? (first expre) 'if) (evaluar-if expre amb-global amb-local)
     (igual? (first expre) 'exit) (salir expre amb-global amb-local)
     (igual? (first expre) 'setq) (evaluar-setq expre amb-global amb-local)
     (igual? (first expre) 'cond) (evaluar-cond (next expre) amb-global amb-local)
@@ -178,13 +180,13 @@
 ; setq: Done!
 ; quote: Done!
 ; lambda: Done!
+; nil: Done!
+; t: Ya deberia estar... no?
+; if: Done!
 ; 
 ; cond: WIP
-; if
 ; load
 ; or
-; nil: No estoy seguro
-; t: No estoy seguro
 
 
 ; Aplica una funcion a una lista de argumentos evaluados, usando los ambientes
@@ -768,6 +770,19 @@
 (defn fun-read
   "Retorna la lectura de un elemento desde input standard"
   [_] (read))
+
+
+(defn evaluar-if
+  "Evalua una expresión `expre` condicional"
+  [expre amb-global amb-local]
+  (let [ari (controlar-aridad expre 4)
+        resul-expre (evaluar (second expre) amb-global amb-local)
+        rama-true (first (nnext expre))
+        rama-false (second (nnext expre))]
+    (cond
+      (error? ari) (list ari amb-global)
+      (igual? (first resul-expre) nil) (evaluar rama-false amb-global amb-local)
+      :else (evaluar rama-true amb-global amb-local))))
 
 
 ; Al terminar de cargar el archivo, se retorna true.
