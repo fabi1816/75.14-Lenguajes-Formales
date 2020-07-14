@@ -33,8 +33,10 @@
 (declare fun-prin3)
 (declare fun-sumar)
 (declare rama-true)
+(declare tlc-true?)
 (declare evaluar-de)
 (declare evaluar-if)
+(declare evaluar-or)
 (declare fun-append)
 (declare fun-length)
 (declare fun-terpri)
@@ -156,10 +158,6 @@
 ; pasandole 4 argumentos: la evaluacion del primer elemento, una lista con las
 ;  evaluaciones de los demas, el ambiente global y el ambiente local.
 
-(defn evaluar-or
-  "Evalua una expresión `expre` condicional 'or'"
-  [expre amb-global amb-local]
-  )
 
 (defn evaluar
   "Evalua una expresion en los ambientes global y local
@@ -191,7 +189,7 @@
 ; nil: Done!
 ; t: Ya deberia estar... no?
 ; if: Done!
-; or:
+; or: Done!
 ; 
 ; cond: WIP
 ; load
@@ -799,6 +797,24 @@
       (error? ari) (list ari amb-global)
       (igual? (first resul-expre) nil) (evaluar (rama-false expre) amb-global amb-local)
       :else (evaluar (rama-true expre) amb-global amb-local))))
+
+
+(defn tlc-true?
+  "Devuelve 'true' si el resultado de evaluar la expresión TLC-Lisp `expre`
+   es 't'"
+  [expre amb-global amb-local]
+  (igual? (first (evaluar expre amb-global amb-local)) 't))
+
+
+(defn evaluar-or
+  "Evalua una expresión `expre` condicional 'or' de TLC-Lisp"
+  [expre amb-global amb-local]
+  (let [ari (controlar-aridad expre 3)]
+    (cond
+      (error? ari) (list ari amb-global)
+      (or (tlc-true? (first (next expre)) amb-global amb-local)
+          (tlc-true? (second (next expre)) amb-global amb-local)) (list 't amb-global)
+      :else (list nil amb-global))))
 
 
 ; Al terminar de cargar el archivo, se retorna true.
