@@ -32,11 +32,13 @@
 (declare fun-first)
 (declare fun-prin3)
 (declare fun-sumar)
+(declare rama-true)
 (declare evaluar-de)
 (declare evaluar-if)
 (declare fun-append)
 (declare fun-length)
 (declare fun-terpri)
+(declare rama-false)
 (declare fun-reverse)
 (declare next-lambda)
 (declare cargar-input)
@@ -154,6 +156,11 @@
 ; pasandole 4 argumentos: la evaluacion del primer elemento, una lista con las
 ;  evaluaciones de los demas, el ambiente global y el ambiente local.
 
+(defn evaluar-or
+  "Evalua una expresión `expre` condicional 'or'"
+  [expre amb-global amb-local]
+  )
+
 (defn evaluar
   "Evalua una expresion en los ambientes global y local
    Retorna un lista con el resultado y un ambiente"
@@ -164,6 +171,7 @@
     (igual? (first expre) '*error*) (list expre amb-global)
     (igual? (first expre) 'de) (evaluar-de expre amb-global amb-local)
     (igual? (first expre) 'if) (evaluar-if expre amb-global amb-local)
+    (igual? (first expre) 'or) (evaluar-or expre amb-global amb-local)
     (igual? (first expre) 'exit) (salir expre amb-global amb-local)
     (igual? (first expre) 'setq) (evaluar-setq expre amb-global amb-local)
     (igual? (first expre) 'cond) (evaluar-cond (next expre) amb-global amb-local)
@@ -183,10 +191,10 @@
 ; nil: Done!
 ; t: Ya deberia estar... no?
 ; if: Done!
+; or:
 ; 
 ; cond: WIP
 ; load
-; or
 
 
 ; Aplica una funcion a una lista de argumentos evaluados, usando los ambientes
@@ -772,17 +780,25 @@
   [_] (read))
 
 
+(defn rama-true 
+  "Devuelve la rama verdadera de una `expre`"
+  [expre] (first (nnext expre)))
+
+
+(defn rama-false
+  "Devuelve la rama falsa de una `expre`"
+  [expre] (second (nnext expre)))
+
+
 (defn evaluar-if
   "Evalua una expresión `expre` condicional"
   [expre amb-global amb-local]
   (let [ari (controlar-aridad expre 4)
-        resul-expre (evaluar (second expre) amb-global amb-local)
-        rama-true (first (nnext expre))
-        rama-false (second (nnext expre))]
+        resul-expre (evaluar (second expre) amb-global amb-local)]
     (cond
       (error? ari) (list ari amb-global)
-      (igual? (first resul-expre) nil) (evaluar rama-false amb-global amb-local)
-      :else (evaluar rama-true amb-global amb-local))))
+      (igual? (first resul-expre) nil) (evaluar (rama-false expre) amb-global amb-local)
+      :else (evaluar (rama-true expre) amb-global amb-local))))
 
 
 ; Al terminar de cargar el archivo, se retorna true.
