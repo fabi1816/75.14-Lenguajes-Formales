@@ -54,6 +54,7 @@
 (declare build-amb-lambda)
 (declare fun-greater-than)
 (declare numero-o-string?)
+(declare build-nombre-arch)
 (declare de-define-params?)
 (declare evaluar-escalares)
 (declare aplicar-fun-lambda)
@@ -122,10 +123,7 @@
    (let [nomb (first (evaluar arch amb-global amb-local))]
      (if (error? nomb)
        (do (imprimir nomb) amb-global)    ; Mostrar el error
-       (let [nm (lower-case (str nomb))
-             nom (if (nombre-archivo-valido? nm)
-                   nm
-                   (str nm ".lsp"))       ; Si no es un nombre de archivo valido le agrega '.lsp' al final
+       (let [nom (build-nombre-arch (lower-case (str nomb)))
              ret (try (with-open [in (java.io.PushbackReader. (reader nom))]
                         (binding [*read-eval* false]
                           (cargar-input in amb-global)))
@@ -190,9 +188,9 @@
 ; t: Ya deberia estar... no?
 ; if: Done!
 ; or: Done!
+; load: 
 ; 
 ; cond: WIP
-; load
 
 
 ; Aplica una funcion a una lista de argumentos evaluados, usando los ambientes
@@ -815,6 +813,14 @@
       (or (tlc-true? (first (next expre)) amb-global amb-local)
           (tlc-true? (second (next expre)) amb-global amb-local)) (list 't amb-global)
       :else (list nil amb-global))))
+
+
+(defn build-nombre-arch
+  "Dada una entrada la convierte en un nombre de archivo TLC-Lisp valido"
+  [nom]
+  (cond
+    (nombre-archivo-valido? nom) nom
+    :else (str nom ".lsp")))    ; Agrega '.lsp' al final)
 
 
 ; Al terminar de cargar el archivo, se retorna true.
