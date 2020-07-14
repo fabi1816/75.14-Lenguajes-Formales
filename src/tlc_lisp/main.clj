@@ -156,6 +156,11 @@
 ; pasandole 4 argumentos: la evaluacion del primer elemento, una lista con las
 ;  evaluaciones de los demas, el ambiente global y el ambiente local.
 
+(defn evaluar-load 
+  "Carga en el ambiente un archivo `expre` de código TLC-Lisp"
+  [expre amb-global amb-local]
+  (println expre)
+  (cargar-arch amb-global amb-local expre))
 
 (defn evaluar
   "Evalua una expresion en los ambientes global y local
@@ -168,9 +173,10 @@
     (igual? (first expre) 'de) (evaluar-de expre amb-global amb-local)
     (igual? (first expre) 'if) (evaluar-if expre amb-global amb-local)
     (igual? (first expre) 'or) (evaluar-or expre amb-global amb-local)
-    (igual? (first expre) 'exit) (salir expre amb-global amb-local)
-    (igual? (first expre) 'setq) (evaluar-setq expre amb-global amb-local)
     (igual? (first expre) 'cond) (evaluar-cond (next expre) amb-global amb-local)
+    (igual? (first expre) 'exit) (salir expre amb-global amb-local)
+    (igual? (first expre) 'load) (evaluar-load expre amb-global amb-local)
+    (igual? (first expre) 'setq) (evaluar-setq expre amb-global amb-local)
     (igual? (first expre) 'quote) (evaluar-quote expre amb-global amb-local)
     (igual? (first expre) 'lambda) (evaluar-lambda expre amb-global amb-local)
     :else (aplicar (resultado-de-evaluar (first expre) amb-global amb-local)         ; Función a evaluar
