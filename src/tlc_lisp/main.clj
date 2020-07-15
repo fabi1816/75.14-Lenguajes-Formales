@@ -179,21 +179,6 @@
                    amb-global amb-local)))
 
 
-; TODO: Estos macros deberia ser definidos en la función evaluar
-; de: Done!
-; exit: Done!
-; setq: Done!
-; quote: Done!
-; lambda: Done!
-; nil: Done!
-; t: Ya deberia estar... no?
-; if: Done!
-; or: Done!
-; cond: Done!
-; load: Done!
-; 
-
-
 ; Aplica una funcion a una lista de argumentos evaluados, usando los ambientes
 ;  global y local. Siempre retorna una lista con un resultado y un ambiente.
 ; Si la aplicacion falla, el resultado es una lista con '*error* como primer
