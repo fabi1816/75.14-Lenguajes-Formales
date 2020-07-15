@@ -5,7 +5,7 @@
 (declare buscar)    ; Done!
 (declare igual?)    ; Done!
 (declare aplicar)    ; Done!
-(declare evaluar)    ; TODO: Terminar
+(declare evaluar)    ; Done!
 (declare imprimir)    ; Done!
 (declare revisar-f)    ; Done!
 (declare revisar-lae)    ; Done!
@@ -44,6 +44,7 @@
 (declare fun-reverse)
 (declare next-lambda)
 (declare cargar-input)
+(declare evaluar-load)
 (declare evaluar-setq)
 (declare cuerpo-lambda)
 (declare evaluar-quote)
@@ -122,17 +123,17 @@
   "Carga el contenido de un archivo"
   ([amb-global amb-local arch]
    (let [nomb (first (evaluar arch amb-global amb-local))]
-     (if (error? nomb)
-       (do (imprimir nomb) amb-global)    ; Mostrar el error
-       (let [nom (build-nombre-arch (lower-case (str nomb)))
-             ret (try (with-open [in (java.io.PushbackReader. (reader nom))]
-                        (binding [*read-eval* false]
-                          (cargar-input in amb-global)))
-                      (catch java.io.FileNotFoundException _
-                        (imprimir (list '*error* 'file-open-error 'file-not-found nom '1 'READ)) amb-global))]
+     (cond
+       (error? nomb) (do (imprimir nomb) amb-global)    ; Mostrar el error
+       :else (let [nom (build-nombre-arch (lower-case (str nomb)))
+                   ret (try (with-open [in (java.io.PushbackReader. (reader nom))]
+                              (binding [*read-eval* false]
+                                (cargar-input in amb-global)))
+                            (catch java.io.FileNotFoundException _
+                              (imprimir (list '*error* 'file-open-error 'file-not-found nom '1 'READ)) amb-global))]
          ret))))
   ([amb-global _amb-local in res]
-   (try (let [res (evaluar (read in) amb-global nil)]    ; Identico a cargar-input pero maneja la excapción diferente
+   (try (let [res (evaluar (read in) amb-global nil)]    ; Identico a cargar-input pero maneja la excepción diferente
           (cargar-arch (second res) nil in res))
         (catch Exception _
           (imprimir (first res)) amb-global))))
@@ -156,13 +157,6 @@
 ;  aplicacion de calculo lambda), por lo que se llama a la funcion aplicar,
 ; pasandole 4 argumentos: la evaluacion del primer elemento, una lista con las
 ;  evaluaciones de los demas, el ambiente global y el ambiente local.
-
-(defn evaluar-load 
-  "Carga en el ambiente un archivo `expre` de código TLC-Lisp"
-  [expre amb-global amb-local]
-  (println expre)
-  (cargar-arch amb-global amb-local expre))
-
 (defn evaluar
   "Evalua una expresion en los ambientes global y local
    Retorna un lista con el resultado y un ambiente"
@@ -196,8 +190,8 @@
 ; if: Done!
 ; or: Done!
 ; cond: Done!
+; load: Done!
 ; 
-; load: 
 
 
 ; Aplica una funcion a una lista de argumentos evaluados, usando los ambientes
@@ -839,6 +833,12 @@
   (cond
     (nombre-archivo-valido? nom) nom
     :else (str nom ".lsp")))    ; Agrega '.lsp' al final)
+
+
+(defn evaluar-load
+  "Carga en el ambiente un archivo `expre` de código TLC-Lisp"
+  [expre amb-global amb-local]
+  (cargar-arch amb-global amb-local (second expre)))
 
 
 ; Al terminar de cargar el archivo, se retorna true.
