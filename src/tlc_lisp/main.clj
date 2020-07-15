@@ -710,7 +710,7 @@
 
 (defn fun-cons
   "Retorna inserción del elem en la cabeza de la lista"
-  [lae] (cons (ffirst lae) (second (first lae))))
+  [lae] (cons (first lae) (second lae)))
 
 
 (defn fun-null
