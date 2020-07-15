@@ -10,7 +10,7 @@
 (declare revisar-f)    ; Done!
 (declare revisar-lae)    ; Done!
 (declare cargar-arch)    ; Done!
-(declare evaluar-cond)
+(declare evaluar-cond)    ; Done!
 (declare actualizar-amb)    ; Done!
 (declare controlar-aridad)    ; Done!
 (declare evaluar-secuencia-en-cond)    ; Done!
@@ -59,6 +59,7 @@
 (declare evaluar-escalares)
 (declare aplicar-fun-lambda)
 (declare evaluar-setq-unico)
+(declare evaluar-cuerpo-cond)
 (declare non-nil-empty-list?)
 (declare setq-insuficientes?)
 (declare lambda-define-param?)
@@ -194,9 +195,9 @@
 ; t: Ya deberia estar... no?
 ; if: Done!
 ; or: Done!
-; load: 
+; cond: Done!
 ; 
-; cond: WIP
+; load: 
 
 
 ; Aplica una funcion a una lista de argumentos evaluados, usando los ambientes
@@ -399,7 +400,9 @@
   [lis amb-global amb-local]
   (cond
     (igual? lis nil) (list nil amb-global)
-    :else (evaluar (first lis) amb-global amb-local)))
+    (igual? (first lis) nil) (list nil amb-global)
+    (tlc-true? (ffirst lis) amb-global amb-local) (evaluar-cuerpo-cond lis amb-global amb-local)
+    :else (evaluar-cond (next lis) amb-global amb-local)))
 
 
 ; Evalua (con evaluar) secuencialmente las sublistas de una lista y retorna
@@ -819,6 +822,15 @@
       (or (tlc-true? (first (next expre)) amb-global amb-local)
           (tlc-true? (second (next expre)) amb-global amb-local)) (list 't amb-global)
       :else (list nil amb-global))))
+
+
+(defn evaluar-cuerpo-cond
+  "Evalua la lista `lis` de comandos de una rama de un comando 'cond'.
+   Une 'evaluar-cond' con 'evaluar-secuencia-en-cond'"
+  [lis amb-global amb-local]
+  (list
+   (evaluar-secuencia-en-cond (next (first lis)) amb-global amb-local)
+   amb-global))
 
 
 (defn build-nombre-arch

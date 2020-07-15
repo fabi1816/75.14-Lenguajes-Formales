@@ -175,15 +175,34 @@
     (is (= '((lambda () (1)) (A B)) (evaluar '(lambda () (1)) '(A B) nil)))
     (is (= '((lambda (x) (* 2 x)) (A B)) (evaluar '(lambda (x) (* 2 x)) '(A B) nil)))))
 
-;; (deftest test-evaluar-commando-cond
-;;   (testing "Lista de comandos vacia"
-;;     (is (= '(nil ()) (evaluar '(cond) '() nil)))
-;;     (is (= '(nil ()) (evaluar '(cond ()) '() nil)))
-;;     (is (= '(nil ()) (evaluar '(cond nil) '() nil)))
-;;     (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) nil)))
-;;     (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) '(C D)))))
-;;   (testing "Cond simple en formato TLC-Lisp"
-;;     (is (= '(A ()) (evaluar '(cond ((t 'A))) '(t t) nil)))))
+(deftest test-evaluar-commando-cond
+  (testing "Lista de comandos vacia"
+    (is (= '(nil ()) (evaluar '(cond) '() nil)))
+    (is (= '(nil ()) (evaluar '(cond ()) '() nil)))
+    (is (= '(nil ()) (evaluar '(cond nil) '() nil)))
+    (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) nil)))
+    (is (= '(nil (A B)) (evaluar '(cond ()) '(A B) '(C D)))))
+  (testing "Cond simple en formato TLC-Lisp"
+    (is (= '(1 (t t)) (evaluar '(cond (t 1)) '(t t) nil)))
+    (is (= '(2 (t t nil nil)) (evaluar '(cond (nil 1) (t 2)) '(t t nil nil) nil)))
+    (is (= '(3 (t t nil nil)) (evaluar '(cond (nil 1) (nil 2) (t 3)) '(t t nil nil) nil))))
+  (testing "Cond un poco mas complejo en formato TLC-Lisp"
+    (is (= '(A (t t nil nil equal equal))
+           (evaluar '(cond ((equal 1 1) 'A)) '(t t nil nil equal equal) nil)))
+    (is (= '(B (t t nil nil equal equal))
+           (evaluar '(cond ((equal 1 2) 'A) ((equal 1 1) 'B)) '(t t nil nil equal equal) nil)))
+    (is (= '(C (t t nil nil equal equal))
+           (evaluar '(cond ((equal 1 2) 'A) ((equal 1 2) 'B) (t 'C)) '(t t nil nil equal equal) nil))))
+  (testing "Cond real completo"
+    (is (= '(2 (t t nil nil equal equal + add))
+           (evaluar '(cond ((equal 1 1) (+ 1 1))) '(t t nil nil equal equal + add) nil)))
+    (is (= '(4 (t t nil nil equal equal + add))
+           (evaluar '(cond ((equal 1 2) (+ 1 1)) ((equal 2 2) (+ 2 2))) '(t t nil nil equal equal + add) nil)))
+    (is (= '(6 (t t nil nil equal equal + add))
+           (evaluar '(cond ((equal 1 2) (+ 1 1)) ((equal 1 2) (+ 2 2)) (t (+ 3 3))) 
+                    '(t t nil nil equal equal + add) nil)))
+    )
+  )
 
 ; un cond en TLC-Lisp es:
 ; (cond
