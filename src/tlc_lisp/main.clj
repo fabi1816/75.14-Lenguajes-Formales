@@ -842,5 +842,4 @@
 
 
 ; Al terminar de cargar el archivo, se retorna true.
-
-; TODO: Falta hacer que la carga del interprete en Clojure (tlc-lisp.clj) retorne true
+true
