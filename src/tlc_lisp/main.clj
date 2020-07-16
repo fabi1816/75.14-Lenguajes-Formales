@@ -102,10 +102,10 @@
    (print ">>> ") (flush)
    (try
      (let [res (evaluar (read) amb nil)]    ; Bindea `res` al resultado de `evaluar`
-       (if (nil? (second res))              ; Chequea si la segunda posicion de `res` es `nil`
+       (if (nil? (second res))              ; Chequea si el ambiente del resultado es `nil`
          true
-         (do (imprimir (first res))         ; Imprime el primer elemento del resultado 
-             (repl (second res)))))         ; Se llama a si mismo con el resto del resultado
+         (do (imprimir (first res))         ; Imprime el resultado de `evaluar`
+             (repl (second res)))))         ; Se llama a si mismo con el nuevo ambiente
      (catch Exception e
        (println) (print "*error* ")
        (println (get (Throwable->map e) :cause))
@@ -274,6 +274,7 @@
     (cond
       (and (nil? tlc-a) (nil? tlc-b)) true
       (and (string? a) (string? b)) (= (lower-case a) (lower-case b))
+      (and (symbol? a) (symbol? b)) (= (lower-case a) (lower-case b))
       :else (= a b))))
 
 
@@ -366,7 +367,7 @@
   [elem lis]
   (cond
     (empty? lis) (list '*error* 'unbound-symbol elem)
-    (= elem (first lis)) (second lis)
+    (igual? elem (first lis)) (second lis)
     :else (buscar elem (drop 2 lis))))
 
 

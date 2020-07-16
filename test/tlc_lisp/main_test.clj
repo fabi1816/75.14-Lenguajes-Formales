@@ -43,6 +43,10 @@
     (is (igual? '() nil)))
   (testing "Es el string vacio igual a nil según TLC-Lisp?"
     (is (igual? nil "")))
+  (testing "El igual tambien tiene que comparar simbolos (o como se llamen)"
+    (is (igual? 'a 'a))
+    (is (igual? 'a 'A))
+    (is (igual? 'A 'A)))
   (testing "Las otras comparaciones son iguales"
     (is (igual? 1 1))
     (is (igual? 'A 'A))))
