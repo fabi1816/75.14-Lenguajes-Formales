@@ -117,7 +117,9 @@
     (is (= '(Y (A X)) (evaluar 'A '(A X) '(A Y)))))
   (testing "La expresion es nil o lista vacia, en TLC-Lisp son lo mismo"
     (is (= '(nil (A B)) (evaluar nil '(A B) '(C D))))
-    (is (= '(nil (A B)) (evaluar '() '(A B) '(C D))))))
+    (is (= '(nil (A B)) (evaluar '() '(A B) '(C D)))))
+  (testing "Un 't' es un true en TLC-Lisp"
+    (is (= '(t (t t)) (evaluar 't '(t t) nil)))))
 
 (deftest test-evaluar-comandos-simples
   (testing "La expresión es un mensaje de error"
