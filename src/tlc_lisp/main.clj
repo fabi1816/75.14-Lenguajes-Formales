@@ -1,5 +1,7 @@
 (ns tlc-lisp.main    ; Namespace del interprete TLC-Lisp
-  (:require [clojure.string :refer [ends-with? lower-case]]
+  (:require [clojure.string :refer [blank?
+                                    ends-with?
+                                    lower-case]]
             [clojure.java.io :refer [reader]]))
 
 (declare buscar)    ; Done!
@@ -46,6 +48,7 @@
 (declare cargar-input)
 (declare evaluar-load)
 (declare evaluar-setq)
+(declare tlc-nil->nil)
 (declare cuerpo-lambda)
 (declare evaluar-quote)
 (declare fun-less-than)
@@ -266,11 +269,12 @@
   "Compara igualdad al estilo de TLC-Lisp
    Case-insensitive y nil es igual a la lista vacia"
   [a b]
-  (cond
-    (and (string? a) (string? b)) (= (lower-case a) (lower-case b))
-    (and (nil? a) (non-nil-empty-list? b)) true
-    (and (nil? b) (non-nil-empty-list? a)) true
-    :else (= a b)))
+  (let [tlc-a (tlc-nil->nil a)
+        tlc-b (tlc-nil->nil b)]
+    (cond
+      (and (nil? tlc-a) (nil? tlc-b)) true
+      (and (string? a) (string? b)) (= (lower-case a) (lower-case b))
+      :else (= a b))))
 
 
 ; Imprime, con salto de linea, atomos o listas en formato estandar (las cadenas
@@ -427,8 +431,18 @@
 
 (defn non-nil-empty-list?
   "Chequea que el parametro sea una lista vacia no-nil"
-  [l]
-  (and (list? l) (empty? l)))
+  [l] (and (list? l) (empty? l)))
+
+
+(defn tlc-nil->nil
+  "Si `elem` es 'NIL', 'nil', 'nil, 'NIL o nil devuelve nil, 
+   si no devuelve `elem`"
+  [elem]
+  (cond
+    (blank? (str elem)) nil
+    (= (lower-case (str elem)) "nil") nil
+    (non-nil-empty-list? elem) nil
+    :else elem))
 
 
 (defn escalar?

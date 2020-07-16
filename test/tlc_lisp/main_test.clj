@@ -41,6 +41,8 @@
   (testing "La lista vacia es es igual a nil según TLC-Lisp"
     (is (igual? nil '()))
     (is (igual? '() nil)))
+  (testing "Es el string vacio igual a nil según TLC-Lisp?"
+    (is (igual? nil "")))
   (testing "Las otras comparaciones son iguales"
     (is (igual? 1 1))
     (is (igual? 'A 'A))))
