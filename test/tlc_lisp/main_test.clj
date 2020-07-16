@@ -195,12 +195,14 @@
     (is (= '(B (t t nil nil equal equal))
            (evaluar '(cond ((equal 1 2) 'A) ((equal 1 1) 'B)) '(t t nil nil equal equal) nil)))
     (is (= '(C (t t nil nil equal equal))
-           (evaluar '(cond ((equal 1 2) 'A) ((equal 1 2) 'B) (t 'C)) '(t t nil nil equal equal) nil))))
+           (evaluar '(cond ((equal 1 2) 'A) ((equal 1 2) 'B) (t 'C))
+                    '(t t nil nil equal equal) nil))))
   (testing "Cond real completo"
     (is (= '(2 (t t nil nil equal equal + add))
            (evaluar '(cond ((equal 1 1) (+ 1 1))) '(t t nil nil equal equal + add) nil)))
     (is (= '(4 (t t nil nil equal equal + add))
-           (evaluar '(cond ((equal 1 2) (+ 1 1)) ((equal 2 2) (+ 2 2))) '(t t nil nil equal equal + add) nil)))
+           (evaluar '(cond ((equal 1 2) (+ 1 1)) ((equal 2 2) (+ 2 2)))
+                    '(t t nil nil equal equal + add) nil)))
     (is (= '(6 (t t nil nil equal equal + add))
            (evaluar '(cond ((equal 1 2) (+ 1 1)) ((equal 1 2) (+ 2 2)) (t (+ 3 3))) 
                     '(t t nil nil equal equal + add) nil)))
@@ -216,18 +218,18 @@
 
 (deftest test-evaluar-secuencia-en-cond
   (testing "No hay nada para evaluar"
-    (is (= nil (evaluar-secuencia-en-cond nil '() nil)))
-    (is (= nil (evaluar-secuencia-en-cond '() '() nil)))
-    (is (= nil (evaluar-secuencia-en-cond '(()) '() nil)))
-    (is (= nil (evaluar-secuencia-en-cond '(nil) '() nil))))
+    (is (= '(nil ()) (evaluar-secuencia-en-cond nil '() nil)))
+    (is (= '(nil ()) (evaluar-secuencia-en-cond '() '() nil)))
+    (is (= '(nil ()) (evaluar-secuencia-en-cond '(()) '() nil)))
+    (is (= '(nil ()) (evaluar-secuencia-en-cond '(nil) '() nil))))
   (testing "La lista solo tiene una evaluación"
-    (is (= 1 (evaluar-secuencia-en-cond '(1) '() nil)))
-    (is (= 'A (evaluar-secuencia-en-cond '('A) '() nil)))
-    (is (= 3 (evaluar-secuencia-en-cond '((+ 1 2)) '(+ add) nil))))
+    (is (= '(1 ()) (evaluar-secuencia-en-cond '(1) '() nil)))
+    (is (= '(A ()) (evaluar-secuencia-en-cond '('A) '() nil)))
+    (is (= '(3 (+ add)) (evaluar-secuencia-en-cond '((+ 1 2)) '(+ add) nil))))
   (testing "La lista tiene varias evaluaciones"
-    (is (= 9 (evaluar-secuencia-en-cond '((+ 1 2) 9) '(+ add) nil)))
-    (is (= 6 (evaluar-secuencia-en-cond '((+ 1 2) 9 (+ 3 3)) '(+ add) nil)))
-    (is (= 'A (evaluar-secuencia-en-cond '((+ 1 2) 9 (+ 3 3) 'A) '(+ add) nil)))))
+    (is (= '(9 (+ add)) (evaluar-secuencia-en-cond '((+ 1 2) 9) '(+ add) nil)))
+    (is (= '(6 (+ add)) (evaluar-secuencia-en-cond '((+ 1 2) 9 (+ 3 3)) '(+ add) nil)))
+    (is (= '(A (+ add)) (evaluar-secuencia-en-cond '((+ 1 2) 9 (+ 3 3) 'A) '(+ add) nil)))))
 
 (deftest test-aplicar
   (testing "Maneja errores en las funciones por aplicar"
