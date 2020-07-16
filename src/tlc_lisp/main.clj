@@ -776,7 +776,7 @@
 (defn fun-prin3
   "Imprime un elemento y lo retorna"
   [lae]
-  (print (first lae))
+  (print (first lae)) (flush)
   (first lae))
 
 
