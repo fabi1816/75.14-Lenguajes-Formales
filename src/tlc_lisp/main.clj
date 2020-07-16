@@ -402,14 +402,14 @@
             (evaluar-secuencia-en-cond (next lis) new-amb-global amb-local))))
 
 
+;; Funciones auxiliares
+
+
 (defn evaluar-cuerpo-cond
   "Evalua la lista `lis` de comandos de una rama de un comando 'cond'.
    Une 'evaluar-cond' con 'evaluar-secuencia-en-cond'"
   [lis amb-global amb-local]
   (evaluar-secuencia-en-cond (next (first lis)) amb-global amb-local))
-
-
-;; Funciones auxiliares
 
 
 (defn error?
