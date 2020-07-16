@@ -395,11 +395,18 @@
    Retorna el valor de la ultima evaluacion."
   [lis amb-global amb-local]
   (cond
-    (igual? lis nil) nil
-    (= (count lis) 1) (first (evaluar (first lis) amb-global amb-local))
-    :else (do
-            (first (evaluar (first lis) amb-global amb-local))
-            (evaluar-secuencia-en-cond (next lis) amb-global amb-local))))
+    (igual? lis nil) (list nil amb-global)
+    (= (count lis) 1) (evaluar (first lis) amb-global amb-local)
+    :else (let [result (evaluar (first lis) amb-global amb-local)
+                new-amb-global (second result)]
+            (evaluar-secuencia-en-cond (next lis) new-amb-global amb-local))))
+
+
+(defn evaluar-cuerpo-cond
+  "Evalua la lista `lis` de comandos de una rama de un comando 'cond'.
+   Une 'evaluar-cond' con 'evaluar-secuencia-en-cond'"
+  [lis amb-global amb-local]
+  (evaluar-secuencia-en-cond (next (first lis)) amb-global amb-local))
 
 
 ;; Funciones auxiliares
@@ -815,15 +822,6 @@
       (or (tlc-true? (first (next expre)) amb-global amb-local)
           (tlc-true? (second (next expre)) amb-global amb-local)) (list 't amb-global)
       :else (list nil amb-global))))
-
-
-(defn evaluar-cuerpo-cond
-  "Evalua la lista `lis` de comandos de una rama de un comando 'cond'.
-   Une 'evaluar-cond' con 'evaluar-secuencia-en-cond'"
-  [lis amb-global amb-local]
-  (list
-   (evaluar-secuencia-en-cond (next (first lis)) amb-global amb-local)
-   amb-global))
 
 
 (defn build-nombre-arch
