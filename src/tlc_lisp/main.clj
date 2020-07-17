@@ -45,7 +45,6 @@
 (declare rama-false)
 (declare fun-reverse)
 (declare next-lambda)
-(declare cargar-input)
 (declare evaluar-load)
 (declare evaluar-setq)
 (declare tlc-nil->nil)
@@ -55,6 +54,7 @@
 (declare no-aplicable?)
 (declare evaluar-lambda)
 (declare lambda-simple?)
+(declare leer-y-evaluar)
 (declare build-amb-lambda)
 (declare fun-greater-than)
 (declare numero-o-string?)
@@ -64,6 +64,7 @@
 (declare aplicar-fun-lambda)
 (declare evaluar-setq-unico)
 (declare evaluar-cuerpo-cond)
+(declare iniciar-carga-input)
 (declare non-nil-empty-list?)
 (declare setq-insuficientes?)
 (declare lambda-define-param?)
@@ -129,17 +130,40 @@
      (cond
        (error? nomb) (do (imprimir nomb) amb-global)    ; Mostrar el error
        :else (let [nom (build-nombre-arch (lower-case (str nomb)))
-                   ret (try (with-open [in (java.io.PushbackReader. (reader nom))]
-                              (binding [*read-eval* false]
-                                (cargar-input in amb-global)))
-                            (catch java.io.FileNotFoundException _
-                              (imprimir (list '*error* 'file-open-error 'file-not-found nom '1 'READ)) amb-global))]
-         ret))))
-  ([amb-global _amb-local in res]
-   (try (let [res (evaluar (read in) amb-global nil)]    ; Identico a cargar-input pero maneja la excepción diferente
-          (cargar-arch (second res) nil in res))
-        (catch Exception _
-          (imprimir (first res)) amb-global))))
+                   ret (try
+                         (with-open [in (java.io.PushbackReader. (reader nom))]
+                           (binding [*read-eval* false]
+                             (iniciar-carga-input in amb-global)))
+                         (catch java.io.FileNotFoundException _
+                           (imprimir (list '*error* 'file-open-error 'file-not-found nom '1 'READ))
+                           amb-global))]
+               ret))))
+  ([amb-global _amb-local in old-res]
+   (try
+     (leer-y-evaluar in amb-global)
+     (catch Exception _
+       (imprimir (first old-res))
+       amb-global))))
+
+
+(defn leer-y-evaluar
+  "Lee y evalua el `input`, controla el EOF"
+  [input amb-global]
+  (let [lectura (read input false :end)
+        res (evaluar lectura amb-global nil)]
+    (cond
+      (= lectura :end) (list true amb-global)    ; Llegó al final del archivo
+      :else (cargar-arch (second res) nil input res)))) ; Sigue leyendo
+
+
+(defn iniciar-carga-input
+  "Carga y evalua el primer comando desde el input"
+  [input amb-global]
+  (try
+    (leer-y-evaluar input amb-global)
+    (catch Exception _
+      (imprimir nil)
+      amb-global)))
 
 
 ; Evalua una expresion usando los ambientes global y local.
@@ -425,16 +449,6 @@
   [nombre]
   (and (> (count nombre) 4)
        (ends-with? nombre ".lsp")))
-
-
-(defn cargar-input
-  "Carga y evalua uno a uno todo el contenido del input"
-  [input amb-global]
-  (try
-    (let [res (evaluar (read input) amb-global nil)]
-      (cargar-arch (second res) nil input res))
-    (catch Exception _
-      (imprimir nil) amb-global)))
 
 
 (defn non-nil-empty-list?

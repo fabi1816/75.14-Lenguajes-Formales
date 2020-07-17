@@ -119,6 +119,11 @@
     (is (= '(B (A B)) (evaluar 'A '(A B) '(C D))))
     (is (= '(D (A B)) (evaluar 'C '(A B) '(C D))))
     (is (= '(Y (A X)) (evaluar 'A '(A X) '(A Y)))))
+  (testing "Busca el escalar case-insensitive-like"
+    (is (= '(2 (a 2)) (evaluar 'A '(a 2) nil)))
+    (is (= '(2 (A 2)) (evaluar 'a '(A 2) nil)))
+    (is (= '(3 (A 2)) (evaluar 'B '(A 2) '(b 3))))
+    (is (= '(3 (A 2)) (evaluar 'b '(A 2) '(B 3)))))
   (testing "La expresion es nil o lista vacia, en TLC-Lisp son lo mismo"
     (is (= '(nil (A B)) (evaluar nil '(A B) '(C D))))
     (is (= '(nil (A B)) (evaluar '() '(A B) '(C D)))))
