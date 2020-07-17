@@ -8,6 +8,11 @@ Un interprete de la implementación de TLC-Lisp escrito en Clojure
 
 Para iniciar el interprete de TLC-LISP:
 
+- Abrir `Powershell`
+- Ir a la carpeta `C:\Users\Fabi\Documents\Lenguajes Formales 2020\TP-Final\`
+- Iniciar un REPL de Clojure con `lein repl`
+- Iniciar el interprete de TLC-Lisp con el comando:
+
 > `tlc-lisp.main=> (repl)`
 
 ### Ejemplos de código TLC-Lisp
@@ -15,7 +20,8 @@ Para iniciar el interprete de TLC-LISP:
 Cargar el archivo con los ejemplos:
 
 > `>>> (load "src/programas/ejemplo.lsp")`  
-> compa
+> ~~compa~~  
+> true
 
 Ejecutar el código de ejemplo:
 
@@ -32,7 +38,8 @@ Ejecutar el código de ejemplo:
 > -1
 
 > `>>> (c (list first rest list) '((1 2 3) (4 5 6) (7 8 9)))`  
-> ((1 2 3) ((4 5 6) (7 8 9)) (((1 2 3) (4 5 6) (7 8 9))))
+> ~~((1 2 3) ((4 5 6) (7 8 9)) (((1 2 3) (4 5 6) (7 8 9))))~~
+> *error* list expected first
 
 > `>>> (cargarR)`  
 > `R: 99_`  
@@ -40,15 +47,17 @@ Ejecutar el código de ejemplo:
 > nil
 
 > `>>> (recorrer '(9))`  
-> (9 0)
+> ~~(9 0)~~  
+> *error* Don't know how to create ISeq from: java.lang.Long
 
 > `>>> (recorrer '(9 8 7))`  
-> (9 0)  
-> (8 1)  
-> (7 2)
+> ~~(9 0)~~  
+> ~~(8 1)~~  
+> ~~(7 2)~~  
+> *error* Don't know how to create ISeq from: java.lang.Long
 
 > `>>> m`  
-> (\*error* unbounded-symbol)
+> (\*error* unbound-symbol m)
 
 > `>>> (compa 1 1)`  
 > 5
@@ -57,7 +66,9 @@ Ejecutar el código de ejemplo:
 > 5
 
 > `>>> (compa 1 2)`  
- _;; Sale del interprete de TLC-Lisp_
+> true  
+> tlc-lisp.main=>  
+> _;; Sale del interprete de TLC-Lisp_
 
 ### Sistema productivo de resolución
 
