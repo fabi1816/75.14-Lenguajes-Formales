@@ -32,11 +32,12 @@ Ejecutar el código de ejemplo:
 > -1
 
 > `>>> (c (list first rest list) '((1 2 3) (4 5 6) (7 8 9)))`  
-> ???
+> ((1 2 3) ((4 5 6) (7 8 9)) (((1 2 3) (4 5 6) (7 8 9))))
 
 > `>>> (cargarR)`  
 > `R: 99_`  
-> R * 2: 198
+> R * 2: 198  
+> nil
 
 > `>>> (recorrer '(9))`  
 > (9 0)
@@ -44,7 +45,7 @@ Ejecutar el código de ejemplo:
 > `>>> (recorrer '(9 8 7))`  
 > (9 0)  
 > (8 1)  
-> (7 0)
+> (7 2)
 
 > `>>> m`  
 > (\*error* unbounded-symbol)
@@ -87,7 +88,7 @@ Para iniciar el interprete real de TLC-Lisp:
 - Ingresar `c:`
 - Iniciar TLC-Lisp `lisp`
 
-### Ejemplos de código TLC-Lisp
+### Ejemplos de código TLC-Lisp real
 
 Cargar el archivo con los ejemplos:
 
@@ -109,11 +110,12 @@ Ejecutar el código de ejemplo:
 > -1
 
 > `>>> (c (list first rest list) '((1 2 3) (4 5 6) (7 8 9)))`  
-> ???
+> ((1 2 3) ((4 5 6) (7 8 9)) (((1 2 3) (4 5 6) (7 8 9))))
 
 > `>>> (cargarR)`  
 > `R: 99_`  
 > R * 2: 198
+> nil
 
 > `>>> (recorrer '(9))`  
 > (9 0)
@@ -121,10 +123,10 @@ Ejecutar el código de ejemplo:
 > `>>> (recorrer '(9 8 7))`  
 > (9 0)  
 > (8 1)  
-> (7 0)
+> (7 2)
 
 > `>>> m`  
-> (\*error* unbounded-symbol)
+> (\*error* unbound-symbol m)
 
 > `>>> (compa 1 1)`  
 > 5
@@ -133,9 +135,10 @@ Ejecutar el código de ejemplo:
 > 5
 
 > `>>> (compa 1 2)`  
- _;; Sale del interprete de TLC-Lisp_
+> C:\\>  
+> _;; Sale del interprete de TLC-Lisp_
 
-### Sistema productivo de resolución TLC-Lisp
+### Sistema productivo de resolución TLC-Lisp real
 
 Cargar las 'Jarras' y el algoritmo de resolución de TLC-Lisp:
 
