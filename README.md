@@ -15,7 +15,7 @@ Para iniciar el interprete de TLC-LISP:
 
 > `tlc-lisp.main=> (repl)`
 
-### Ejemplos de código TLC-Lisp
+### Ejemplos de código TLC-Lisp falso
 
 Cargar el archivo con los ejemplos:
 
@@ -70,7 +70,7 @@ Ejecutar el código de ejemplo:
 > tlc-lisp.main=>  
 > _;; Sale del interprete de TLC-Lisp_
 
-### Sistema productivo de resolución
+### Sistema productivo de resolución falso
 
 Cargar las 'Jarras' y el algoritmo de resolución de TLC-Lisp:
 
