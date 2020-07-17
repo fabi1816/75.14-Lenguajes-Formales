@@ -74,7 +74,7 @@ Ejecutar el código de ejemplo:
 
 Cargar las 'Jarras' y el algoritmo de resolución de TLC-Lisp:
 
-> `>>> (load "src/programas/jarra.lsp")`  
+> `>>> (load "jarra.lsp")`  
 > ~~jarra8~~  
 > true
 
