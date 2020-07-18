@@ -60,7 +60,9 @@
     (is (= '(A B K V C D) (actualizar-amb '(A B K feo C D) 'K 'V))))
   (testing "Si hay un error no modifica el ambiente"
     (is (= '() (actualizar-amb '() 'K '*error*)))
-    (is (= '(K V) (actualizar-amb '(K V) 'K '*error*)))))
+    (is (= '(K V) (actualizar-amb '(K V) 'K '*error*))))
+  (testing "Actualizar el ambiente es case-insensitive"
+    (is (= '(k v) (actualizar-amb '(K NO-V) 'k 'v)))))
 
 (deftest test-revisar-f
   (testing "Es un error"

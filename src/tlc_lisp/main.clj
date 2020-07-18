@@ -347,12 +347,12 @@
     ; No modifica el ambiente si el valor es un *error*
     (= '*error* valor) amb-global
 
-    ; El primer elemento es la clave buscada: Lo reemplazo junto con su valor
-    (= clave (first amb-global)) (concat (list clave valor) (drop 2 amb-global))
-
     ; El ambiente está vacio: los agrego
     (empty? amb-global) (list clave valor)
 
+    ; El primer elemento es la clave buscada: Lo reemplazo junto con su valor
+    (igual? clave (first amb-global)) (concat (list clave valor) (drop 2 amb-global))
+    
     ; Agrego los primeros 2 elementos a lo que me devuelva la actualización
     ;  del resto del ambiente
     :else (concat (take 2 amb-global)
