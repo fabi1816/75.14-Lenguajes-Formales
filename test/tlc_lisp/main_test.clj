@@ -189,7 +189,13 @@
   (testing "Lambda define función"
     (is (= '((lambda () (1)) ()) (evaluar '(lambda () (1)) '() nil)))
     (is (= '((lambda () (1)) (A B)) (evaluar '(lambda () (1)) '(A B) nil)))
-    (is (= '((lambda (x) (* 2 x)) (A B)) (evaluar '(lambda (x) (* 2 x)) '(A B) nil)))))
+    (is (= '((lambda (x) (* 2 x)) (A B)) (evaluar '(lambda (x) (* 2 x)) '(A B) nil))))
+  (testing "Aplicar una función lambda a unos parametros"
+    (is (= '(3 (+ add lambda lambda))
+           (evaluar '((lambda (a b) (+ a b)) 1 2) '(+ add lambda lambda) nil)))
+    (is (= '(1 (+ add lambda lambda first first list list))
+           (evaluar '((lambda (a b) (a b)) first (list 1 2))
+                    '(+ add lambda lambda first first list list) nil)))))
 
 (deftest test-evaluar-commando-cond
   (testing "Lista de comandos vacia"

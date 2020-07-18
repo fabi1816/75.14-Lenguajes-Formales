@@ -376,8 +376,7 @@
 (defn revisar-lae
   "Retorna la sub-lista que es un mensaje de error
    Si no hay ninguna retorna nil"
-  [lis]
-  (first (remove nil? (map revisar-f (filter seq? lis)))))
+  [lis] (first (remove nil? (map revisar-f (filter seq? lis)))))
 
 
 ; Busca una clave en un ambiente (una lista con claves en las posiciones
@@ -634,7 +633,7 @@
   "Usa los parametros del lambda `f`, sus argumentos y los concatena al 
    ambiente local para construir el ambiente donde se evaluará"
   [f lae amb-local]
-  (concat (flatten (map list (second f) lae)) amb-local))
+  (concat (reduce concat (map list (second f) lae)) amb-local))
 
 
 (defn aplicar-fun-lambda-simple
