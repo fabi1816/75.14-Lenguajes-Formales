@@ -9,7 +9,8 @@
 (def amb-esperado '(+ add - sub null null setq setq  de de if if nil nil
                       cons cons first first rest rest list list quote quote
                       prin3 prin3 read read terpri terpri cond cond t t
-                      equal equal exit exit sumar (lambda (a b) (+ a b))
+                      equal equal exit exit lambda lambda
+                      sumar (lambda (a b) (+ a b))
                       restar (lambda (a b) (- a b)) x 1 y 2
                       C (lambda (LF X) (if (null LF) nil (cons ((first LF) X) (C (rest LF) X))))
                       cargarR (lambda () (prin3 "R: ") (setq R (read)) (prin3 "R * 2: ") (prin3 (+ R R)) (terpri))
@@ -21,10 +22,20 @@
                      nil nil cons cons first first rest rest
                      list list quote quote prin3 prin3 read read
                      terpri terpri cond cond t t equal equal
-                     exit exit))
+                     exit exit lambda lambda))
 
 (deftest test-cargar-arch
   (testing "Vamos a cargar el archivo de ejemplo"
     (is (= (list 'compa amb-esperado)
            (evaluar '(load "src/programas/ejemplo.lsp")
                     amb-entrada nil)))))
+
+(deftest test-mf
+  (testing "Check that these work"
+    (is (= (list 1 amb-entrada)
+           (evaluar '((lambda (a b) (a b)) first '(1 2)) amb-entrada nil)))
+    (is (= (list 1 amb-entrada)
+           (evaluar '((lambda (a b) (a b)) first (list 1 2)) amb-entrada nil))))
+  (testing "First elemental"
+    (is (= '(1 (first first list list))
+           (evaluar '(first (list 1 2)) '(first first list list) nil)))))
