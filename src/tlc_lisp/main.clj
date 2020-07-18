@@ -770,7 +770,7 @@
   (let [ari (controlar-aridad lae 0)]
     (cond
       (error? ari) ari
-      :else (newline))))
+      :else (do (newline) (flush)))))
 
 
 (defn fun-append
