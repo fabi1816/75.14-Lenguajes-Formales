@@ -38,7 +38,7 @@ Ejecutar el código de ejemplo:
 
 > `>>> (c (list first rest list) '((1 2 3) (4 5 6) (7 8 9)))`  
 > ~~((1 2 3) ((4 5 6) (7 8 9)) (((1 2 3) (4 5 6) (7 8 9))))~~
-> *error* list expected first
+> *error* non-applicable-type nil
 
 > `>>> (cargarR)`  
 > `R: 99_`  
@@ -47,13 +47,27 @@ Ejecutar el código de ejemplo:
 
 > `>>> (recorrer '(9))`  
 > ~~(9 0)~~  
-> *error* Don't know how to create ISeq from: java.lang.Long
+> (9 0)  
+> (nil 1)  
+> ...  
+> (nil 279)  
+> Execution error (StackOverflowError) at tlc-lisp.main/buscar  (main.clj:392)  
+> null  
+> _;; Sale del interprete de TLC-Lisp_
 
 > `>>> (recorrer '(9 8 7))`  
 > ~~(9 0)~~  
 > ~~(8 1)~~  
 > ~~(7 2)~~  
-> *error* Don't know how to create ISeq from: java.lang.Long
+> (9 0)  
+> (8 1)  
+> (7 2)  
+> (nil 3)  
+> ...  
+> (nil 279)  
+> Execution error (StackOverflowError) at tlc-lisp.main/buscar  (main.clj:392)  
+> null  
+> _;; Sale del interprete de TLC-Lisp_
 
 > `>>> m`  
 > (\*error* unbound-symbol m)
