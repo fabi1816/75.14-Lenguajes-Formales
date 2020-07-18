@@ -40,6 +40,11 @@ Ejecutar el código de ejemplo:
 > ~~((1 2 3) ((4 5 6) (7 8 9)) (((1 2 3) (4 5 6) (7 8 9))))~~
 > *error* non-applicable-type nil
 
+> `>>> (cargarr)`  
+> `R: 55_`  
+> R * 2: 110  
+> nil
+
 > `>>> (cargarR)`  
 > `R: 99_`  
 > R * 2: 198  
@@ -138,6 +143,11 @@ Ejecutar el código de ejemplo:
 
 > `>>> (c (list first rest list) '((1 2 3) (4 5 6) (7 8 9)))`  
 > ((1 2 3) ((4 5 6) (7 8 9)) (((1 2 3) (4 5 6) (7 8 9))))
+
+> `>>> (cargarr)`  
+> `R: 55_`  
+> R * 2: 110  
+> nil
 
 > `>>> (cargarR)`  
 > `R: 99_`  
