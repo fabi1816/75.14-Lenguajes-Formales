@@ -20,8 +20,7 @@ Para iniciar el interprete de TLC-LISP:
 Cargar el archivo con los ejemplos:
 
 > `>>> (load "src/programas/ejemplo.lsp")`  
-> ~~compa~~  
-> true
+> compa
 
 Ejecutar el código de ejemplo:
 

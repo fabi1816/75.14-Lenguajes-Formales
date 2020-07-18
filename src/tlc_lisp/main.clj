@@ -140,30 +140,30 @@
                ret))))
   ([amb-global _amb-local in old-res]
    (try
-     (leer-y-evaluar in amb-global)
+     (leer-y-evaluar in amb-global old-res)
      (catch Exception _
        (imprimir (first old-res))
        amb-global))))
-
-
-(defn leer-y-evaluar
-  "Lee y evalua el `input`, controla el EOF"
-  [input amb-global]
-  (let [lectura (read input false :end)
-        res (evaluar lectura amb-global nil)]
-    (cond
-      (= lectura :end) (list true amb-global)    ; Llegó al final del archivo
-      :else (cargar-arch (second res) nil input res)))) ; Sigue leyendo
 
 
 (defn iniciar-carga-input
   "Carga y evalua el primer comando desde el input"
   [input amb-global]
   (try
-    (leer-y-evaluar input amb-global)
+    (leer-y-evaluar input amb-global nil)
     (catch Exception _
       (imprimir nil)
       amb-global)))
+
+
+(defn leer-y-evaluar
+  "Lee y evalua el `input`, controla el EOF"
+  [input amb-global prev-result]
+  (let [lectura (read input false :end)
+        res (evaluar lectura amb-global nil)]
+    (cond
+      (= lectura :end) (list (first prev-result) amb-global)    ; Llegó al final del archivo
+      :else (cargar-arch (second res) nil input res)))) ; Sigue leyendo
 
 
 ; Evalua una expresion usando los ambientes global y local.

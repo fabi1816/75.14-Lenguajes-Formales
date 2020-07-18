@@ -25,6 +25,6 @@
 
 (deftest test-cargar-arch
   (testing "Vamos a cargar el archivo de ejemplo"
-    (is (= (list true amb-esperado)
+    (is (= (list 'compa amb-esperado)
            (evaluar '(load "src/programas/ejemplo.lsp")
                     amb-entrada nil)))))
