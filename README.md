@@ -30,7 +30,7 @@ Se puede ejecutar el interprete de TLC-Lisp como si fuese una aplicación normal
 
 > `lein run`
 
-### Ejemplos de código TLC-Lisp falso
+### Ejemplos de código TLC-Lisp emulado
 
 Cargar el archivo con los ejemplos:
 
@@ -86,7 +86,7 @@ Ejecutar el código de ejemplo:
 > tlc-lisp.main=>  
 > _;; Sale del interprete de TLC-Lisp_
 
-### Sistema productivo de resolución falso
+### Sistema productivo de resolución emulado
 
 Cargar las 'Jarras' y el algoritmo de resolución de TLC-Lisp:
 
