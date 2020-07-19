@@ -750,10 +750,7 @@
 
 (defn fun-null
   "Retorna t si un elemento es nil en TLC-Lisp"
-  [lae] 
-  (cond
-    (igual? (first lae) nil) 't 
-    :else nil))
+  [lae] (if (igual? (first lae) nil) 't nil))
 
 
 (defn fun-list
