@@ -148,7 +148,8 @@
     (is (= '((*error* cannot-set nil) (A B)) (evaluar '(setq nil XXX) '(A B) '(C D))))
     (is (= '((*error* cannot-set nil) (A B)) (evaluar '(setq () XXX) '(A B) '(C D))))
     (is (= '((*error* symbol expected 1) (A B)) (evaluar '(setq 1 XXX) '(A B) '(C D))))
-    (is (= '((*error* symbol expected "TEXTO") (A B)) (evaluar '(setq "TEXTO" XXX) '(A B) '(C D)))))
+    (is (= '((*error* symbol expected "TEXTO") (A B))
+           (evaluar '(setq "TEXTO" XXX) '(A B) '(C D)))))
   (testing "Evaluar el comando setq"
     (is (= '(1 (A 1)) (evaluar '(setq A 1) '(A B) '(C D))))
     (is (= '(1 (A B X 1)) (evaluar '(setq X 1) '(A B) '(C D))))
@@ -157,18 +158,24 @@
 (deftest test-evaluar-comando-de
   (testing "Error al evaluar el comando 'de'"
     (is (= '((*error* list expected nil) (A B)) (evaluar '(de) '(A B) nil)))
-    (is (= '((*error* list expected nil) (A B)) (evaluar '(de fun-nombre) '(A B) nil)))
-    (is (= '((*error* list expected "XX") (A B)) (evaluar '(de fun-nombre "XX") '(A B) nil)))
-    (is (= '((*error* list expected XX) (A B)) (evaluar '(de fun-nombre XX) '(A B) nil)))
+    (is (= '((*error* list expected nil) (A B)) 
+           (evaluar '(de fun-nombre) '(A B) nil)))
+    (is (= '((*error* list expected "XX") (A B)) 
+           (evaluar '(de fun-nombre "XX") '(A B) nil)))
+    (is (= '((*error* list expected XX) (A B)) 
+           (evaluar '(de fun-nombre XX) '(A B) nil)))
     (is (= '((*error* cannot-set nil) (A B)) (evaluar '(de nil ()) '(A B) nil)))
     (is (= '((*error* cannot-set nil) (A B)) (evaluar '(de () ()) '(A B) nil)))
     (is (= '((*error* symbol expected 1) (A B)) (evaluar '(de 1 ()) '(A B) nil)))
-    (is (= '((*error* symbol expected "XX") (A B)) (evaluar '(de "XX" ()) '(A B) nil))))
+    (is (= '((*error* symbol expected "XX") (A B))
+           (evaluar '(de "XX" ()) '(A B) nil))))
   (testing "Evalua el comando 'de' y define una función"
     (is (= '(f (f (lambda () (1)))) (evaluar '(de f () (1)) '() nil)))
     (is (= '(f (A B f (lambda () (1)))) (evaluar '(de f () (1)) '(A B) nil)))
-    (is (= '(suma (suma (lambda (a b) (+ a b)))) (evaluar '(de suma (a b) (+ a b)) '() nil)))
-    (is (= '(suma (A B suma (lambda (a b) (+ a b)))) (evaluar '(de suma (a b) (+ a b)) '(A B) nil)))))
+    (is (= '(suma (suma (lambda (a b) (+ a b))))
+           (evaluar '(de suma (a b) (+ a b)) '() nil)))
+    (is (= '(suma (A B suma (lambda (a b) (+ a b))))
+           (evaluar '(de suma (a b) (+ a b)) '(A B) nil)))))
 
 (deftest test-evaluar-comando-quote
   (testing "Quote vacio"
@@ -190,7 +197,8 @@
   (testing "Lambda define función"
     (is (= '((lambda () (1)) ()) (evaluar '(lambda () (1)) '() nil)))
     (is (= '((lambda () (1)) (A B)) (evaluar '(lambda () (1)) '(A B) nil)))
-    (is (= '((lambda (x) (* 2 x)) (A B)) (evaluar '(lambda (x) (* 2 x)) '(A B) nil))))
+    (is (= '((lambda (x) (* 2 x)) (A B)) 
+           (evaluar '(lambda (x) (* 2 x)) '(A B) nil))))
   (testing "Aplicar una función lambda a unos parametros"
     (is (= '(3 (+ add lambda lambda))
            (evaluar '((lambda (a b) (+ a b)) 1 2) '(+ add lambda lambda) nil)))
@@ -208,18 +216,21 @@
   (testing "Cond simple en formato TLC-Lisp"
     (is (= '(1 (t t)) (evaluar '(cond (t 1)) '(t t) nil)))
     (is (= '(2 (t t nil nil)) (evaluar '(cond (nil 1) (t 2)) '(t t nil nil) nil)))
-    (is (= '(3 (t t nil nil)) (evaluar '(cond (nil 1) (nil 2) (t 3)) '(t t nil nil) nil))))
+    (is (= '(3 (t t nil nil)) 
+           (evaluar '(cond (nil 1) (nil 2) (t 3)) '(t t nil nil) nil))))
   (testing "Cond un poco mas complejo en formato TLC-Lisp"
     (is (= '(A (t t nil nil equal equal))
            (evaluar '(cond ((equal 1 1) 'A)) '(t t nil nil equal equal) nil)))
     (is (= '(B (t t nil nil equal equal))
-           (evaluar '(cond ((equal 1 2) 'A) ((equal 1 1) 'B)) '(t t nil nil equal equal) nil)))
+           (evaluar '(cond ((equal 1 2) 'A) ((equal 1 1) 'B)) 
+                    '(t t nil nil equal equal) nil)))
     (is (= '(C (t t nil nil equal equal))
            (evaluar '(cond ((equal 1 2) 'A) ((equal 1 2) 'B) (t 'C))
                     '(t t nil nil equal equal) nil))))
   (testing "Cond real completo"
     (is (= '(2 (t t nil nil equal equal + add))
-           (evaluar '(cond ((equal 1 1) (+ 1 1))) '(t t nil nil equal equal + add) nil)))
+           (evaluar '(cond ((equal 1 1) (+ 1 1))) 
+                    '(t t nil nil equal equal + add) nil)))
     (is (= '(4 (t t nil nil equal equal + add))
            (evaluar '(cond ((equal 1 2) (+ 1 1)) ((equal 2 2) (+ 2 2)))
                     '(t t nil nil equal equal + add) nil)))
@@ -248,18 +259,22 @@
     (is (= '(3 (+ add)) (evaluar-secuencia-en-cond '((+ 1 2)) '(+ add) nil))))
   (testing "La lista tiene varias evaluaciones"
     (is (= '(9 (+ add)) (evaluar-secuencia-en-cond '((+ 1 2) 9) '(+ add) nil)))
-    (is (= '(6 (+ add)) (evaluar-secuencia-en-cond '((+ 1 2) 9 (+ 3 3)) '(+ add) nil)))
-    (is (= '(A (+ add)) (evaluar-secuencia-en-cond '((+ 1 2) 9 (+ 3 3) 'A) '(+ add) nil)))))
+    (is (= '(6 (+ add)) (evaluar-secuencia-en-cond '((+ 1 2) 9 (+ 3 3)) 
+                                                   '(+ add) nil)))
+    (is (= '(A (+ add)) (evaluar-secuencia-en-cond '((+ 1 2) 9 (+ 3 3) 'A) 
+                                                   '(+ add) nil)))))
 
 (deftest test-aplicar
   (testing "Maneja errores en las funciones por aplicar"
     (is (= '((*error*) ()) (aplicar '(*error*) '() '() nil)))
     (is (= '((*error*) (A B)) (aplicar '(*error*) '() '(A B) nil)))
-    (is (= '((*error* descrip) (A B)) (aplicar '(*error* descrip) '() '(A B) nil))))
+    (is (= '((*error* descrip) (A B)) 
+           (aplicar '(*error* descrip) '() '(A B) nil))))
   (testing "Maneja errores en los argumentos por aplicar"
     (is (= '((*error*) ()) (aplicar '() '((*error*)) '() nil)))
     (is (= '((*error*) (A B)) (aplicar '() '((*error*)) '(A B) nil)))
-    (is (= '((*error* descrip) (A B)) (aplicar '() '((*error* descrip)) '(A B) nil))))
+    (is (= '((*error* descrip) (A B)) 
+           (aplicar '() '((*error* descrip)) '(A B) nil))))
   (testing "Manejo de la función 'env'"
     (is (= '(() ()) (aplicar 'env '() '() nil)))
     (is (= '((A B) (A B)) (aplicar 'env '() '(A B) nil)))
@@ -291,16 +306,19 @@
     (is (= '((*error* unbound-symbol X) ()) (aplicar 'X '() '() nil)))
     (is (= '((*error* unbound-symbol X) (A 1)) (aplicar 'X '() '(A 1) '(B 1))))
     (is (= '((*error* non-applicable-type t) (A t)) (aplicar 'A '() '(A t) nil)))
-    (is (= '((*error* non-applicable-type nil) (A nil)) (aplicar 'A '() '(A nil) nil)))
+    (is (= '((*error* non-applicable-type nil) (A nil)) 
+           (aplicar 'A '() '(A nil) nil)))
     (is (= '((*error* non-applicable-type 1) (A 1)) (aplicar 'A '() '(A 1) nil)))
     (is (= '((*error* non-applicable-type 2) (A 1)) (aplicar 'B '() '(A 1) '(B 2))))
     (is (= '((*error* non-applicable-type 1) ()) (aplicar 1 '() '() nil)))
     (is (= '((*error* non-applicable-type t) ()) (aplicar 't '() '() nil)))
     (is (= '((*error* non-applicable-type nil) ()) (aplicar nil '() '() nil)))
-    (is (= '((*error* random-error) ()) (aplicar '(*error* random-error) '() '() nil))))
+    (is (= '((*error* random-error) ()) 
+           (aplicar '(*error* random-error) '() '() nil))))
   (testing "Aplicar funciones definidas por el usuario"
     (is (= '(3 (sumar add)) (aplicar 'sumar '(1 2) '(sumar add) nil)))
-    (is (= '(5 (pepe add sumar pepe)) (aplicar 'sumar '(2 3) '(pepe add sumar pepe) nil))))
+    (is (= '(5 (pepe add sumar pepe)) 
+           (aplicar 'sumar '(2 3) '(pepe add sumar pepe) nil))))
   (testing "Errores al aplicar lambdas"
     (is (= '((*error* too-few-args) (+ add))
            (aplicar '(lambda (x) (+ x x)) '() '(+ add) nil)))
@@ -308,7 +326,8 @@
            (aplicar '(lambda (x) (+ x x)) '(1 2) '(+ add) nil))))
   (testing "Aplicar lambdas"
     (is (= '(6 (+ add)) (aplicar '(lambda (x) (+ x x)) '(3) '(+ add) nil)))
-    (is (= '(9 (+ add)) (aplicar '(lambda (x) (+ x x) (+ x x x)) '(3) '(+ add) nil)))))
+    (is (= '(9 (+ add)) (aplicar '(lambda (x) (+ x x) (+ x x x)) 
+                                 '(3) '(+ add) nil)))))
 
 
 ; Las nuevas funciones y macros que nosotros tenemos que agregar
@@ -325,8 +344,10 @@
     (is (= '(t (equal equal)) (evaluar '(equal "A" "A") '(equal equal) nil)))
     (is (= '(t (equal equal)) (evaluar '(equal "a" "A") '(equal equal) nil))))
   (testing "Errores"
-    (is (= '((*error* too-few-args) (equal equal)) (evaluar '(equal 1) '(equal equal) nil)))
-    (is (= '((*error* too-many-args) (equal equal)) (evaluar '(equal 1 1 1) '(equal equal) nil)))))
+    (is (= '((*error* too-few-args) (equal equal)) 
+           (evaluar '(equal 1) '(equal equal) nil)))
+    (is (= '((*error* too-many-args) (equal equal)) 
+           (evaluar '(equal 1 1 1) '(equal equal) nil)))))
 
 (deftest test-evaluar-length
   (testing "Longitud de listas"
@@ -343,8 +364,10 @@
     (is (= '(3 (sub sub)) (evaluar '(sub 4 1) '(sub sub) nil)))
     (is (= '(-2 (sub sub)) (evaluar '(sub 3 5) '(sub sub) nil))))
   (testing "Errores"
-    (is (= '((*error* too-few-args) (sub sub)) (evaluar '(sub 1) '(sub sub) nil)))
-    (is (= '((*error* too-many-args) (sub sub)) (evaluar '(sub 1 1 1) '(sub sub) nil)))))
+    (is (= '((*error* too-few-args) (sub sub)) 
+           (evaluar '(sub 1) '(sub sub) nil)))
+    (is (= '((*error* too-many-args) (sub sub)) 
+           (evaluar '(sub 1 1 1) '(sub sub) nil)))))
 
 (deftest test-suma-resta
   (testing "Suma y resta"
@@ -388,13 +411,20 @@
 
 (deftest test-evaluar-reverse
   (testing "Reverse una lista"
-    (is (= '(() (reverse reverse)) (evaluar '(reverse '()) '(reverse reverse) nil)))
-    (is (= '((1) (reverse reverse)) (evaluar '(reverse '(1)) '(reverse reverse) nil)))
-    (is (= '((A) (reverse reverse)) (evaluar '(reverse '(A)) '(reverse reverse) nil)))
-    (is (= '((2 1) (reverse reverse)) (evaluar '(reverse '(1 2)) '(reverse reverse) nil)))
-    (is (= '((3 2 1) (reverse reverse)) (evaluar '(reverse '(1 2 3)) '(reverse reverse) nil)))
-    (is (= '((3 (2) 1) (reverse reverse)) (evaluar '(reverse '(1 (2) 3)) '(reverse reverse) nil)))
-    (is (= '((3 (2 4) 1) (reverse reverse)) (evaluar '(reverse '(1 (2 4) 3)) '(reverse reverse) nil)))))
+    (is (= '(() (reverse reverse)) 
+           (evaluar '(reverse '()) '(reverse reverse) nil)))
+    (is (= '((1) (reverse reverse)) 
+           (evaluar '(reverse '(1)) '(reverse reverse) nil)))
+    (is (= '((A) (reverse reverse)) 
+           (evaluar '(reverse '(A)) '(reverse reverse) nil)))
+    (is (= '((2 1) (reverse reverse)) 
+           (evaluar '(reverse '(1 2)) '(reverse reverse) nil)))
+    (is (= '((3 2 1) (reverse reverse)) 
+           (evaluar '(reverse '(1 2 3)) '(reverse reverse) nil)))
+    (is (= '((3 (2) 1) (reverse reverse)) 
+           (evaluar '(reverse '(1 (2) 3)) '(reverse reverse) nil)))
+    (is (= '((3 (2 4) 1) (reverse reverse)) 
+           (evaluar '(reverse '(1 (2 4) 3)) '(reverse reverse) nil)))))
 
 (deftest test-evaluar-cons
   (testing "Cons una lista"
@@ -408,8 +438,8 @@
     (is (= '(t (null null)) (evaluar '(null nil) '(null null) nil)))
     (is (= '(t (null null)) (evaluar '(null ()) '(null null) nil)))
     (is (= '(t (null null)) (evaluar '(null '()) '(null null) nil)))
-    (is (= '(t (null null list list)) (evaluar '(null (list)) '(null null list list) nil)))
-    )
+    (is (= '(t (null null list list))
+           (evaluar '(null (list)) '(null null list list) nil))))
   (testing "No es nil"
     (is (= '(nil (null null)) (evaluar '(null 1) '(null null) nil)))
     (is (= '(nil (null null)) (evaluar '(null 'A) '(null null) nil)))))
@@ -446,10 +476,14 @@
     (is (= '((*error* too-many-args) (append append))
            (evaluar '(append '(A) '(B) '(C)) '(append append) nil))))
   (testing "Appendear las listas"
-    (is (= '(() (append append)) (evaluar '(append '() '()) '(append append) nil)))
-    (is (= '((1 2) (append append)) (evaluar '(append '(1) '(2)) '(append append) nil)))
-    (is (= '((1 2) (append append)) (evaluar '(append '() '(1 2)) '(append append) nil)))
-    (is (= '((1 2) (append append)) (evaluar '(append '(1 2) '()) '(append append) nil)))
+    (is (= '(() (append append))
+           (evaluar '(append '() '()) '(append append) nil)))
+    (is (= '((1 2) (append append))
+           (evaluar '(append '(1) '(2)) '(append append) nil)))
+    (is (= '((1 2) (append append)) 
+           (evaluar '(append '() '(1 2)) '(append append) nil)))
+    (is (= '((1 2) (append append)) 
+           (evaluar '(append '(1 2) '()) '(append append) nil)))
     (is (= '((1 1 2 2) (append append))
            (evaluar '(append '(1 1) '(2 2)) '(append append) nil)))))
 
@@ -462,17 +496,22 @@
   (testing "Devuelve el mismo elemento que imprime"
     (is (= '(1 (prin3 prin3)) (evaluar '(prin3 1) '(prin3 prin3) nil)))
     (is (= '(A (prin3 prin3)) (evaluar '(prin3 'A) '(prin3 prin3) nil)))
-    (is (= '((1 2 3) (prin3 prin3)) (evaluar '(prin3 '(1 2 3)) '(prin3 prin3) nil)))))
+    (is (= '((1 2 3) (prin3 prin3))
+           (evaluar '(prin3 '(1 2 3)) '(prin3 prin3) nil)))))
 
 (deftest test-evaluar-if
   (testing "Simple 'if'"
-    (is (= '(1 (if if t t nil nil)) (evaluar '(if t 1 2) '(if if t t nil nil) nil)))
-    (is (= '(2 (if if t t nil nil)) (evaluar '(if nil 1 2) '(if if t t nil nil) nil))))
+    (is (= '(1 (if if t t nil nil)) 
+           (evaluar '(if t 1 2) '(if if t t nil nil) nil)))
+    (is (= '(2 (if if t t nil nil)) 
+           (evaluar '(if nil 1 2) '(if if t t nil nil) nil))))
   (testing "Se tiene que evaluar la condición"
     (is (= '(1 (if if t t nil nil equal equal))
-           (evaluar '(if (equal 'A 'A) 1 2) '(if if t t nil nil equal equal) nil)))
+           (evaluar '(if (equal 'A 'A) 1 2) 
+                    '(if if t t nil nil equal equal) nil)))
     (is (= '(2 (if if t t nil nil equal equal))
-           (evaluar '(if (equal 'A 'B) 1 2) '(if if t t nil nil equal equal) nil))))
+           (evaluar '(if (equal 'A 'B) 1 2)
+                    '(if if t t nil nil equal equal) nil))))
   (testing "Se tiene que evaluar las ramas"
     (is (= '(3 (if if t t nil nil equal equal + add))
            (evaluar '(if (equal 'A 'A) (+ 1 2) (+ 2 3))
@@ -481,50 +520,59 @@
            (evaluar '(if (equal 'A 'B) (+ 1 2) (+ 2 3))
                     '(if if t t nil nil equal equal + add) nil))))
   (testing "Solo se aceptan, exactamente, 3 argumentos"
-    (is (= '((*error* too-few-args) (if if t t)) (evaluar '(if) '(if if t t) nil)))
-    (is (= '((*error* too-few-args) (if if t t)) (evaluar '(if t) '(if if t t) nil)))
-    (is (= '((*error* too-few-args) (if if t t)) (evaluar '(if t 1) '(if if t t) nil)))
-    (is (= '((*error* too-many-args) (if if t t)) (evaluar '(if t 1 2 3) '(if if t t) nil)))))
+    (is (= '((*error* too-few-args) (if if t t))
+           (evaluar '(if) '(if if t t) nil)))
+    (is (= '((*error* too-few-args) (if if t t))
+           (evaluar '(if t) '(if if t t) nil)))
+    (is (= '((*error* too-few-args) (if if t t))
+           (evaluar '(if t 1) '(if if t t) nil)))
+    (is (= '((*error* too-many-args) (if if t t))
+           (evaluar '(if t 1 2 3) '(if if t t) nil)))))
 
 (deftest test-evaluar-or
   (testing "Simple 'or'"
     (is (= '(t (or or t t nil nil)) (evaluar '(or t t) '(or or t t nil nil) nil)))
     (is (= '(t (or or t t nil nil)) (evaluar '(or t nil) '(or or t t nil nil) nil)))
     (is (= '(t (or or t t nil nil)) (evaluar '(or nil t) '(or or t t nil nil) nil)))
-    (is (= '(nil (or or t t nil nil)) (evaluar '(or nil nil) '(or or t t nil nil) nil))))
+    (is (= '(nil (or or t t nil nil))
+           (evaluar '(or nil nil) '(or or t t nil nil) nil))))
   (testing "Evaluar un 'or' mas complejo"
-    (is (= '(t (or or t t nil nil equal equal)) 
+    (is (= '(t (or or t t nil nil equal equal))
            (evaluar '(or (equal 1 1) t) '(or or t t nil nil equal equal) nil)))
-    (is (= '(t (or or t t nil nil equal equal)) 
+    (is (= '(t (or or t t nil nil equal equal))
            (evaluar '(or (equal 1 2) t) '(or or t t nil nil equal equal) nil)))
-    (is (= '(t (or or t t nil nil equal equal)) 
+    (is (= '(t (or or t t nil nil equal equal))
            (evaluar '(or (equal 1 1) nil) '(or or t t nil nil equal equal) nil)))
-    (is (= '(nil (or or t t nil nil equal equal)) 
+    (is (= '(nil (or or t t nil nil equal equal))
            (evaluar '(or (equal 1 2) nil) '(or or t t nil nil equal equal) nil)))
     (is (= '(t (or or t t nil nil equal equal))
            (evaluar '(or t (equal 1 1)) '(or or t t nil nil equal equal) nil)))
-    (is (= '(t (or or t t nil nil equal equal)) 
+    (is (= '(t (or or t t nil nil equal equal))
            (evaluar '(or t (equal 1 2)) '(or or t t nil nil equal equal) nil)))
     (is (= '(t (or or t t nil nil equal equal))
            (evaluar '(or nil (equal 1 1)) '(or or t t nil nil equal equal) nil)))
-    (is (= '(nil (or or t t nil nil equal equal)) 
+    (is (= '(nil (or or t t nil nil equal equal))
            (evaluar '(or nil (equal 1 2)) '(or or t t nil nil equal equal) nil))))
-   (testing "Evaluar un 'or' real"
-     (is (= '(t (or or t t nil nil equal equal))
-            (evaluar '(or (equal 1 1) (equal 1 1)) '(or or t t nil nil equal equal) nil)))
-     (is (= '(t (or or t t nil nil equal equal))
-            (evaluar '(or (equal 1 1) (equal 1 2)) '(or or t t nil nil equal equal) nil)))
-     (is (= '(t (or or t t nil nil equal equal))
-            (evaluar '(or (equal 1 2) (equal 1 1)) '(or or t t nil nil equal equal) nil)))
-     (is (= '(nil (or or t t nil nil equal equal))
-            (evaluar '(or (equal 1 2) (equal 1 2)) '(or or t t nil nil equal equal) nil))))
-   (testing "Un 'or' recibe, exactamente 2 (dos) expresiones"
-     (is (= '((*error* too-few-args) (or or t t nil nil))
-            (evaluar '(or) '(or or t t nil nil) nil)))
-     (is (= '((*error* too-few-args) (or or t t nil nil))
-            (evaluar '(or t) '(or or t t nil nil) nil)))
-     (is (= '((*error* too-many-args) (or or t t nil nil))
-            (evaluar '(or t t t) '(or or t t nil nil) nil)))))
+  (testing "Evaluar un 'or' real"
+    (is (= '(t (or or t t nil nil equal equal))
+           (evaluar '(or (equal 1 1) (equal 1 1))
+                    '(or or t t nil nil equal equal) nil)))
+    (is (= '(t (or or t t nil nil equal equal))
+           (evaluar '(or (equal 1 1) (equal 1 2))
+                    '(or or t t nil nil equal equal) nil)))
+    (is (= '(t (or or t t nil nil equal equal))
+           (evaluar '(or (equal 1 2) (equal 1 1))
+                    '(or or t t nil nil equal equal) nil)))
+    (is (= '(nil (or or t t nil nil equal equal))
+           (evaluar '(or (equal 1 2) (equal 1 2))
+                    '(or or t t nil nil equal equal) nil))))
+  (testing "Un 'or' recibe, exactamente 2 (dos) expresiones"
+    (is (= '((*error* too-few-args) (or or t t nil nil))
+           (evaluar '(or) '(or or t t nil nil) nil)))
+    (is (= '((*error* too-few-args) (or or t t nil nil))
+           (evaluar '(or t) '(or or t t nil nil) nil)))
+    (is (= '((*error* too-many-args) (or or t t nil nil))
+           (evaluar '(or t t t) '(or or t t nil nil) nil)))))
 
 ;; Las pruebas que estan en el enunciado del TP
 
@@ -533,7 +581,8 @@
   (is (= '(doble (+ add doble (lambda (x) (+ x x))))
          (evaluar '(de doble (x) (+ x x)) '(+ add) nil)))
   (is (= '(5 (+ add)) (evaluar '(+ 2 3) '(+ add) nil)))
-  (is (= '((*error* unbound-symbol +) (add add)) (evaluar '(+ 2 3) '(add add) nil)))
+  (is (= '((*error* unbound-symbol +) (add add))
+         (evaluar '(+ 2 3) '(add add) nil)))
   (is (= '(6 (+ add doble (lambda (x) (+ x x))))
          (evaluar '(doble 3) '(+ add doble (lambda (x) (+ x x))) nil)))
   (is (= '(8 (+ add r 4 doble (lambda (x) (+ x x))))
@@ -547,7 +596,8 @@
   (is (= '(8 (+ add r 4 doble (lambda (x) (+ x x))))
          (evaluar '(doble r) '(+ add r 4 doble (lambda (x) (+ x x))) nil)))
   (is (= '(8 (+ add r 4 doble (lambda (x) (+ x x))))
-         (aplicar '(lambda (x) (+ x x)) '(4) '(+ add r 4 doble (lambda (x) (+ x x))) nil))))
+         (aplicar '(lambda (x) (+ x x)) '(4)
+                  '(+ add r 4 doble (lambda (x) (+ x x))) nil))))
 
 (deftest test-TP-controlar-aridad
   (is (= '(*error* too-few-args) (controlar-aridad '(a b c) 4)))
@@ -578,16 +628,19 @@
 
 (deftest test-TP-revisar-lae
   (is (nil? (revisar-lae '(1 add first))))
-  (is (= '(*error* too-many-args) (revisar-lae '(1 add (*error* too-many-args) first)))))
+  (is (= '(*error* too-many-args)
+         (revisar-lae '(1 add (*error* too-many-args) first)))))
 
 (deftest test-TP-buscar
   (is (= 'sub (buscar '- '(+ add - sub))))
   (is (= '(*error* unbound-symbol doble) (buscar 'doble '(+ add - sub)))))
 
 (deftest test-TP-evaluar-cond
-  (is (= '(nil (equal equal setq setq)) (evaluar-cond nil '(equal equal setq setq) nil)))
+  (is (= '(nil (equal equal setq setq))
+         (evaluar-cond nil '(equal equal setq setq) nil)))
   (is (= '(nil (equal equal first first)) 
-         (evaluar-cond '(((equal 'a 'b) (setq x 1))) '(equal equal first first) nil)))
+         (evaluar-cond '(((equal 'a 'b) (setq x 1)))
+                       '(equal equal first first) nil)))
   (is (= '(2 (equal equal setq setq y 2))
          (evaluar-cond '(((equal 'a 'b) (setq x 1)) ((equal 'a 'a) (setq y 2)))
                        '(equal equal setq setq) nil)))
@@ -596,13 +649,7 @@
                        '(equal equal setq setq) nil))))
 
 (deftest test-TP-evaluar-secuencia-en-cond
-  (is (= '(2 (setq setq y 2)) (evaluar-secuencia-en-cond '((setq y 2)) '(setq setq) nil)))
+  (is (= '(2 (setq setq y 2))
+         (evaluar-secuencia-en-cond '((setq y 2)) '(setq setq) nil)))
   (is (= '(3 (setq setq y 2 z 3))
          (evaluar-secuencia-en-cond '((setq y 2) (setq z 3)) '(setq setq) nil))))
-
-
-
-
-
-
-
