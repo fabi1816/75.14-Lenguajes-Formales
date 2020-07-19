@@ -81,15 +81,12 @@ Cargar las 'Jarras' y el algoritmo de resolución de TLC-Lisp:
 Ejecutar resolución del problema de las jarras:
 
 > `>>> (breadth-first bc)`  
-> ~~`Ingrese el estado inicial: (0 0)_`~~  
-> ~~`Ingrese el estado final:   (4 0)_`~~  
-> ~~Exito!~~  
-> ~~Prof ....... 11~~  
-> ~~Solucion ... ((0 0) (5 0) (0 5) (5 5) (2 8) (2 0) (0 2) (5 2) (0 7) (5 7) (4 8) (4 0))~~  
-> ~~t~~  
-> `(0 0)_`  
-> `(4 0)_`  
-> nil
+> `Ingrese el estado inicial: (0 0)_`  
+> `Ingrese el estado final:   (4 0)_`  
+> Exito!  
+> Prof ....... 11  
+> Solucion ... ((0 0) (5 0) (0 5) (5 5) (2 8) (2 0) (0 2) (5 2) (0 7) (5 7) (4 8) (4 0))  
+> t 
 
 _Obs:_ Estado inicial y final se refiere al par de jarras utilizadas en el algoritmo 
 
