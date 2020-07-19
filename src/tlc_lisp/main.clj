@@ -102,11 +102,11 @@
   ([amb]
    (print ">>> ") (flush)
    (try
-     (let [res (evaluar (read) amb nil)]    ; Bindea `res` al resultado de `evaluar`
-       (if (nil? (second res))              ; Chequea si el ambiente del resultado es `nil`
+     (let [res (evaluar (read) amb nil)]  ; Bindea `res` al resultado de `evaluar`
+       (if (nil? (second res))            ; Chequea si el ambiente del resultado es `nil`
          true
-         (do (imprimir (first res))         ; Imprime el resultado de `evaluar`
-             (repl (second res)))))         ; Se llama a si mismo con el nuevo ambiente
+         (do (imprimir (first res))       ; Imprime el resultado de `evaluar`
+             (repl (second res)))))       ; Se llama a si mismo con el nuevo ambiente
      (catch Exception e
        (println) (print "*error* ")
        (println (get (Throwable->map e) :cause))
@@ -135,7 +135,7 @@
                            (binding [*read-eval* false]
                              (iniciar-carga-input in amb-global)))
                          (catch java.io.FileNotFoundException _
-                           (imprimir (list '*error* 'file-open-error 'file-not-found nom '1 'READ))
+                           (imprimir '(*error* file-open-error file-not-found nom 1 READ))
                            amb-global))]
                ret))))
   ([amb-global _amb-local in old-res]
@@ -162,8 +162,8 @@
   (let [lectura (read input false :end)
         res (evaluar lectura amb-global nil)]
     (cond
-      (= lectura :end) (list (first prev-result) amb-global)    ; Llegó al final del archivo
-      :else (cargar-arch (second res) nil input res)))) ; Sigue leyendo
+      (= lectura :end) (list (first prev-result) amb-global)  ; EOF!
+      :else (cargar-arch (second res) nil input res))))       ; Sigue leyendo
 
 
 ; Evalua una expresion usando los ambientes global y local.
@@ -236,8 +236,8 @@
    (aplicar (revisar-f f) (revisar-lae lae) f lae amb-global amb-local))
   ([resu1 resu2 f lae amb-global amb-local]
    (cond
-     (not (nil? resu1)) (list resu1 amb-global)    ; La función es un mensaje de error
-     (not (nil? resu2)) (list resu2 amb-global)    ; La lista de argumentos es un mensaje de error
+     (error? resu1) (list resu1 amb-global)
+     (error? resu2) (list resu2 amb-global)
      (not (seq? f)) (aplicar-fun-escalares f lae amb-global amb-local)
      :else (aplicar-fun-lambda f lae amb-global amb-local))))
 
@@ -316,13 +316,13 @@
 ; Si no, imprime su primer elemento en formato estandar, imprime un espacio y
 ;  se llama recursivamente con la cola del primer parametro y el segundo intacto.
 (defn imprimir
-  "Imprime, con un salto de linea al final, lo recibido devolviendo el mismo valor,
-   Muestra los errores."
+  "Imprime, con un salto de linea al final, lo recibido devolviendo 
+   el mismo valor, tambien muestra los errores."
   ([elem]
    (cond
      (= \space elem) elem    ; Si es \space no lo imprime pero si lo devuelve
-     (and (list? elem) (= '*error* (first elem))) (imprimir elem elem)
-     :else (do (println elem) (flush) elem)))    ; Es un no *error*
+     (error? elem) (imprimir elem elem)
+     :else (do (println elem) (flush) elem)))
   ([lis orig]
    (cond
      (nil? lis) (do (println) (flush) orig)
@@ -364,10 +364,7 @@
 ;  Si no, retorna nil.
 (defn revisar-f
   "Si la `lis` contiene un error lo devuelve, si no devuelve nil"
-  [lis]
-  (cond
-    (and (seq? lis) (= '*error* (first lis))) lis
-    :else nil))
+  [lis] (if (error? lis) lis nil))
 
 
 ; Revisa una lista de argumentos evaluados.
@@ -438,16 +435,12 @@
 
 (defn error?
   "Es una secuencia cuyo primer elemento es '*error*'?"
-  [elem]
-  (and (seq? elem)
-       (igual? (first elem) '*error*)))
+  [elem] (and (seq? elem) (igual? (first elem) '*error*)))
 
 
 (defn nombre-archivo-valido?
   "Checkquea que el string sea un nombre de archivo .lsp valido"
-  [nombre]
-  (and (> (count nombre) 4)
-       (ends-with? nombre ".lsp")))
+  [nombre] (and (> (count nombre) 4) (ends-with? nombre ".lsp")))
 
 
 (defn non-nil-empty-list?
@@ -494,26 +487,23 @@
 
 (defn setq-insuficientes?
   "Valida que el comando de setq tenga suficientes elementos"
-  [cmd]
-  (or (= (count cmd) 1) (< (count (next cmd)) 2)))
+  [cmd] (or (= (count cmd) 1) (< (count (next cmd)) 2)))
 
 
 (defn evaluar-setq-unico
   "Evalua una unica expresion del comando setq de TLC-Lisp"
   [expre amb-global amb-local]
   (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
-    (list
-     (first res)
-     (actualizar-amb amb-global (second expre) (first res)))))
+    (list (first res)
+          (actualizar-amb amb-global (second expre) (first res)))))
 
 
 (defn evaluar-setq-multiples
   "Evaluan todos los comandos de setq en la `expre`"
   [expre amb-global amb-local]
   (let [res (evaluar (first (nnext expre)) amb-global amb-local)]
-    (evaluar
-     (cons 'setq (drop 3 expre))
-     (actualizar-amb amb-global (second expre) (first res)) amb-local)))
+    (evaluar (cons 'setq (drop 3 expre))
+             (actualizar-amb amb-global (second expre) (first res)) amb-local)))
 
 
 (defn evaluar-setq
@@ -521,7 +511,7 @@
   [expre amb-global amb-local]
   (cond
     (setq-insuficientes? expre) (list (list '*error* 'list 'expected nil) amb-global)
-    (igual? (second expre) nil) (list (list '*error* 'cannot-set nil) amb-global)    ; Trata de re-definir el nil
+    (igual? (second expre) nil) (list (list '*error* 'cannot-set nil) amb-global)
     (not (symbol? (second expre))) (list (list '*error* 'symbol 'expected (second expre)) amb-global)
     (= (count (next expre)) 2) (evaluar-setq-unico expre amb-global amb-local)    ; Solo hay un comando setq
     :else (evaluar-setq-multiples expre amb-global amb-local)))    ; Multiples setq en la expresión
@@ -653,7 +643,7 @@
   [f lae amb-global amb-local]
   (aplicar (next-lambda f)
            lae
-           (second (aplicar-fun-lambda-simple f lae amb-global amb-local))    ; Nuevo ambiente global
+           (second (aplicar-fun-lambda-simple f lae amb-global amb-local))  ; Nuevo ambiente global
            amb-local))
 
 
@@ -692,9 +682,9 @@
   "Resta dos elementos"
   [lae]
   (let [ari (controlar-aridad lae 2)]
-    (if (error? ari)
-      ari
-      (- (first lae) (second lae)))))
+    (cond
+      (error? ari) ari
+      :else (- (first lae) (second lae)))))
 
 
 (defn fun-not
@@ -706,8 +696,7 @@
 
 
 (defn fun-less-than
-  "Devuelve 't si el primer numero es menor que el segundo,
-   nil si no."
+  "Devuelve 't si el primer numero es menor que el segundo, nil si no."
   [lae]
   (let [ari (controlar-aridad lae 2)]
     (cond
@@ -717,8 +706,7 @@
 
 
 (defn fun-greater-than
-  "Devuelve 't si el primer numero es mayor que el segundo,
-   nil si no."
+  "Devuelve 't si el primer numero es mayor que el segundo, nil si no."
   [lae]
   (let [ari (controlar-aridad lae 2)]
     (cond
@@ -728,8 +716,7 @@
 
 
 (defn fun-greater-or-equal-than
-  "Devuelve 't si el primer numero es mayor o igual que el segundo,
-   nil si no."
+  "Devuelve 't si el primer numero es mayor o igual que el segundo, nil si no."
   [lae]
   (let [ari (controlar-aridad lae 2)]
     (cond
@@ -821,8 +808,8 @@
 
 
 (defn tlc-true?
-  "Devuelve 'true' si el resultado de evaluar la expresión TLC-Lisp `expre`
-   es 't'"
+  "Devuelve 'true' si el resultado de evaluar la expresión 
+   de TLC-Lisp `expre` es 't'"
   [expre amb-global amb-local]
   (igual? (first (evaluar expre amb-global amb-local)) 't))
 
@@ -843,7 +830,7 @@
   [nom]
   (cond
     (nombre-archivo-valido? nom) nom
-    :else (str nom ".lsp")))    ; Agrega '.lsp' al final)
+    :else (str nom ".lsp")))    ; Agrega '.lsp' al final
 
 
 (defn evaluar-load
