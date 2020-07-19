@@ -406,7 +406,10 @@
 (deftest test-evaluar-null
   (testing "Es nil"
     (is (= '(t (null null)) (evaluar '(null nil) '(null null) nil)))
-    (is (= '(t (null null)) (evaluar '(null ()) '(null null) nil))))
+    (is (= '(t (null null)) (evaluar '(null ()) '(null null) nil)))
+    (is (= '(t (null null)) (evaluar '(null '()) '(null null) nil)))
+    (is (= '(t (null null list list)) (evaluar '(null (list)) '(null null list list) nil)))
+    )
   (testing "No es nil"
     (is (= '(nil (null null)) (evaluar '(null 1) '(null null) nil)))
     (is (= '(nil (null null)) (evaluar '(null 'A) '(null null) nil)))))
@@ -421,8 +424,8 @@
 
 (deftest test-evaluar-rest
   (testing "No hay nada para devolver"
-    (is (= '(() (rest rest)) (evaluar '(rest '()) '(rest rest) nil)))
-    (is (= '(() (rest rest)) (evaluar '(rest '(1)) '(rest rest) nil))))
+    (is (= '(nil (rest rest)) (evaluar '(rest '()) '(rest rest) nil)))
+    (is (= '(nil (rest rest)) (evaluar '(rest '(1)) '(rest rest) nil))))
   (testing "Devuelve algo"
     (is (= '((2) (rest rest)) (evaluar '(rest '(1 2)) '(rest rest) nil)))
     (is (= '((2 3) (rest rest)) (evaluar '(rest '(1 2 3)) '(rest rest) nil)))))

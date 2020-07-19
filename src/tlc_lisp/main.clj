@@ -760,7 +760,7 @@
 
 (defn fun-rest
   "Retorna una lista sin su 1ra. posición"
-  [lae] (rest (first lae)))
+  [lae] (next (first lae)))
 
 
 (defn fun-terpri
