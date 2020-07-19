@@ -37,8 +37,7 @@ Ejecutar el código de ejemplo:
 > -1
 
 > `>>> (c (list first rest list) '((1 2 3) (4 5 6) (7 8 9)))`  
-> ~~((1 2 3) ((4 5 6) (7 8 9)) (((1 2 3) (4 5 6) (7 8 9))))~~
-> *error* non-applicable-type nil
+> ((1 2 3) ((4 5 6) (7 8 9)) (((1 2 3) (4 5 6) (7 8 9))))
 
 > `>>> (cargarr)`  
 > `R: 55_`  
@@ -51,28 +50,12 @@ Ejecutar el código de ejemplo:
 > nil
 
 > `>>> (recorrer '(9))`  
-> ~~(9 0)~~  
-> (9 0)  
-> (nil 1)  
-> ...  
-> (nil 279)  
-> Execution error (StackOverflowError) at tlc-lisp.main/buscar  (main.clj:392)  
-> null  
-> _;; Sale del interprete de TLC-Lisp_
+> (9 0)
 
 > `>>> (recorrer '(9 8 7))`  
-> ~~(9 0)~~  
-> ~~(8 1)~~  
-> ~~(7 2)~~  
 > (9 0)  
 > (8 1)  
 > (7 2)  
-> (nil 3)  
-> ...  
-> (nil 279)  
-> Execution error (StackOverflowError) at tlc-lisp.main/buscar  (main.clj:392)  
-> null  
-> _;; Sale del interprete de TLC-Lisp_
 
 > `>>> m`  
 > (\*error* unbound-symbol m)
