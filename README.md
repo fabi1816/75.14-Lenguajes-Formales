@@ -15,6 +15,16 @@ Para iniciar el interprete de TLC-LISP:
 
 > `tlc-lisp.main=> (repl)`
 
+### Ejecutar directamente
+
+Se puede ejecutar el interprete de TLC-Lisp como si fuese una aplicación normal, para ello:
+
+- Abrir `Powershell`
+- Ir a la carpeta `C:\Users\Fabi\Documents\Lenguajes Formales 2020\TP-Final\`
+- Ejecutar la aplicación mediante
+
+> `lein run`
+
 ### Ejemplos de código TLC-Lisp falso
 
 Cargar el archivo con los ejemplos:
