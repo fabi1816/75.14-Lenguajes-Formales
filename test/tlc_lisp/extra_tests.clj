@@ -39,3 +39,31 @@
   (testing "First elemental"
     (is (= '(1 (first first list list))
            (evaluar '(first (list 1 2)) '(first first list list) nil)))))
+
+(deftest test-codigo-ejemplo
+  (testing "Simple"
+    (is (= 1 (first (evaluar 'x amb-cargado nil))))
+    (is (= 2 (first (evaluar 'y amb-cargado nil))))
+    (is (= '(*error* unbound-symbol m) (first (evaluar 'm amb-cargado nil)))))
+  (testing "Ejecución de funciones"
+    (is (= 2 (first (evaluar '(sumar x x) amb-cargado nil))))
+    (is (= 3 (first (evaluar '(sumar x y) amb-cargado nil))))
+    (is (= 3 (first (evaluar '(sumar y x) amb-cargado nil))))
+    (is (= 4 (first (evaluar '(sumar y y) amb-cargado nil))))
+    (is (= 0 (first (evaluar '(restar x x) amb-cargado nil))))
+    (is (= -1 (first (evaluar '(restar x y) amb-cargado nil))))
+    (is (= 1 (first (evaluar '(restar y x) amb-cargado nil))))
+    (is (= 0 (first (evaluar '(restar y y) amb-cargado nil))))
+    (is (= 5 (first (evaluar '(compa x x) amb-cargado nil))))
+    (is (= 5 (first (evaluar '(compa y y) amb-cargado nil))))
+    (is (= 5 (first (evaluar '(compa 9 9) amb-cargado nil)))))
+  (testing "Funciones complejas"
+    (is (= '((1 2))
+           (first (evaluar '(c (list first) '((1 2) (3 4))) amb-cargado nil))))
+    (is (= '(((3 4)))
+           (first (evaluar '(c (list rest) '((1 2) (3 4))) amb-cargado nil))))
+    (is (= '((1 2) ((3 4)) (((1 2) (3 4))))
+           (first (evaluar '(c (list first rest list) '((1 2) (3 4))) amb-cargado nil))))
+    (is (= '(9 0) (first (evaluar '(recorrer (list 9)) amb-cargado nil))))
+    (is (= '(8 1) (first (evaluar '(recorrer (list 9 8)) amb-cargado nil))))
+    (is (= '(7 2) (first (evaluar '(recorrer (list 9 8 7)) amb-cargado nil))))))
