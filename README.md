@@ -4,6 +4,11 @@
 
 Un interprete de la implementación de TLC-Lisp escrito en Clojure
 
+## Requerimientos
+
+- [Clojure](https://clojure.org)
+- [Leiningen](https://leiningen.org)
+
 ## Uso
 
 Para iniciar el interprete de TLC-LISP:
