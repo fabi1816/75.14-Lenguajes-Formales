@@ -91,7 +91,8 @@
   (testing "Existe el elemento"
     (is (= 'B (buscar 'A '(A B))))
     (is (= 'B (buscar 'A '(X Y A B))))
-    (is (= 'B (buscar 'A '(X Y A B V W)))))
+    (is (= 'B (buscar 'A '(X Y A B V W))))
+    (is (= 'B (buscar 'a '(X Y A B V W)))))
   (testing "No existe el elemento"
     (is (= '(*error* unbound-symbol A) (buscar 'A '())))
     (is (= '(*error* unbound-symbol A) (buscar 'A '(C D))))
