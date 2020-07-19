@@ -452,7 +452,7 @@
 
 (defn non-nil-empty-list?
   "Chequea que el parametro sea una lista vacia no-nil"
-  [l] (and (list? l) (empty? l)))
+  [l] (and (seq? l) (empty? l)))
 
 
 (defn tlc-nil->nil
@@ -749,8 +749,11 @@
 
 
 (defn fun-null
-  "Retorna t si un elemento es nil"
-  [lae] (if (nil? (first lae)) 't nil))
+  "Retorna t si un elemento es nil en TLC-Lisp"
+  [lae] 
+  (cond
+    (igual? (first lae) nil) 't 
+    :else nil))
 
 
 (defn fun-list
