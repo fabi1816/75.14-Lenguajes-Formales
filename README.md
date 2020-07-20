@@ -11,18 +11,18 @@ Un interprete de la implementación de TLC-Lisp escrito en Clojure
 
 ## Uso
 
-Para iniciar el interprete de TLC-LISP:
+Para iniciar el interprete de TLC-LISP emulado:
 
 - Abrir `Powershell`
 - Ir a la carpeta `C:\Users\Fabi\Documents\Lenguajes Formales 2020\TP-Final\`
 - Iniciar un REPL de Clojure con `lein repl`
-- Iniciar el interprete de TLC-Lisp con el comando:
+- Iniciar el interprete de TLC-Lisp emulado con el comando:
 
 > `tlc-lisp.main=> (repl)`
 
 ### Ejecutar directamente
 
-Se puede ejecutar el interprete de TLC-Lisp como si fuese una aplicación normal, para ello:
+Se puede ejecutar el interprete de TLC-Lisp emulado como si fuese una aplicación normal, para ello:
 
 - Abrir `Powershell`
 - Ir a la carpeta `C:\Users\Fabi\Documents\Lenguajes Formales 2020\TP-Final\`
@@ -84,9 +84,9 @@ Ejecutar el código de ejemplo:
 > `>>> (compa 1 2)`  
 > true  
 > tlc-lisp.main=>  
-> _;; Sale del interprete de TLC-Lisp_
+> _;; Sale del interprete de TLC-Lisp emulado_
 
-### Sistema productivo de resolución emulado
+### Sistema de producción en TLC-Lisp emulado
 
 Cargar las 'Jarras' y el algoritmo de resolución de TLC-Lisp:
 
@@ -168,9 +168,9 @@ Ejecutar el código de ejemplo:
 
 > `>>> (compa 1 2)`  
 > C:\\>  
-> _;; Sale del interprete de TLC-Lisp_
+> _;; Sale del interprete de TLC-Lisp real_
 
-### Sistema productivo de resolución TLC-Lisp real
+### Sistema de producción en TLC-Lisp real
 
 Cargar las 'Jarras' y el algoritmo de resolución de TLC-Lisp:
 
