@@ -77,6 +77,7 @@
 (declare aplicar-fun-lambda-multiple)
 (declare fun-definida-por-el-usuario)
 
+(declare fun-mul)
 
 ; REPL (read–eval–print loop).
 ; Aridad 0: Muestra mensaje de bienvenida y se llama recursivamente con
@@ -98,7 +99,7 @@
                eval eval exit exit first first ge ge gt gt if if lambda lambda
                length length list list load load lt lt nil nil not not null null
                or or prin3 prin3 quote quote read read rest rest reverse reverse
-               setq setq sub sub t t terpri terpri + add - sub)))
+               setq setq sub sub t t terpri terpri + add - sub mul mul)))
   ([amb]
    (print ">>> ") (flush)
    (try
@@ -265,6 +266,7 @@
     (igual? f 'rest) (list (fun-rest lae) amb-global)
     (igual? f 'reverse) (list (fun-reverse lae) amb-global)
     (igual? f 'sub) (list (fun-sub lae) amb-global)
+    (igual? f 'mul) (list (fun-mul lae) amb-global)
     (igual? f 'terpri) (list (fun-terpri lae) amb-global)
     :else (fun-definida-por-el-usuario f lae amb-global amb-local)))
 
@@ -595,6 +597,12 @@
     (try (reduce + lae)
          (catch Exception _ (list '*error* 'number-expected)))))
 
+(defn fun-mul
+  [lae]
+  (if (< (count lae) 2)
+    (list '*error* 'too-few-args)
+    (try (reduce * lae)
+         (catch Exception _ (list '*error* 'number-expected)))))
 
 (defn no-aplicable?
   "Chequea si `elem` es un número, 't' (true), nil o una lista vacia"
